@@ -1,26 +1,83 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-serif: "Cormorant Garamond", serif;
+  --font-sans: "DM Sans", sans-serif;
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-bg-muted: var(--bg-muted);
+  --color-fg-muted: var(--fg-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-border: var(--border);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --bg: #ffffff;
+  --fg: #0a0a0a;
+  --bg-muted: #f5f5f0;
+  --fg-muted: #6b7280;
+  --accent: #8b7355;
+  --accent-hover: #7a6349;
+  --border: #e5e5e0;
+  --overlay: rgba(255, 255, 255, 0.8);
+}
+
+.dark {
+  --bg: #0a0a0a;
+  --fg: #f5f5f0;
+  --bg-muted: #1a1a1a;
+  --fg-muted: #9ca3af;
+  --accent: #c4a882;
+  --accent-hover: #d4b892;
+  --border: #2a2a2a;
+  --overlay: rgba(10, 10, 10, 0.8);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background-color: var(--accent);
+  color: var(--bg);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--fg-muted);
+  border-radius: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.img-reveal {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.img-reveal.revealed {
+  clip-path: inset(0 0 0 0);
 }
