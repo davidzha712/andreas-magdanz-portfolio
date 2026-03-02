@@ -3,7 +3,7 @@ import { client } from "@/lib/sanity/client";
 import { allProjectsQuery } from "@/lib/sanity/queries";
 import type { Project } from "@/types/sanity";
 import WorkGrid from "@/components/work/WorkGrid";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import SanityImage from "@/components/shared/SanityImage";
 import type { Project } from "@/types/sanity";
 

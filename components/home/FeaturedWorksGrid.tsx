@@ -1,16 +1,17 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { gsap, ScrollTrigger } from "@/lib/gsap/gsapPlugins";
 import SanityImage from "@/components/shared/SanityImage";
 import type { Project } from "@/types/sanity";
 
 interface FeaturedWorksGridProps {
   projects: Project[];
+  title: string;
 }
 
-export default function FeaturedWorksGrid({ projects }: FeaturedWorksGridProps) {
+export default function FeaturedWorksGrid({ projects, title }: FeaturedWorksGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function FeaturedWorksGrid({ projects }: FeaturedWorksGridProps) 
   return (
     <section className="py-24 px-8 md:px-12 lg:px-16">
       <h2 className="font-serif text-4xl text-center text-fg mb-16 tracking-tight">
-        Selected Works
+        {title}
       </h2>
 
       <div

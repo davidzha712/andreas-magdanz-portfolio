@@ -7,7 +7,7 @@ import {
 import type { SiteSettings, Project } from "@/types/sanity";
 import HeroSection from "@/components/home/HeroSection";
 import FeaturedWorksGrid from "@/components/home/FeaturedWorksGrid";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 // Placeholder projects shown when Sanity is not connected
 const PLACEHOLDER_PROJECTS = [
@@ -51,7 +51,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     return (
       <>
         <HeroSection project={siteSettings.homeHeroProject as Project} />
-        <FeaturedWorksGrid projects={featuredProjects} />
+        <FeaturedWorksGrid projects={featuredProjects} title={t("selectedWorks")} />
       </>
     );
   }

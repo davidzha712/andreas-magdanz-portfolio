@@ -1,8 +1,9 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { useTransition } from "react";
+import type { Locale } from "@/i18n/config";
 
 export default function LanguageSwitcher() {
   const locale = useLocale();
@@ -10,22 +11,17 @@ export default function LanguageSwitcher() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  function switchLocale(newLocale: string) {
-    // Replace the locale prefix in the current path
-    const segments = pathname.split("/");
-    segments[1] = newLocale;
-    const newPath = segments.join("/");
+  const otherLocale: Locale = locale === "de" ? "en" : "de";
 
+  function switchLocale() {
     startTransition(() => {
-      router.replace(newPath);
+      router.replace(pathname, { locale: otherLocale });
     });
   }
 
-  const otherLocale = locale === "de" ? "en" : "de";
-
   return (
     <button
-      onClick={() => switchLocale(otherLocale)}
+      onClick={switchLocale}
       disabled={isPending}
       className="font-sans text-xs tracking-widest uppercase text-fg-muted hover:text-fg transition-colors duration-200 disabled:opacity-50"
       title={otherLocale === "en" ? "Switch to English" : "Auf Deutsch wechseln"}
