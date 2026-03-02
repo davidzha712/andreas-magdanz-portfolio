@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import StudioClient from "./StudioClient";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   referrer: "same-origin",
   robots: "noindex",

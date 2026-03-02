@@ -22,7 +22,6 @@ const CATEGORY_ORDER: CVEntry["category"][] = [
 
 export default function CVTimeline({ entries }: CVTimelineProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<SVGLineElement>(null);
   const t = useTranslations("cv");
 
   const CATEGORY_LABELS: Record<CVEntry["category"], string> = {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface VideoEmbedProps {
   title: string;
@@ -74,10 +75,11 @@ export default function VideoEmbed({
               aria-label={`Play: ${title}`}
             >
               {/* YouTube thumbnail */}
-              <img
+              <Image
                 src={`https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`}
                 alt=""
-                className="w-full h-full object-cover brightness-75 group-hover:brightness-[0.6] transition-all duration-500 group-hover:scale-[1.02]"
+                fill
+                className="object-cover brightness-75 group-hover:brightness-[0.6] transition-all duration-500 group-hover:scale-[1.02]"
               />
               {/* Play icon */}
               <div className="absolute inset-0 flex items-center justify-center">

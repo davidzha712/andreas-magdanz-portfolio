@@ -69,7 +69,7 @@ export function useStaggerReveal<T extends HTMLElement>(selector: string) {
     return () => {
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
-  }, []);
+  }, [selector]);
 
   return containerRef;
 }

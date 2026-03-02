@@ -13,6 +13,7 @@ export default defineConfig({
   title: "Andreas Magdanz Portfolio",
   projectId,
   dataset,
+  basePath: "/studio",
   plugins: [structureTool(), visionTool()],
   schema: { types: schemaTypes },
 });

@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { pdfjs } from "react-pdf";
 import HTMLFlipBook from "react-pageflip";
+import Image from "next/image";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -173,12 +174,14 @@ const BookPage = forwardRef<
   { src: string; number: number; isCover?: boolean }
 >(function BookPage({ src, number, isCover }, ref) {
   return (
-    <div ref={ref} className={`pdf-page${isCover ? " pdf-cover" : ""}`}>
-      <img
+    <div ref={ref} className={`pdf-page${isCover ? " pdf-cover" : ""} relative w-full h-full`}>
+      <Image
         src={src}
         alt={`Page ${number}`}
         draggable={false}
-        style={{ width: "100%", height: "100%", display: "block" }}
+        fill
+        unoptimized
+        className="block"
       />
     </div>
   );
@@ -209,7 +212,10 @@ export default function PdfBookViewer({
   /* ── Reduced motion ── */
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // Set initial value
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPrefersReducedMotion(mq.matches);
+
     const onChange = (e: MediaQueryListEvent) =>
       setPrefersReducedMotion(e.matches);
     mq.addEventListener("change", onChange);
