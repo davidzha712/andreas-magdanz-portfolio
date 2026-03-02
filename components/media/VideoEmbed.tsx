@@ -14,9 +14,13 @@ function getOldSiteVideoUrl(url: string): string | null {
   // URL pattern: index.php?id=6002&media=FILENAME.mp4
   const match = url.match(/media=([^&]+\.mp4)/i);
   if (match) {
-    return `http://www.andreasmagdanz.de/content/presse/video/${match[1]}`;
+    return `http://www.andreasmagdanz.de/content/presse/media/${match[1]}`;
   }
   return null;
+}
+
+function isDirectVideoUrl(url: string): boolean {
+  return /\.(mp4|webm|ogg)(\?|$)/i.test(url) || /cdn\.sanity\.io\/files\//i.test(url);
 }
 
 export default function VideoEmbed({ title, embedUrl }: VideoEmbedProps) {
@@ -33,6 +37,25 @@ export default function VideoEmbed({ title, embedUrl }: VideoEmbedProps) {
             allowFullScreen
             className="absolute inset-0 w-full h-full border-0"
           />
+        </div>
+        <p className="font-sans text-xs text-fg-muted">{title}</p>
+      </div>
+    );
+  }
+
+  // Direct video URL (Sanity CDN or other direct link)
+  if (isDirectVideoUrl(embedUrl)) {
+    return (
+      <div className="space-y-2">
+        <div className="relative w-full aspect-video bg-bg-muted overflow-hidden">
+          <video
+            controls
+            preload="metadata"
+            className="w-full h-full object-contain"
+            title={title}
+          >
+            <source src={embedUrl} type="video/mp4" />
+          </video>
         </div>
         <p className="font-sans text-xs text-fg-muted">{title}</p>
       </div>

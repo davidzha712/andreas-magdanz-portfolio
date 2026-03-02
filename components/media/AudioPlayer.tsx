@@ -8,7 +8,18 @@ interface AudioPlayerProps {
   url: string;
 }
 
+function resolveAudioUrl(url: string): string {
+  // Old site PHP URL: index.php?id=6003&media=FILENAME.mp3
+  const match = url.match(/andreasmagdanz\.de\/index\.php\?.*media=([^&]+\.mp3)/i);
+  if (match) {
+    return `http://www.andreasmagdanz.de/content/presse/media/${match[1]}`;
+  }
+  // Already a direct URL (Sanity CDN or other)
+  return url;
+}
+
 export default function AudioPlayer({ title, source, url }: AudioPlayerProps) {
+  const resolvedUrl = resolveAudioUrl(url);
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -82,7 +93,7 @@ export default function AudioPlayer({ title, source, url }: AudioPlayerProps) {
 
   return (
     <div className="group border border-border bg-bg-muted/30 hover:bg-bg-muted/60 transition-colors duration-200 p-5">
-      <audio ref={audioRef} src={url} preload="metadata" />
+      <audio ref={audioRef} src={resolvedUrl} preload="metadata" />
 
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-4">
