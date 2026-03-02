@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { MediaItem } from "@/types/sanity";
 
 interface PressArticleCardProps {
@@ -5,63 +8,67 @@ interface PressArticleCardProps {
 }
 
 export default function PressArticleCard({ mediaItem }: PressArticleCardProps) {
-  const formattedDate = mediaItem.date
-    ? new Date(mediaItem.date).toLocaleDateString("en-GB", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : null;
+  const [expanded, setExpanded] = useState(false);
+
+  const hasInlineContent = mediaItem.description && mediaItem.description.length > 0;
+
+  // Extract plain text from Portable Text blocks
+  const articleText = hasInlineContent
+    ? (mediaItem.description as any[]).map(block => {
+        if (block._type !== "block") return "";
+        return (block.children as { text: string }[])?.map(c => c.text).join("") || "";
+      }).filter(Boolean)
+    : [];
 
   return (
-    <article className="group border border-border bg-bg-muted/20 hover:bg-bg-muted/50 transition-all duration-200 p-5 hover:border-accent/30">
-      {/* Source + date */}
-      <div className="flex items-center justify-between gap-3 mb-3">
-        <span className="font-sans text-xs uppercase tracking-widest text-accent">
-          {mediaItem.source}
-        </span>
-        {formattedDate && (
-          <time
-            dateTime={mediaItem.date}
-            className="font-sans text-xs text-fg-muted shrink-0"
+    <div className="border border-border bg-bg-muted/20 overflow-hidden">
+      {/* Header */}
+      <div className="p-5 flex items-start justify-between gap-4">
+        <div>
+          <p className="font-sans text-xs uppercase tracking-widest text-accent mb-1">
+            {mediaItem.source}
+            {mediaItem.date && (
+              <span className="text-fg-muted/60 ml-2 normal-case tracking-normal">
+                {mediaItem.date}
+              </span>
+            )}
+          </p>
+          <h3 className="font-serif text-base text-fg leading-snug">
+            {mediaItem.title}
+          </h3>
+        </div>
+
+        {hasInlineContent ? (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="shrink-0 font-sans text-xs uppercase tracking-wider text-fg-muted hover:text-fg transition-colors duration-200 border border-border px-3 py-1.5"
           >
-            {formattedDate}
-          </time>
-        )}
+            {expanded ? "Close" : "Read"}
+          </button>
+        ) : mediaItem.externalUrl ? (
+          <a
+            href={mediaItem.externalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 font-sans text-xs uppercase tracking-wider text-fg-muted hover:text-fg transition-colors duration-200 border border-border px-3 py-1.5"
+          >
+            Link
+          </a>
+        ) : null}
       </div>
 
-      {/* Title */}
-      <h3 className="font-serif text-lg text-fg leading-snug group-hover:text-accent transition-colors duration-200">
-        {mediaItem.title}
-      </h3>
-
-      {/* External link */}
-      {mediaItem.externalUrl && (
-        <a
-          href={mediaItem.externalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 mt-4 font-sans text-xs uppercase tracking-wider text-fg-muted hover:text-fg transition-colors duration-200"
-        >
-          Read article
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="10"
-            height="10"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-            <polyline points="15 3 21 3 21 9" />
-            <line x1="10" y1="14" x2="21" y2="3" />
-          </svg>
-        </a>
+      {/* Expandable article content */}
+      {hasInlineContent && expanded && (
+        <div className="border-t border-border px-5 py-6 max-h-[60vh] overflow-y-auto">
+          <div className="prose prose-sm max-w-none">
+            {articleText.map((paragraph, i) => (
+              <p key={i} className="font-sans text-sm text-fg/90 leading-relaxed mb-3 last:mb-0">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        </div>
       )}
-    </article>
+    </div>
   );
 }
