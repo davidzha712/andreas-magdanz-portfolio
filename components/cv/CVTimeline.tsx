@@ -1,23 +1,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { gsap, ScrollTrigger } from "@/lib/gsap/gsapPlugins";
 import type { CVEntry } from "@/types/sanity";
 
 interface CVTimelineProps {
   entries: CVEntry[];
 }
-
-const CATEGORY_LABELS: Record<CVEntry["category"], string> = {
-  soloExhibition: "Solo Exhibitions",
-  groupExhibition: "Group Exhibitions",
-  award: "Awards & Grants",
-  collection: "Collections",
-  teaching: "Teaching",
-  education: "Education",
-  publication: "Publications",
-  grant: "Grants",
-};
 
 const CATEGORY_ORDER: CVEntry["category"][] = [
   "education",
@@ -33,6 +23,18 @@ const CATEGORY_ORDER: CVEntry["category"][] = [
 export default function CVTimeline({ entries }: CVTimelineProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<SVGLineElement>(null);
+  const t = useTranslations("cv");
+
+  const CATEGORY_LABELS: Record<CVEntry["category"], string> = {
+    soloExhibition: t("soloExhibition"),
+    groupExhibition: t("groupExhibition"),
+    award: t("award"),
+    collection: t("collection"),
+    teaching: t("teaching"),
+    education: t("education"),
+    publication: t("publication"),
+    grant: t("grant"),
+  };
 
   // Group entries by category
   const grouped = CATEGORY_ORDER.reduce<
@@ -64,8 +66,8 @@ export default function CVTimeline({ entries }: CVTimelineProps) {
     if (prefersReduced) return;
 
     // Animate entries with stagger per section
-    const entries = container.querySelectorAll<HTMLElement>(".cv-entry");
-    entries.forEach((entry) => {
+    const entryElements = container.querySelectorAll<HTMLElement>(".cv-entry");
+    entryElements.forEach((entry) => {
       gsap.fromTo(
         entry,
         { opacity: 0, x: -24 },
@@ -137,7 +139,7 @@ export default function CVTimeline({ entries }: CVTimelineProps) {
                   <div className="hidden sm:flex items-start justify-end pr-6 pt-0.5">
                     <span className="font-sans text-sm font-medium text-fg-muted tabular-nums">
                       {entry.endYear
-                        ? `${entry.year}–${entry.endYear}`
+                        ? `${entry.year}\u2013${entry.endYear}`
                         : entry.year}
                     </span>
                   </div>
@@ -150,7 +152,7 @@ export default function CVTimeline({ entries }: CVTimelineProps) {
                     {/* Mobile year */}
                     <span className="sm:hidden font-sans text-xs font-medium text-fg-muted tracking-wider uppercase block mb-1">
                       {entry.endYear
-                        ? `${entry.year}–${entry.endYear}`
+                        ? `${entry.year}\u2013${entry.endYear}`
                         : entry.year}
                     </span>
 

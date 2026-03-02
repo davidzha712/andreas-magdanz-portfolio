@@ -1,31 +1,38 @@
-import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
 import { allProjectsQuery } from "@/lib/sanity/queries";
 import type { Project } from "@/types/sanity";
 import WorkGrid from "@/components/work/WorkGrid";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Work — Andreas Magdanz",
-  description:
-    "Photography projects by Andreas Magdanz — documentary and conceptual work spanning institutional landscapes, memory, and architecture.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "work" });
+  return {
+    title: `${t("title")} — Andreas Magdanz`,
+    description: t("description"),
+  };
+}
 
 // Placeholder projects shown when Sanity is not connected
 const PLACEHOLDER_PROJECTS = [
-  { id: "1", title: "Eifel", year: "1995–1998", slug: "eifel" },
-  { id: "2", title: "Garzweiler", year: "2003–2006", slug: "garzweiler" },
-  { id: "3", title: "Dienststelle Marienthal", year: "1999–2000", slug: "dienststelle-marienthal" },
-  { id: "4", title: "Auschwitz-Birkenau", year: "2002–2003", slug: "auschwitz-birkenau" },
-  { id: "5", title: "BND-Standort Pullach", year: "2005–2006", slug: "bnd-standort-pullach" },
-  { id: "6", title: "Stuttgart Stammheim", year: "2010–2012", slug: "stuttgart-stammheim" },
-  { id: "7", title: "Bitterfeld", year: "1996–1997", slug: "bitterfeld" },
-  { id: "8", title: "Kraftwerk", year: "2001–2002", slug: "kraftwerk" },
-  { id: "9", title: "Transiträume", year: "2007–2009", slug: "transitraeume" },
-  { id: "10", title: "Archive", year: "2013–2015", slug: "archive" },
+  { id: "1", title: "Eifel", year: "1995-1998", slug: "eifel" },
+  { id: "2", title: "Garzweiler", year: "2003-2006", slug: "garzweiler" },
+  { id: "3", title: "Dienststelle Marienthal", year: "1999-2000", slug: "dienststelle-marienthal" },
+  { id: "4", title: "Auschwitz-Birkenau", year: "2002-2003", slug: "auschwitz-birkenau" },
+  { id: "5", title: "BND-Standort Pullach", year: "2005-2006", slug: "bnd-standort-pullach" },
+  { id: "6", title: "Stuttgart Stammheim", year: "2010-2012", slug: "stuttgart-stammheim" },
+  { id: "7", title: "Bitterfeld", year: "1996-1997", slug: "bitterfeld" },
+  { id: "8", title: "Kraftwerk", year: "2001-2002", slug: "kraftwerk" },
+  { id: "9", title: "Transitraume", year: "2007-2009", slug: "transitraeume" },
+  { id: "10", title: "Archive", year: "2013-2015", slug: "archive" },
 ];
 
-export default async function WorkPage() {
+export default async function WorkPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("work");
+
   let projects: Project[] = [];
 
   try {
@@ -39,11 +46,10 @@ export default async function WorkPage() {
       {/* Page header */}
       <header className="mb-16">
         <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
-          Work
+          {t("title")}
         </h1>
         <p className="mt-4 font-sans text-sm text-fg-muted tracking-wide max-w-md">
-          Documentary and conceptual photography exploring institutional
-          landscapes, collective memory, and architecture.
+          {t("description")}
         </p>
         <div className="mt-6 w-12 h-px bg-accent" />
       </header>

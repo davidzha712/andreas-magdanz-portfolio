@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface FormState {
   name: string;
@@ -30,18 +31,19 @@ export default function ContactForm() {
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [fieldErrors, setFieldErrors] = useState<Partial<FormState>>({});
+  const t = useTranslations("contact");
 
   const validate = (): boolean => {
     const errors: Partial<FormState> = {};
 
-    if (!form.name.trim()) errors.name = "Name is required";
+    if (!form.name.trim()) errors.name = "Required";
     if (!form.email.trim()) {
-      errors.email = "Email is required";
+      errors.email = "Required";
     } else if (!isValidEmail(form.email)) {
-      errors.email = "Please enter a valid email address";
+      errors.email = "Invalid email";
     }
-    if (!form.subject.trim()) errors.subject = "Subject is required";
-    if (!form.message.trim()) errors.message = "Message is required";
+    if (!form.subject.trim()) errors.subject = "Required";
+    if (!form.message.trim()) errors.message = "Required";
 
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -96,7 +98,7 @@ export default function ContactForm() {
           htmlFor="name"
           className="block font-sans text-xs uppercase tracking-widest text-fg-muted mb-2"
         >
-          Name <span className="text-accent">*</span>
+          {t("name")} <span className="text-accent">*</span>
         </label>
         <input
           id="name"
@@ -104,7 +106,6 @@ export default function ContactForm() {
           type="text"
           value={form.name}
           onChange={handleChange}
-          placeholder="Your name"
           autoComplete="name"
           className={[
             inputClasses,
@@ -124,7 +125,7 @@ export default function ContactForm() {
           htmlFor="email"
           className="block font-sans text-xs uppercase tracking-widest text-fg-muted mb-2"
         >
-          Email <span className="text-accent">*</span>
+          {t("email")} <span className="text-accent">*</span>
         </label>
         <input
           id="email"
@@ -132,7 +133,6 @@ export default function ContactForm() {
           type="email"
           value={form.email}
           onChange={handleChange}
-          placeholder="your@email.com"
           autoComplete="email"
           className={[
             inputClasses,
@@ -152,7 +152,7 @@ export default function ContactForm() {
           htmlFor="subject"
           className="block font-sans text-xs uppercase tracking-widest text-fg-muted mb-2"
         >
-          Subject <span className="text-accent">*</span>
+          {t("subject")} <span className="text-accent">*</span>
         </label>
         <input
           id="subject"
@@ -160,7 +160,6 @@ export default function ContactForm() {
           type="text"
           value={form.subject}
           onChange={handleChange}
-          placeholder="Regarding..."
           className={[
             inputClasses,
             fieldErrors.subject
@@ -181,7 +180,7 @@ export default function ContactForm() {
           htmlFor="message"
           className="block font-sans text-xs uppercase tracking-widest text-fg-muted mb-2"
         >
-          Message <span className="text-accent">*</span>
+          {t("message")} <span className="text-accent">*</span>
         </label>
         <textarea
           id="message"
@@ -189,7 +188,6 @@ export default function ContactForm() {
           rows={6}
           value={form.message}
           onChange={handleChange}
-          placeholder="Your message..."
           className={[
             inputClasses,
             "resize-y min-h-[140px]",
@@ -227,10 +225,10 @@ export default function ContactForm() {
               >
                 <path d="M21 12a9 9 0 1 1-6.219-8.56" />
               </svg>
-              Sending...
+              {t("sending")}
             </>
           ) : (
-            "Send Message"
+            t("send")
           )}
         </button>
       </div>
@@ -239,7 +237,7 @@ export default function ContactForm() {
       {status === "success" && (
         <div className="border border-green-700/40 bg-green-900/10 px-4 py-3">
           <p className="font-sans text-sm text-green-400">
-            Your message has been sent. Thank you for getting in touch.
+            {t("success")}
           </p>
         </div>
       )}
@@ -248,7 +246,7 @@ export default function ContactForm() {
       {status === "error" && (
         <div className="border border-red-700/40 bg-red-900/10 px-4 py-3">
           <p className="font-sans text-sm text-red-400">
-            {errorMessage || "Something went wrong. Please try again."}
+            {errorMessage || t("error")}
           </p>
         </div>
       )}

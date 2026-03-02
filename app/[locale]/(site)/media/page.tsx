@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
 import { allMediaItemsQuery } from "@/lib/sanity/queries";
 import type { MediaItem } from "@/types/sanity";
@@ -6,18 +6,21 @@ import AudioPlayer from "@/components/media/AudioPlayer";
 import VideoEmbed from "@/components/media/VideoEmbed";
 import PressArticleCard from "@/components/media/PressArticleCard";
 
-export const metadata: Metadata = {
-  title: "Media — Andreas Magdanz",
-  description:
-    "Audio interviews, video features, and press coverage of Andreas Magdanz's photographic work.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "media" });
+  return {
+    title: `${t("title")} — Andreas Magdanz`,
+    description: t("description"),
+  };
+}
 
 const FALLBACK_MEDIA_ITEMS: MediaItem[] = [
   // Audio
   {
     _id: "media-audio-1",
     _type: "mediaItem",
-    title: "Scala — Interview über Dienststelle Marienthal",
+    title: "Scala — Interview uber Dienststelle Marienthal",
     mediaType: "audio",
     source: "WDR 5",
     date: "2002-03-15",
@@ -26,7 +29,7 @@ const FALLBACK_MEDIA_ITEMS: MediaItem[] = [
   {
     _id: "media-audio-2",
     _type: "mediaItem",
-    title: "Mosaik — Über das Projekt Stuttgart Stammheim",
+    title: "Mosaik — Uber das Projekt Stuttgart Stammheim",
     mediaType: "audio",
     source: "WDR 3",
     date: "2013-09-10",
@@ -47,9 +50,9 @@ const FALLBACK_MEDIA_ITEMS: MediaItem[] = [
     _id: "media-press-1",
     _type: "mediaItem",
     title:
-      "Architektur des Grauens — Magdanz dokumentiert Stätten der NS-Geschichte",
+      "Architektur des Grauens — Magdanz dokumentiert Statten der NS-Geschichte",
     mediaType: "press",
-    source: "Süddeutsche Zeitung",
+    source: "Suddeutsche Zeitung",
     date: "2010-07-22",
     externalUrl: "https://www.sueddeutsche.de",
   },
@@ -65,7 +68,7 @@ const FALLBACK_MEDIA_ITEMS: MediaItem[] = [
   {
     _id: "media-press-3",
     _type: "mediaItem",
-    title: "Stammheim revisited — Magdanz im Museum für Photographie",
+    title: "Stammheim revisited — Magdanz im Museum fur Photographie",
     mediaType: "press",
     source: "art-magazin.de",
     date: "2013-10-14",
@@ -73,7 +76,11 @@ const FALLBACK_MEDIA_ITEMS: MediaItem[] = [
   },
 ];
 
-export default async function MediaPage() {
+export default async function MediaPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("media");
+
   let mediaItems: MediaItem[] = [];
 
   try {
@@ -93,10 +100,10 @@ export default async function MediaPage() {
       {/* Page header */}
       <header className="mb-16">
         <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
-          Media
+          {t("title")}
         </h1>
         <p className="mt-4 font-sans text-sm text-fg-muted tracking-wide max-w-md">
-          Audio interviews, video features, and press coverage.
+          {t("description")}
         </p>
         <div className="mt-6 w-12 h-px bg-accent" />
       </header>
@@ -105,7 +112,7 @@ export default async function MediaPage() {
         {/* Audio section */}
         {audioItems.length > 0 && (
           <section>
-            <SectionHeading title="Audio" />
+            <SectionHeading title={t("audio")} />
             <div className="space-y-4">
               {audioItems.map((item) =>
                 item.embedUrl ? (
@@ -136,7 +143,7 @@ export default async function MediaPage() {
                         rel="noopener noreferrer"
                         className="shrink-0 font-sans text-xs uppercase tracking-wider text-fg-muted hover:text-fg transition-colors duration-200 border border-border px-3 py-1.5"
                       >
-                        Listen
+                        {t("listen")}
                       </a>
                     )}
                   </div>
@@ -149,7 +156,7 @@ export default async function MediaPage() {
         {/* Video section */}
         {videoItems.length > 0 && (
           <section>
-            <SectionHeading title="Video" />
+            <SectionHeading title={t("video")} />
             <div className="grid sm:grid-cols-2 gap-6">
               {videoItems.map((item) =>
                 item.embedUrl ? (
@@ -167,7 +174,7 @@ export default async function MediaPage() {
         {/* Press section */}
         {pressItems.length > 0 && (
           <section>
-            <SectionHeading title="Press" />
+            <SectionHeading title={t("press")} />
             <div className="grid sm:grid-cols-2 gap-4">
               {pressItems.map((item) => (
                 <PressArticleCard key={item._id} mediaItem={item} />

@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "work": "Work",
+    "about": "About",
+    "cv": "CV",
+    "exhibitions": "Exhibitions",
+    "publications": "Publications",
+    "media": "Media",
+    "contact": "Contact"
+  },
+  "home": {
+    "selectedWorks": "Selected Works",
+    "scroll": "Scroll",
+    "photographer": "Photographer"
+  },
+  "work": {
+    "title": "Work",
+    "description": "Documentary and conceptual photography exploring institutional landscapes, collective memory, and architecture.",
+    "statement": "Statement",
+    "details": "Details",
+    "year": "Year",
+    "location": "Location"
+  },
+  "about": {
+    "title": "Andreas Magdanz",
+    "subtitle": "Photographer — Aachen, Germany",
+    "representation": "Representation",
+    "teaching": "Teaching"
+  },
+  "cv": {
+    "title": "Curriculum Vitae",
+    "download": "Download PDF",
+    "soloExhibition": "Solo Exhibitions",
+    "groupExhibition": "Group Exhibitions",
+    "award": "Awards & Grants",
+    "collection": "Collections",
+    "teaching": "Teaching",
+    "education": "Education",
+    "publication": "Publications",
+    "grant": "Grants"
+  },
+  "exhibitions": {
+    "title": "Exhibitions",
+    "description": "Selected solo and group exhibitions.",
+    "solo": "Solo",
+    "group": "Group",
+    "all": "All",
+    "filter": "Filter"
+  },
+  "publications": {
+    "title": "Publications",
+    "description": "Monographs and books documenting photographic projects."
+  },
+  "media": {
+    "title": "Media",
+    "description": "Audio interviews, video features, and press coverage.",
+    "audio": "Audio",
+    "video": "Video",
+    "press": "Press",
+    "read": "Read",
+    "close": "Close",
+    "listen": "Listen",
+    "watchVideo": "Watch Video"
+  },
+  "contact": {
+    "title": "Contact",
+    "description": "For exhibition enquiries, press requests, print sales, or general correspondence, please use the form below.",
+    "gallery": "Gallery",
+    "studio": "Studio",
+    "university": "University",
+    "name": "Name",
+    "email": "Email",
+    "subject": "Subject",
+    "message": "Message",
+    "send": "Send Message",
+    "sending": "Sending...",
+    "success": "Message sent! We will get back to you soon.",
+    "error": "Failed to send. Please try again."
+  },
+  "footer": {
+    "copyright": "© {year} Andreas Magdanz. All rights reserved.",
+    "gallery": "Represented by"
+  },
+  "common": {
+    "backToTop": "Back to top",
+    "viewAll": "View all",
+    "readMore": "Read more",
+    "noResults": "No results found."
+  }
+}

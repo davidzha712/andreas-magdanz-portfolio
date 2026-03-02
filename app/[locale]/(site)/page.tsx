@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
 import {
   siteSettingsQuery,
@@ -9,23 +9,31 @@ import HeroSection from "@/components/home/HeroSection";
 import FeaturedWorksGrid from "@/components/home/FeaturedWorksGrid";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Andreas Magdanz — Photographer",
-  description:
-    "Photography by Andreas Magdanz. Documentary and conceptual work exploring institutional memory, landscape, and architecture.",
-};
-
 // Placeholder projects shown when Sanity is not connected
 const PLACEHOLDER_PROJECTS = [
-  { id: "1", title: "Dienststelle Marienthal", year: "1999–2000", slug: "dienststelle-marienthal" },
-  { id: "2", title: "Auschwitz-Birkenau", year: "2002–2003", slug: "auschwitz-birkenau" },
-  { id: "3", title: "BND-Standort Pullach", year: "2005–2006", slug: "bnd-standort-pullach" },
-  { id: "4", title: "Stuttgart Stammheim", year: "2010–2012", slug: "stuttgart-stammheim" },
-  { id: "5", title: "Garzweiler", year: "2003–2006", slug: "garzweiler" },
-  { id: "6", title: "Eifel", year: "1995–1998", slug: "eifel" },
+  { id: "1", title: "Dienststelle Marienthal", year: "1999-2000", slug: "dienststelle-marienthal" },
+  { id: "2", title: "Auschwitz-Birkenau", year: "2002-2003", slug: "auschwitz-birkenau" },
+  { id: "3", title: "BND-Standort Pullach", year: "2005-2006", slug: "bnd-standort-pullach" },
+  { id: "4", title: "Stuttgart Stammheim", year: "2010-2012", slug: "stuttgart-stammheim" },
+  { id: "5", title: "Garzweiler", year: "2003-2006", slug: "garzweiler" },
+  { id: "6", title: "Eifel", year: "1995-1998", slug: "eifel" },
 ];
 
-export default async function HomePage() {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "home" });
+  return {
+    title: `Andreas Magdanz — ${t("photographer")}`,
+    description:
+      "Photography by Andreas Magdanz. Documentary and conceptual work exploring institutional memory, landscape, and architecture.",
+  };
+}
+
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("home");
+
   let siteSettings: SiteSettings | null = null;
   let featuredProjects: Project[] = [];
 
@@ -81,14 +89,14 @@ export default async function HomePage() {
             ANDREAS MAGDANZ
           </h1>
           <p className="mt-3 font-sans text-sm tracking-widest uppercase text-fg-muted">
-            Photographer — Aachen, Germany
+            {t("photographer")} — Aachen, Germany
           </p>
         </div>
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-fg-muted/60">
           <span className="font-sans text-[10px] tracking-widest uppercase">
-            Scroll
+            {t("scroll")}
           </span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -111,7 +119,7 @@ export default async function HomePage() {
       {/* Featured works — placeholder cards */}
       <section className="py-24 px-8 md:px-12 lg:px-16">
         <h2 className="font-serif text-4xl text-center text-fg mb-16 tracking-tight">
-          Selected Works
+          {t("selectedWorks")}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

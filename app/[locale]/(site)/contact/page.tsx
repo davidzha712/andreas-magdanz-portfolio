@@ -1,16 +1,23 @@
-import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
 import { siteSettingsQuery } from "@/lib/sanity/queries";
 import type { SiteSettings } from "@/types/sanity";
 import ContactForm from "@/components/contact/ContactForm";
 
-export const metadata: Metadata = {
-  title: "Kontakt — Andreas Magdanz",
-  description:
-    "Kontakt zu Andreas Magdanz — Ausstellungsanfragen, Presseanfragen, Printverkauf.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "contact" });
+  return {
+    title: `${t("title")} — Andreas Magdanz`,
+    description: t("description"),
+  };
+}
 
-export default async function ContactPage() {
+export default async function ContactPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("contact");
+
   let settings: SiteSettings | null = null;
 
   try {
@@ -22,11 +29,11 @@ export default async function ContactPage() {
   const galleryName = settings?.galleryName ?? "Janet Borden Inc.";
   const galleryAddress = settings?.galleryAddress ?? "560 Broadway, Suite 601\nNew York, NY 10012\nUnited States";
   const galleryUrl = settings?.galleryUrl ?? "https://www.janetbordeninc.com";
-  const contactAddress = settings?.contactAddress ?? "Kapellenstraße 66\nD-52066 Aachen\nGermany";
+  const contactAddress = settings?.contactAddress ?? "Kapellenstrasse 66\nD-52066 Aachen\nGermany";
   const contactEmail = settings?.contactEmail ?? "magdanz@andreasmagdanz.de";
   const contactPhone = settings?.contactPhone ?? "";
-  const universityInfo = settings?.universityInfo ?? "HAWK Hildesheim/Holzminden/Göttingen";
-  const universityAddress = settings?.universityAddress ?? "Fakultät Gestaltung\nLübecker Straße 2\n31134 Hildesheim, Germany";
+  const universityInfo = settings?.universityInfo ?? "HAWK Hildesheim/Holzminden/Gottingen";
+  const universityAddress = settings?.universityAddress ?? "Fakultat Gestaltung\nLubecker Strasse 2\n31134 Hildesheim, Germany";
 
   return (
     <div className="px-8 md:px-12 lg:px-16 py-16">
@@ -34,7 +41,7 @@ export default async function ContactPage() {
         {/* Page header */}
         <header className="mb-16">
           <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
-            Kontakt
+            {t("title")}
           </h1>
           <div className="mt-4 w-12 h-px bg-accent" />
         </header>
@@ -43,8 +50,7 @@ export default async function ContactPage() {
           {/* Left: Contact form */}
           <div>
             <p className="font-sans text-sm text-fg-muted mb-8 leading-relaxed max-w-md">
-              Sie haben Fragen, Kritik oder Anregungen? Für Ausstellungsanfragen, Presseanfragen,
-              Printverkauf oder allgemeine Korrespondenz nutzen Sie bitte das Formular.
+              {t("description")}
             </p>
             <ContactForm />
           </div>
@@ -54,7 +60,7 @@ export default async function ContactPage() {
             {/* Gallery */}
             <div className="border border-border p-6 bg-bg-muted/20">
               <p className="font-sans text-xs uppercase tracking-widest text-accent mb-3">
-                Gallery
+                {t("gallery")}
               </p>
               <p className="font-serif text-lg text-fg mb-2">{galleryName}</p>
               <p className="font-sans text-sm text-fg-muted whitespace-pre-line">
@@ -73,7 +79,7 @@ export default async function ContactPage() {
             {/* Studio */}
             <div className="border border-border p-6 bg-bg-muted/20">
               <p className="font-sans text-xs uppercase tracking-widest text-accent mb-3">
-                Studio
+                {t("studio")}
               </p>
               <p className="font-serif text-lg text-fg mb-2">Andreas Magdanz</p>
               <address className="not-italic">
@@ -99,7 +105,7 @@ export default async function ContactPage() {
             {/* University */}
             <div className="border border-border p-6 bg-bg-muted/20">
               <p className="font-sans text-xs uppercase tracking-widest text-accent mb-3">
-                Universität
+                {t("university")}
               </p>
               <p className="font-serif text-lg text-fg mb-2">{universityInfo}</p>
               <p className="font-sans text-sm text-fg-muted whitespace-pre-line">

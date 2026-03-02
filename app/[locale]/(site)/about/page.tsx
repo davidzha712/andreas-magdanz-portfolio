@@ -1,15 +1,19 @@
-import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
 import { siteSettingsQuery } from "@/lib/sanity/queries";
 import type { SiteSettings } from "@/types/sanity";
 import SanityImage from "@/components/shared/SanityImage";
 import type { PortableTextBlock } from "sanity";
 
-export const metadata: Metadata = {
-  title: "About — Andreas Magdanz",
-  description:
-    "Andreas Magdanz — Fotograf, Professor an der HAWK Hildesheim. Dokumentarische Großformatfotografie zu historisch und politisch bedeutsamen Orten.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "about" });
+  return {
+    title: `${t("title")} — ${t("subtitle")}`,
+    description:
+      "Andreas Magdanz — Fotograf, Professor an der HAWK Hildesheim. Dokumentarische Grossformatfotografie zu historisch und politisch bedeutsamen Orten.",
+  };
+}
 
 function BlockRenderer({ blocks }: { blocks: PortableTextBlock[] }) {
   return (
@@ -46,7 +50,11 @@ function BlockRenderer({ blocks }: { blocks: PortableTextBlock[] }) {
   );
 }
 
-export default async function AboutPage() {
+export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("about");
+
   let settings: SiteSettings | null = null;
 
   try {
@@ -64,10 +72,10 @@ export default async function AboutPage() {
         {/* Page header */}
         <header className="mb-16">
           <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
-            Andreas Magdanz
+            {t("title")}
           </h1>
           <p className="mt-4 font-sans text-sm text-fg-muted tracking-wide">
-            Fotograf — Aachen, Germany
+            {t("subtitle")}
           </p>
           <div className="mt-6 w-12 h-px bg-accent" />
         </header>
@@ -125,13 +133,13 @@ export default async function AboutPage() {
             ) : (
               <div className="space-y-5">
                 <p className="font-serif text-lg text-fg leading-relaxed">
-                  Andreas Magdanz (geb. 1964, Mönchengladbach) ist ein deutscher Fotograf, bekannt für seine dokumentarischen Großformatserien, die historisch und politisch bedeutsame Orte untersuchen.
+                  Andreas Magdanz (geb. 1964, Monchengladbach) ist ein deutscher Fotograf, bekannt fur seine dokumentarischen Grossformatserien, die historisch und politisch bedeutsame Orte untersuchen.
                 </p>
                 <p className="font-serif text-lg text-fg leading-relaxed">
                   Seine Arbeiten umfassen Projekte wie Dienststelle Marienthal, Auschwitz-Birkenau, BND-Standort Pullach, NS-Ordensburg Vogelsang und Stuttgart Stammheim.
                 </p>
                 <p className="font-serif text-lg text-fg leading-relaxed">
-                  Seit 2005 ist er Professor für Fotografie an der HAWK Hildesheim/Holzminden/Göttingen. Er lebt und arbeitet in Aachen.
+                  Seit 2005 ist er Professor fur Fotografie an der HAWK Hildesheim/Holzminden/Gottingen. Er lebt und arbeitet in Aachen.
                 </p>
               </div>
             )}
@@ -148,7 +156,7 @@ export default async function AboutPage() {
         {/* Gallery representation */}
         <section className="border-t border-border pt-16">
           <div className="mb-8">
-            <h2 className="font-serif text-3xl text-fg">Representation</h2>
+            <h2 className="font-serif text-3xl text-fg">{t("representation")}</h2>
             <div className="mt-3 w-10 h-px bg-accent" />
           </div>
 

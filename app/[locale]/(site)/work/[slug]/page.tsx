@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { client } from "@/lib/sanity/client";
 import {
@@ -11,7 +11,7 @@ import ProjectMeta from "@/components/work/ProjectMeta";
 import ProjectDetailClient from "@/components/work/ProjectDetailClient";
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }
 
 export async function generateStaticParams() {
@@ -25,13 +25,14 @@ export async function generateStaticParams() {
   }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
+export async function generateMetadata({ params }: PageProps) {
+  const { slug, locale } = await params;
 
   try {
     const project = await client.fetch<Project>(projectBySlugQuery, { slug });
     if (!project) {
-      return { title: "Work — Andreas Magdanz" };
+      const t = await getTranslations({ locale, namespace: "work" });
+      return { title: `${t("title")} — Andreas Magdanz` };
     }
 
     const description =
@@ -55,7 +56,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function WorkDetailPage({ params }: PageProps) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("work");
 
   let project: Project | null = null;
 
@@ -158,7 +161,7 @@ export default async function WorkDetailPage({ params }: PageProps) {
                 {hasStatement && (
                   <div>
                     <h2 className="font-sans text-xs tracking-widest uppercase text-fg-muted mb-4">
-                      Statement
+                      {t("statement")}
                     </h2>
                     <div className="font-serif text-base text-fg leading-relaxed space-y-3">
                       <StatementRenderer blocks={project.artistStatement!} />
@@ -169,7 +172,7 @@ export default async function WorkDetailPage({ params }: PageProps) {
                 {/* Metadata */}
                 <div>
                   <h2 className="font-sans text-xs tracking-widest uppercase text-fg-muted mb-4">
-                    Details
+                    {t("details")}
                   </h2>
                   <ProjectMeta project={project} />
                 </div>
@@ -185,7 +188,7 @@ export default async function WorkDetailPage({ params }: PageProps) {
           {hasStatement && (
             <div>
               <h2 className="font-sans text-xs tracking-widest uppercase text-fg-muted mb-4">
-                Statement
+                {t("statement")}
               </h2>
               <div className="font-serif text-base text-fg leading-relaxed">
                 <StatementRenderer blocks={project.artistStatement!} />
@@ -194,7 +197,7 @@ export default async function WorkDetailPage({ params }: PageProps) {
           )}
           <div>
             <h2 className="font-sans text-xs tracking-widest uppercase text-fg-muted mb-4">
-              Details
+              {t("details")}
             </h2>
             <ProjectMeta project={project} />
           </div>

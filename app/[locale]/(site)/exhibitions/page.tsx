@@ -1,14 +1,17 @@
-import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
 import { allExhibitionsQuery } from "@/lib/sanity/queries";
 import type { Exhibition } from "@/types/sanity";
 import ExhibitionTimeline from "@/components/exhibitions/ExhibitionTimeline";
 
-export const metadata: Metadata = {
-  title: "Exhibitions — Andreas Magdanz",
-  description:
-    "Solo and group exhibitions by Andreas Magdanz — international venues spanning museums, galleries, and documentary photography institutions.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "exhibitions" });
+  return {
+    title: `${t("title")} — Andreas Magdanz`,
+    description: t("description"),
+  };
+}
 
 const FALLBACK_EXHIBITIONS: Exhibition[] = [
   // Solo exhibitions
@@ -47,7 +50,7 @@ const FALLBACK_EXHIBITIONS: Exhibition[] = [
     _type: "exhibition",
     title: "NS-Ordensburg Vogelsang",
     type: "solo",
-    venue: "NS-Dokumentationszentrum Köln",
+    venue: "NS-Dokumentationszentrum Koln",
     city: "Cologne",
     country: "Germany",
     year: 2010,
@@ -57,7 +60,7 @@ const FALLBACK_EXHIBITIONS: Exhibition[] = [
     _type: "exhibition",
     title: "Stuttgart Stammheim",
     type: "solo",
-    venue: "Museum für Photographie Braunschweig",
+    venue: "Museum fur Photographie Braunschweig",
     city: "Braunschweig",
     country: "Germany",
     year: 2013,
@@ -68,8 +71,8 @@ const FALLBACK_EXHIBITIONS: Exhibition[] = [
     _type: "exhibition",
     title: "Architektur und Verbrechen",
     type: "group",
-    venue: "Kunsthalle Düsseldorf",
-    city: "Düsseldorf",
+    venue: "Kunsthalle Dusseldorf",
+    city: "Dusseldorf",
     country: "Germany",
     year: 2003,
   },
@@ -95,7 +98,11 @@ const FALLBACK_EXHIBITIONS: Exhibition[] = [
   },
 ];
 
-export default async function ExhibitionsPage() {
+export default async function ExhibitionsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("exhibitions");
+
   let exhibitions: Exhibition[] = [];
 
   try {
@@ -112,10 +119,10 @@ export default async function ExhibitionsPage() {
       {/* Page header */}
       <header className="mb-16">
         <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
-          Exhibitions
+          {t("title")}
         </h1>
         <p className="mt-4 font-sans text-sm text-fg-muted tracking-wide max-w-md">
-          Selected solo and group exhibitions from 2001 to the present.
+          {t("description")}
         </p>
         <div className="mt-6 w-12 h-px bg-accent" />
       </header>

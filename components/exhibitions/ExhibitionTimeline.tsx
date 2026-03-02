@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { gsap, ScrollTrigger } from "@/lib/gsap/gsapPlugins";
 import type { Exhibition } from "@/types/sanity";
 
@@ -15,6 +16,7 @@ export default function ExhibitionTimeline({
 }: ExhibitionTimelineProps) {
   const [filter, setFilter] = useState<FilterType>("all");
   const containerRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations("exhibitions");
 
   const filtered = exhibitions.filter((e) => {
     if (filter === "all") return true;
@@ -60,9 +62,9 @@ export default function ExhibitionTimeline({
   }, [filtered]);
 
   const filterButtons: { label: string; value: FilterType }[] = [
-    { label: "All", value: "all" },
-    { label: "Solo", value: "solo" },
-    { label: "Group", value: "group" },
+    { label: t("all"), value: "all" },
+    { label: t("solo"), value: "solo" },
+    { label: t("group"), value: "group" },
   ];
 
   return (
@@ -123,7 +125,7 @@ export default function ExhibitionTimeline({
                       : {}
                   }
                 >
-                  <ExhibitionCard exhibition={exhibition} align={isLeft ? "right" : "left"} />
+                  <ExhibitionCard exhibition={exhibition} />
                 </div>
 
                 {/* Spacer for alternating side on desktop */}
@@ -145,10 +147,8 @@ export default function ExhibitionTimeline({
 
 function ExhibitionCard({
   exhibition,
-  align,
 }: {
   exhibition: Exhibition;
-  align: "left" | "right";
 }) {
   return (
     <div

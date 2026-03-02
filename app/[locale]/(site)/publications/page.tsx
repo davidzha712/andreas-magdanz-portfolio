@@ -1,14 +1,17 @@
-import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
 import { allPublicationsQuery } from "@/lib/sanity/queries";
 import type { Publication } from "@/types/sanity";
 import PublicationGrid from "@/components/publications/PublicationGrid";
 
-export const metadata: Metadata = {
-  title: "Publications — Andreas Magdanz",
-  description:
-    "Books and publications by Andreas Magdanz — documentary photography monographs published with Steidl, Hatje Cantz, and Hartmann Books.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "publications" });
+  return {
+    title: `${t("title")} — Andreas Magdanz`,
+    description: t("description"),
+  };
+}
 
 const FALLBACK_PUBLICATIONS: Publication[] = [
   {
@@ -69,7 +72,11 @@ const FALLBACK_PUBLICATIONS: Publication[] = [
   },
 ];
 
-export default async function PublicationsPage() {
+export default async function PublicationsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("publications");
+
   let publications: Publication[] = [];
 
   try {
@@ -86,11 +93,10 @@ export default async function PublicationsPage() {
       {/* Page header */}
       <header className="mb-16">
         <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
-          Publications
+          {t("title")}
         </h1>
         <p className="mt-4 font-sans text-sm text-fg-muted tracking-wide max-w-md">
-          Monographs and books documenting photographic projects, published with
-          Steidl, Hatje Cantz, Hartmann Books, and others.
+          {t("description")}
         </p>
         <div className="mt-6 w-12 h-px bg-accent" />
       </header>

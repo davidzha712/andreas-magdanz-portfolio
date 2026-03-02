@@ -2,22 +2,25 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import NavMobile from "./NavMobile";
 import ThemeToggle from "./ThemeToggle";
+import LanguageSwitcher from "./LanguageSwitcher";
 
-const NAV_LINKS = [
-  { label: "Work", href: "/work" },
-  { label: "About", href: "/about" },
-  { label: "CV", href: "/cv" },
-  { label: "Exhibitions", href: "/exhibitions" },
-  { label: "Publications", href: "/publications" },
-  { label: "Media", href: "/media" },
-  { label: "Contact", href: "/contact" },
-];
+const NAV_KEYS = [
+  { key: "work", href: "/work" },
+  { key: "about", href: "/about" },
+  { key: "cv", href: "/cv" },
+  { key: "exhibitions", href: "/exhibitions" },
+  { key: "publications", href: "/publications" },
+  { key: "media", href: "/media" },
+  { key: "contact", href: "/contact" },
+] as const;
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const t = useTranslations("nav");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,20 +64,22 @@ export default function Nav() {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8" aria-label="Main navigation">
-            {NAV_LINKS.map((link) => (
+            {NAV_KEYS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className="font-sans text-xs uppercase tracking-widest text-fg-muted hover:text-fg transition-colors duration-200"
               >
-                {link.label}
+                {t(link.key)}
               </Link>
             ))}
+            <LanguageSwitcher />
             <ThemeToggle />
           </nav>
 
           {/* Mobile controls */}
           <div className="flex md:hidden items-center gap-3">
+            <LanguageSwitcher />
             <ThemeToggle />
             <button
               onClick={() => setMobileOpen(true)}

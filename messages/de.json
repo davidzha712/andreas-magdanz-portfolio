@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "work": "Arbeiten",
+    "about": "Über",
+    "cv": "Lebenslauf",
+    "exhibitions": "Ausstellungen",
+    "publications": "Publikationen",
+    "media": "Presse",
+    "contact": "Kontakt"
+  },
+  "home": {
+    "selectedWorks": "Ausgewählte Arbeiten",
+    "scroll": "Scrollen",
+    "photographer": "Fotograf"
+  },
+  "work": {
+    "title": "Arbeiten",
+    "description": "Dokumentarische und konzeptionelle Fotografie — institutionelle Landschaften, kollektives Gedächtnis und Architektur.",
+    "statement": "Statement",
+    "details": "Details",
+    "year": "Jahr",
+    "location": "Ort"
+  },
+  "about": {
+    "title": "Andreas Magdanz",
+    "subtitle": "Fotograf — Aachen, Deutschland",
+    "representation": "Vertretung",
+    "teaching": "Lehre"
+  },
+  "cv": {
+    "title": "Lebenslauf",
+    "download": "PDF herunterladen",
+    "soloExhibition": "Einzelausstellungen",
+    "groupExhibition": "Gruppenausstellungen",
+    "award": "Preise & Stipendien",
+    "collection": "Sammlungen",
+    "teaching": "Lehre",
+    "education": "Ausbildung",
+    "publication": "Publikationen",
+    "grant": "Förderungen"
+  },
+  "exhibitions": {
+    "title": "Ausstellungen",
+    "description": "Ausgewählte Einzel- und Gruppenausstellungen.",
+    "solo": "Einzelausstellung",
+    "group": "Gruppenausstellung",
+    "all": "Alle",
+    "filter": "Filter"
+  },
+  "publications": {
+    "title": "Publikationen",
+    "description": "Monographien und Bücher zu fotografischen Projekten."
+  },
+  "media": {
+    "title": "Presse",
+    "description": "Audio-Interviews, Video-Beiträge und Presseberichte.",
+    "audio": "Audio",
+    "video": "Video",
+    "press": "Presse",
+    "read": "Lesen",
+    "close": "Schließen",
+    "listen": "Anhören",
+    "watchVideo": "Video ansehen"
+  },
+  "contact": {
+    "title": "Kontakt",
+    "description": "Sie haben Fragen, Kritik oder Anregungen? Für Ausstellungsanfragen, Presseanfragen, Printverkauf oder allgemeine Korrespondenz nutzen Sie bitte das Formular.",
+    "gallery": "Galerie",
+    "studio": "Atelier",
+    "university": "Universität",
+    "name": "Name",
+    "email": "E-Mail",
+    "subject": "Betreff",
+    "message": "Nachricht",
+    "send": "Nachricht senden",
+    "sending": "Wird gesendet...",
+    "success": "Nachricht gesendet! Wir melden uns bald.",
+    "error": "Fehler beim Senden. Bitte versuchen Sie es erneut."
+  },
+  "footer": {
+    "copyright": "© {year} Andreas Magdanz. Alle Rechte vorbehalten.",
+    "gallery": "Vertreten durch"
+  },
+  "common": {
+    "backToTop": "Nach oben",
+    "viewAll": "Alle anzeigen",
+    "readMore": "Weiterlesen",
+    "noResults": "Keine Ergebnisse gefunden."
+  }
+}

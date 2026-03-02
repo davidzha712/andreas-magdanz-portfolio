@@ -2,17 +2,19 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import ThemeToggle from "./ThemeToggle";
+import LanguageSwitcher from "./LanguageSwitcher";
 
-const NAV_LINKS = [
-  { label: "Work", href: "/work" },
-  { label: "About", href: "/about" },
-  { label: "CV", href: "/cv" },
-  { label: "Exhibitions", href: "/exhibitions" },
-  { label: "Publications", href: "/publications" },
-  { label: "Media", href: "/media" },
-  { label: "Contact", href: "/contact" },
-];
+const NAV_KEYS = [
+  { key: "work", href: "/work" },
+  { key: "about", href: "/about" },
+  { key: "cv", href: "/cv" },
+  { key: "exhibitions", href: "/exhibitions" },
+  { key: "publications", href: "/publications" },
+  { key: "media", href: "/media" },
+  { key: "contact", href: "/contact" },
+] as const;
 
 interface NavMobileProps {
   isOpen: boolean;
@@ -20,6 +22,8 @@ interface NavMobileProps {
 }
 
 export default function NavMobile({ isOpen, onClose }: NavMobileProps) {
+  const t = useTranslations("nav");
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -64,7 +68,7 @@ export default function NavMobile({ isOpen, onClose }: NavMobileProps) {
 
           {/* Nav links */}
           <nav className="flex-1 flex flex-col items-center justify-center gap-8">
-            {NAV_LINKS.map((link, i) => (
+            {NAV_KEYS.map((link, i) => (
               <motion.div
                 key={link.href}
                 initial={{ opacity: 0, y: 20 }}
@@ -77,14 +81,15 @@ export default function NavMobile({ isOpen, onClose }: NavMobileProps) {
                   onClick={onClose}
                   className="font-serif text-3xl sm:text-4xl tracking-widest uppercase text-fg hover:text-accent transition-colors duration-200"
                 >
-                  {link.label}
+                  {t(link.key)}
                 </Link>
               </motion.div>
             ))}
           </nav>
 
           {/* Footer row */}
-          <div className="px-6 py-5 border-t border-border flex items-center justify-center">
+          <div className="px-6 py-5 border-t border-border flex items-center justify-center gap-4">
+            <LanguageSwitcher />
             <ThemeToggle />
           </div>
         </motion.div>

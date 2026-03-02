@@ -1,15 +1,19 @@
-import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
 import { allCVEntriesQuery } from "@/lib/sanity/queries";
 import type { CVEntry } from "@/types/sanity";
 import CVTimeline from "@/components/cv/CVTimeline";
 import CVDownloadButton from "@/components/cv/CVDownloadButton";
 
-export const metadata: Metadata = {
-  title: "Curriculum Vitae — Andreas Magdanz",
-  description:
-    "Curriculum vitae of Andreas Magdanz — exhibitions, awards, collections, teaching positions, and education.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "cv" });
+  return {
+    title: `${t("title")} — Andreas Magdanz`,
+    description:
+      "Curriculum vitae of Andreas Magdanz — exhibitions, awards, collections, teaching positions, and education.",
+  };
+}
 
 const FALLBACK_CV_ENTRIES: CVEntry[] = [
   // Education
@@ -30,7 +34,7 @@ const FALLBACK_CV_ENTRIES: CVEntry[] = [
     year: 1991,
     endYear: 1993,
     title: "Fine Arts / Photography",
-    institution: "Hochschule für Bildende Künste Braunschweig",
+    institution: "Hochschule fur Bildende Kunste Braunschweig",
     location: "Braunschweig, Germany",
   },
   // Teaching
@@ -50,7 +54,7 @@ const FALLBACK_CV_ENTRIES: CVEntry[] = [
     category: "teaching",
     year: 2005,
     title: "Professor of Photography",
-    institution: "HAWK Hildesheim/Holzminden/Göttingen",
+    institution: "HAWK Hildesheim/Holzminden/Gottingen",
     location: "Hildesheim, Germany",
     description: "Faculty of Design — since 2005",
   },
@@ -61,7 +65,7 @@ const FALLBACK_CV_ENTRIES: CVEntry[] = [
     category: "award",
     year: 2001,
     title: "Photography Prize",
-    institution: "Deutsche Gesellschaft für Photographie (DGPh)",
+    institution: "Deutsche Gesellschaft fur Photographie (DGPh)",
     location: "Germany",
   },
   {
@@ -97,13 +101,17 @@ const FALLBACK_CV_ENTRIES: CVEntry[] = [
     _type: "cvEntry",
     category: "collection",
     year: 2003,
-    title: "Kunstpalast Düsseldorf",
+    title: "Kunstpalast Dusseldorf",
     institution: "Kunstpalast",
-    location: "Düsseldorf, Germany",
+    location: "Dusseldorf, Germany",
   },
 ];
 
-export default async function CVPage() {
+export default async function CVPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("cv");
+
   let entries: CVEntry[] = [];
 
   try {
@@ -120,7 +128,7 @@ export default async function CVPage() {
       <header className="mb-16 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
         <div>
           <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
-            Curriculum Vitae
+            {t("title")}
           </h1>
           <div className="mt-4 w-12 h-px bg-accent" />
         </div>
