@@ -60,7 +60,11 @@
     "read": "Read",
     "close": "Close",
     "listen": "Listen",
-    "watchVideo": "Watch Video"
+    "watchVideo": "Watch Video",
+    "viewPdf": "Open PDF",
+    "openArticle": "Open article",
+    "pdfAvailable": "This article is available as a PDF.",
+    "externalArticle": "This article is available on the external website."
   },
   "contact": {
     "title": "Contact",

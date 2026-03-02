@@ -2,73 +2,113 @@
 
 import { useState } from "react";
 import type { MediaItem } from "@/types/sanity";
+import PressOverlay from "./PressOverlay";
 
 interface PressArticleCardProps {
   mediaItem: MediaItem;
+  translations: {
+    read: string;
+    viewPdf: string;
+    openArticle: string;
+    pdfAvailable: string;
+    externalArticle: string;
+  };
 }
 
-export default function PressArticleCard({ mediaItem }: PressArticleCardProps) {
-  const [expanded, setExpanded] = useState(false);
+export default function PressArticleCard({
+  mediaItem,
+  translations,
+}: PressArticleCardProps) {
+  const [showOverlay, setShowOverlay] = useState(false);
 
-  const hasInlineContent = mediaItem.description && mediaItem.description.length > 0;
+  const hasContent = mediaItem.description && mediaItem.description.length > 0;
+  const isPdf =
+    mediaItem.externalUrl?.endsWith(".pdf") && !hasContent;
+  const canOpen = hasContent || mediaItem.externalUrl;
 
-  // Extract plain text from Portable Text blocks
-  const articleText = hasInlineContent
-    ? (mediaItem.description as any[]).map(block => {
-        if (block._type !== "block") return "";
-        return (block.children as { text: string }[])?.map(c => c.text).join("") || "";
-      }).filter(Boolean)
-    : [];
+  const formattedDate = mediaItem.date
+    ? new Date(mediaItem.date + "T00:00:00").toLocaleDateString("de-DE", {
+        year: "numeric",
+      })
+    : null;
 
   return (
-    <div className="border border-border bg-bg-muted/20 overflow-hidden">
-      {/* Header */}
-      <div className="p-5 flex items-start justify-between gap-4">
-        <div>
-          <p className="font-sans text-xs uppercase tracking-widest text-accent mb-1">
-            {mediaItem.source}
-            {mediaItem.date && (
-              <span className="text-fg-muted/60 ml-2 normal-case tracking-normal">
-                {mediaItem.date}
+    <>
+      <button
+        onClick={() => canOpen && setShowOverlay(true)}
+        disabled={!canOpen}
+        className="group w-full text-left py-6 border-b border-border/50 first:border-t first:border-border/50 transition-colors duration-300 hover:bg-bg-muted/30 disabled:cursor-default"
+      >
+        <div className="flex items-baseline justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            {/* Source & year */}
+            <div className="flex items-center gap-3 mb-2">
+              <span className="font-sans text-[11px] uppercase tracking-[0.2em] text-accent">
+                {mediaItem.source}
               </span>
-            )}
-          </p>
-          <h3 className="font-serif text-base text-fg leading-snug">
-            {mediaItem.title}
-          </h3>
-        </div>
+              {formattedDate && (
+                <>
+                  <span className="w-px h-3 bg-border" />
+                  <span className="font-sans text-[11px] text-fg-muted tracking-wide">
+                    {formattedDate}
+                  </span>
+                </>
+              )}
+            </div>
 
-        {hasInlineContent ? (
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="shrink-0 font-sans text-xs uppercase tracking-wider text-fg-muted hover:text-fg transition-colors duration-200 border border-border px-3 py-1.5"
-          >
-            {expanded ? "Close" : "Read"}
-          </button>
-        ) : mediaItem.externalUrl ? (
-          <a
-            href={mediaItem.externalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 font-sans text-xs uppercase tracking-wider text-fg-muted hover:text-fg transition-colors duration-200 border border-border px-3 py-1.5"
-          >
-            Link
-          </a>
-        ) : null}
-      </div>
-
-      {/* Expandable article content */}
-      {hasInlineContent && expanded && (
-        <div className="border-t border-border px-5 py-6 max-h-[60vh] overflow-y-auto">
-          <div className="prose prose-sm max-w-none">
-            {articleText.map((paragraph, i) => (
-              <p key={i} className="font-sans text-sm text-fg/90 leading-relaxed mb-3 last:mb-0">
-                {paragraph}
-              </p>
-            ))}
+            {/* Title */}
+            <h3 className="font-serif text-lg md:text-xl text-fg leading-snug group-hover:text-accent transition-colors duration-300">
+              {mediaItem.title}
+            </h3>
           </div>
+
+          {/* Action indicator */}
+          {canOpen && (
+            <span className="shrink-0 font-sans text-[11px] uppercase tracking-[0.15em] text-fg-muted group-hover:text-accent transition-colors duration-300 flex items-center gap-1.5">
+              {isPdf ? (
+                <>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    className="opacity-60"
+                  >
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                  PDF
+                </>
+              ) : (
+                <>
+                  {translations.read}
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    className="transform group-hover:translate-x-0.5 transition-transform duration-300 opacity-60"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </>
+              )}
+            </span>
+          )}
         </div>
+      </button>
+
+      {showOverlay && (
+        <PressOverlay
+          item={mediaItem}
+          onClose={() => setShowOverlay(false)}
+          translations={translations}
+        />
       )}
-    </div>
+    </>
   );
 }

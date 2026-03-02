@@ -6,7 +6,11 @@ import AudioPlayer from "@/components/media/AudioPlayer";
 import VideoEmbed from "@/components/media/VideoEmbed";
 import PressArticleCard from "@/components/media/PressArticleCard";
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "media" });
   return {
@@ -15,121 +19,81 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-const FALLBACK_MEDIA_ITEMS: MediaItem[] = [
-  // Audio
-  {
-    _id: "media-audio-1",
-    _type: "mediaItem",
-    title: "Scala — Interview uber Dienststelle Marienthal",
-    mediaType: "audio",
-    source: "WDR 5",
-    date: "2002-03-15",
-    externalUrl: "https://www.wdr.de",
-  },
-  {
-    _id: "media-audio-2",
-    _type: "mediaItem",
-    title: "Mosaik — Uber das Projekt Stuttgart Stammheim",
-    mediaType: "audio",
-    source: "WDR 3",
-    date: "2013-09-10",
-    externalUrl: "https://www.wdr.de",
-  },
-  // Video
-  {
-    _id: "media-video-1",
-    _type: "mediaItem",
-    title: "Andreas Magdanz — Photographer",
-    mediaType: "video",
-    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    source: "YouTube",
-    date: "2020-01-01",
-  },
-  // Press
-  {
-    _id: "media-press-1",
-    _type: "mediaItem",
-    title:
-      "Architektur des Grauens — Magdanz dokumentiert Statten der NS-Geschichte",
-    mediaType: "press",
-    source: "Suddeutsche Zeitung",
-    date: "2010-07-22",
-    externalUrl: "https://www.sueddeutsche.de",
-  },
-  {
-    _id: "media-press-2",
-    _type: "mediaItem",
-    title: "Die Orte des BND — Fotografien von Andreas Magdanz",
-    mediaType: "press",
-    source: "Frankfurter Allgemeine Zeitung",
-    date: "2009-11-05",
-    externalUrl: "https://www.faz.net",
-  },
-  {
-    _id: "media-press-3",
-    _type: "mediaItem",
-    title: "Stammheim revisited — Magdanz im Museum fur Photographie",
-    mediaType: "press",
-    source: "art-magazin.de",
-    date: "2013-10-14",
-    externalUrl: "https://www.art-magazin.de",
-  },
-];
-
-export default async function MediaPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function MediaPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("media");
 
   let mediaItems: MediaItem[] = [];
-
   try {
     mediaItems = await client.fetch<MediaItem[]>(allMediaItemsQuery);
   } catch {
-    // Sanity not connected — use fallback
+    /* Sanity not connected */
   }
 
-  const displayItems = mediaItems.length > 0 ? mediaItems : FALLBACK_MEDIA_ITEMS;
-
-  const audioItems = displayItems.filter((m) => m.mediaType === "audio");
-  const videoItems = displayItems.filter((m) => m.mediaType === "video");
-  const pressItems = displayItems.filter((m) => m.mediaType === "press");
+  const audioItems = mediaItems.filter((m) => m.mediaType === "audio");
+  const videoItems = mediaItems.filter((m) => m.mediaType === "video");
+  const pressItems = mediaItems.filter((m) => m.mediaType === "press");
 
   return (
-    <div className="px-8 md:px-12 lg:px-16 py-16 max-w-5xl mx-auto">
+    <div className="px-6 md:px-12 lg:px-16 py-16 md:py-24">
       {/* Page header */}
-      <header className="mb-16">
-        <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
+      <header className="max-w-4xl mx-auto mb-20 md:mb-28">
+        <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-fg tracking-tight leading-none">
           {t("title")}
         </h1>
-        <p className="mt-4 font-sans text-sm text-fg-muted tracking-wide max-w-md">
+        <p className="mt-5 font-sans text-sm text-fg-muted tracking-wide max-w-lg leading-relaxed">
           {t("description")}
         </p>
-        <div className="mt-6 w-12 h-px bg-accent" />
+        <div className="mt-8 w-16 h-px bg-accent" />
       </header>
 
-      <div className="space-y-20">
-        {/* Audio section */}
+      <div className="space-y-28 md:space-y-36">
+        {/* ── Video Section ── */}
+        {videoItems.length > 0 && (
+          <section className="max-w-5xl mx-auto">
+            <SectionHeader title={t("video")} />
+            <div className="space-y-16 md:space-y-20">
+              {videoItems.map((item) =>
+                item.embedUrl ? (
+                  <VideoEmbed
+                    key={item._id}
+                    title={item.title}
+                    source={item.source}
+                    date={item.date}
+                    embedUrl={item.embedUrl}
+                  />
+                ) : null
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* ── Audio Section ── */}
         {audioItems.length > 0 && (
-          <section>
-            <SectionHeading title={t("audio")} />
-            <div className="space-y-4">
+          <section className="max-w-3xl mx-auto">
+            <SectionHeader title={t("audio")} />
+            <div className="space-y-3">
               {audioItems.map((item) =>
                 item.embedUrl ? (
                   <AudioPlayer
                     key={item._id}
                     title={item.title}
                     source={item.source}
+                    date={item.date}
                     url={item.embedUrl}
                   />
                 ) : (
-                  /* No direct audio URL — render as press-style card with link */
                   <div
                     key={item._id}
-                    className="border border-border bg-bg-muted/20 p-5 flex items-start justify-between gap-4"
+                    className="py-4 border-b border-border/50 flex items-center justify-between gap-4"
                   >
-                    <div>
-                      <p className="font-sans text-xs uppercase tracking-widest text-accent mb-1">
+                    <div className="min-w-0">
+                      <p className="font-sans text-[11px] uppercase tracking-[0.2em] text-accent mb-1">
                         {item.source}
                       </p>
                       <h3 className="font-serif text-base text-fg">
@@ -141,9 +105,10 @@ export default async function MediaPage({ params }: { params: Promise<{ locale: 
                         href={item.externalUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="shrink-0 font-sans text-xs uppercase tracking-wider text-fg-muted hover:text-fg transition-colors duration-200 border border-border px-3 py-1.5"
+                        className="shrink-0 font-sans text-[11px] uppercase tracking-[0.15em] text-fg-muted hover:text-accent transition-colors duration-200"
                       >
                         {t("listen")}
+                        <span className="ml-1">&#8599;</span>
                       </a>
                     )}
                   </div>
@@ -153,37 +118,29 @@ export default async function MediaPage({ params }: { params: Promise<{ locale: 
           </section>
         )}
 
-        {/* Video section */}
-        {videoItems.length > 0 && (
-          <section>
-            <SectionHeading title={t("video")} />
-            <div className="grid sm:grid-cols-2 gap-6">
-              {videoItems.map((item) =>
-                item.embedUrl ? (
-                  <VideoEmbed
-                    key={item._id}
-                    title={item.title}
-                    embedUrl={item.embedUrl}
-                  />
-                ) : null
-              )}
-            </div>
-          </section>
-        )}
-
-        {/* Press section */}
+        {/* ── Press Section ── */}
         {pressItems.length > 0 && (
-          <section>
-            <SectionHeading title={t("press")} />
-            <div className="grid sm:grid-cols-2 gap-4">
+          <section className="max-w-3xl mx-auto">
+            <SectionHeader title={t("press")} />
+            <div>
               {pressItems.map((item) => (
-                <PressArticleCard key={item._id} mediaItem={item} />
+                <PressArticleCard
+                  key={item._id}
+                  mediaItem={item}
+                  translations={{
+                    read: t("read"),
+                    viewPdf: t("viewPdf"),
+                    openArticle: t("openArticle"),
+                    pdfAvailable: t("pdfAvailable"),
+                    externalArticle: t("externalArticle"),
+                  }}
+                />
               ))}
             </div>
           </section>
         )}
 
-        {displayItems.length === 0 && (
+        {mediaItems.length === 0 && (
           <p className="font-sans text-sm text-fg-muted text-center py-16">
             No media items found.
           </p>
@@ -193,11 +150,11 @@ export default async function MediaPage({ params }: { params: Promise<{ locale: 
   );
 }
 
-function SectionHeading({ title }: { title: string }) {
+function SectionHeader({ title }: { title: string }) {
   return (
-    <div className="mb-8">
-      <h2 className="font-serif text-2xl text-fg">{title}</h2>
-      <div className="mt-2 w-8 h-px bg-accent" />
+    <div className="mb-10 md:mb-14 flex items-center gap-6">
+      <h2 className="font-serif text-3xl md:text-4xl text-fg">{title}</h2>
+      <div className="flex-1 h-px bg-border/60" />
     </div>
   );
 }

@@ -81,3 +81,32 @@ body {
 .img-reveal.revealed {
   clip-path: inset(0 0 0 0);
 }
+
+/* Press overlay entrance */
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes overlay-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.press-overlay {
+  animation: overlay-in 0.3s ease-out;
+}
+
+.press-overlay-content {
+  animation: overlay-content-in 0.4s ease-out 0.1s both;
+}

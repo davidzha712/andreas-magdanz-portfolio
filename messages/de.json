@@ -60,7 +60,11 @@
     "read": "Lesen",
     "close": "Schließen",
     "listen": "Anhören",
-    "watchVideo": "Video ansehen"
+    "watchVideo": "Video ansehen",
+    "viewPdf": "PDF öffnen",
+    "openArticle": "Artikel öffnen",
+    "pdfAvailable": "Dieser Artikel ist als PDF verfügbar.",
+    "externalArticle": "Dieser Artikel ist auf der externen Website verfügbar."
   },
   "contact": {
     "title": "Kontakt",
