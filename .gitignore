@@ -42,3 +42,4 @@ yarn-error.log*
 next-env.d.ts
 seed/node_modules/
 seed/images/
+seed/media/
