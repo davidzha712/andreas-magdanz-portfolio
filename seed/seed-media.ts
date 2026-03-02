@@ -89,7 +89,7 @@ interface MediaItemDoc {
 
 async function main() {
   // 1. Fetch all media items that still point to the old site
-  const query = `*[_type == "mediaItem" && (mediaType == "audio" || mediaType == "video") && embedUrl match "andreasmagdanz.de*"]{
+  const query = `*[_type == "mediaItem" && (mediaType == "audio" || mediaType == "video") && embedUrl match "*andreasmagdanz.de*"]{
     _id, _type, title, mediaType, embedUrl
   }`;
   const items: MediaItemDoc[] = await client.fetch(query);
