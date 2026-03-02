@@ -75,6 +75,39 @@ export const siteSettings = defineType({
       rows: 3,
       description: "University position or academic affiliation details",
     }),
+    defineField({
+      name: "artistBio",
+      title: "Artist Biography",
+      type: "array",
+      of: [{ type: "block" }],
+      description: "Full biography text displayed on the About page",
+    }),
+    defineField({
+      name: "artistPortrait",
+      title: "Artist Portrait",
+      type: "image",
+      options: { hotspot: true },
+      description: "Portrait photo displayed on the About page",
+    }),
+    defineField({
+      name: "teachingHistory",
+      title: "Teaching History",
+      type: "array",
+      of: [{ type: "block" }],
+      description: "Teaching positions and academic history",
+    }),
+    defineField({
+      name: "galleryAddress",
+      title: "Gallery Address",
+      type: "text",
+      rows: 3,
+    }),
+    defineField({
+      name: "universityAddress",
+      title: "University Address",
+      type: "text",
+      rows: 3,
+    }),
   ],
   preview: {
     select: {

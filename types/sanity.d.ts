@@ -117,11 +117,16 @@ export interface SiteSettings {
   siteDescription: string;
   homeHeroProject?: Project;
   ogImage?: SanityImageAsset;
+  artistBio?: unknown[];
+  artistPortrait?: SanityImageAsset;
+  teachingHistory?: unknown[];
   galleryName?: string;
   galleryUrl?: string;
   galleryEmail?: string;
+  galleryAddress?: string;
   contactEmail?: string;
   contactAddress?: string;
   contactPhone?: string;
   universityInfo?: string;
+  universityAddress?: string;
 }

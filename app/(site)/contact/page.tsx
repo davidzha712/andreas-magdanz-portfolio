@@ -1,59 +1,40 @@
 import type { Metadata } from "next";
+import { client } from "@/lib/sanity/client";
+import { siteSettingsQuery } from "@/lib/sanity/queries";
+import type { SiteSettings } from "@/types/sanity";
 import ContactForm from "@/components/contact/ContactForm";
 
 export const metadata: Metadata = {
-  title: "Contact — Andreas Magdanz",
+  title: "Kontakt — Andreas Magdanz",
   description:
-    "Contact Andreas Magdanz — studio and gallery enquiries, exhibition loans, publication requests.",
+    "Kontakt zu Andreas Magdanz — Ausstellungsanfragen, Presseanfragen, Printverkauf.",
 };
 
-const CONTACT_INFO = [
-  {
-    label: "Gallery",
-    name: "Janet Borden Inc.",
-    lines: [
-      "560 Broadway, Suite 601",
-      "New York, NY 10012",
-      "United States",
-    ],
-    link: {
-      href: "https://www.janetbordeninc.com",
-      label: "janetbordeninc.com",
-    },
-  },
-  {
-    label: "Studio",
-    name: "Andreas Magdanz",
-    lines: [
-      "Kapellenstraße 66",
-      "D-52066 Aachen",
-      "Germany",
-    ],
-    link: null,
-  },
-  {
-    label: "University",
-    name: "HAWK Hildesheim/Holzminden/Göttingen",
-    lines: [
-      "Faculty of Design",
-      "Lübecker Straße 2",
-      "31134 Hildesheim, Germany",
-    ],
-    link: {
-      href: "https://www.hawk.de",
-      label: "hawk.de",
-    },
-  },
-];
+export default async function ContactPage() {
+  let settings: SiteSettings | null = null;
 
-export default function ContactPage() {
+  try {
+    settings = await client.fetch<SiteSettings>(siteSettingsQuery);
+  } catch {
+    // Sanity not connected
+  }
+
+  const galleryName = settings?.galleryName ?? "Janet Borden Inc.";
+  const galleryAddress = settings?.galleryAddress ?? "560 Broadway, Suite 601\nNew York, NY 10012\nUnited States";
+  const galleryUrl = settings?.galleryUrl ?? "https://www.janetbordeninc.com";
+  const contactAddress = settings?.contactAddress ?? "Kapellenstraße 66\nD-52066 Aachen\nGermany";
+  const contactEmail = settings?.contactEmail ?? "magdanz@andreasmagdanz.de";
+  const contactPhone = settings?.contactPhone ?? "";
+  const universityInfo = settings?.universityInfo ?? "HAWK Hildesheim/Holzminden/Göttingen";
+  const universityAddress = settings?.universityAddress ?? "Fakultät Gestaltung\nLübecker Straße 2\n31134 Hildesheim, Germany";
+
   return (
     <div className="px-8 md:px-12 lg:px-16 py-16">
       <div className="max-w-5xl mx-auto">
         {/* Page header */}
         <header className="mb-16">
           <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
-            Contact
+            Kontakt
           </h1>
           <div className="mt-4 w-12 h-px bg-accent" />
         </header>
@@ -62,42 +43,77 @@ export default function ContactPage() {
           {/* Left: Contact form */}
           <div>
             <p className="font-sans text-sm text-fg-muted mb-8 leading-relaxed max-w-md">
-              For exhibition enquiries, press requests, print sales, or general
-              correspondence, please use the form below.
+              Sie haben Fragen, Kritik oder Anregungen? Für Ausstellungsanfragen, Presseanfragen,
+              Printverkauf oder allgemeine Korrespondenz nutzen Sie bitte das Formular.
             </p>
             <ContactForm />
           </div>
 
           {/* Right: Contact info cards */}
           <aside className="space-y-6">
-            {CONTACT_INFO.map((info) => (
-              <div
-                key={info.label}
-                className="border border-border p-6 bg-bg-muted/20"
+            {/* Gallery */}
+            <div className="border border-border p-6 bg-bg-muted/20">
+              <p className="font-sans text-xs uppercase tracking-widest text-accent mb-3">
+                Gallery
+              </p>
+              <p className="font-serif text-lg text-fg mb-2">{galleryName}</p>
+              <p className="font-sans text-sm text-fg-muted whitespace-pre-line">
+                {galleryAddress}
+              </p>
+              <a
+                href={galleryUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mt-3 font-sans text-xs text-accent hover:text-fg transition-colors duration-200"
               >
-                <p className="font-sans text-xs uppercase tracking-widest text-accent mb-3">
-                  {info.label}
+                janetbordeninc.com
+              </a>
+            </div>
+
+            {/* Studio */}
+            <div className="border border-border p-6 bg-bg-muted/20">
+              <p className="font-sans text-xs uppercase tracking-widest text-accent mb-3">
+                Studio
+              </p>
+              <p className="font-serif text-lg text-fg mb-2">Andreas Magdanz</p>
+              <address className="not-italic">
+                <p className="font-sans text-sm text-fg-muted whitespace-pre-line">
+                  {contactAddress}
                 </p>
-                <p className="font-serif text-lg text-fg mb-2">{info.name}</p>
-                <address className="not-italic">
-                  {info.lines.map((line, i) => (
-                    <p key={i} className="font-sans text-sm text-fg-muted">
-                      {line}
-                    </p>
-                  ))}
-                </address>
-                {info.link && (
-                  <a
-                    href={info.link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-3 font-sans text-xs text-accent hover:text-fg transition-colors duration-200"
-                  >
-                    {info.link.label}
-                  </a>
-                )}
-              </div>
-            ))}
+              </address>
+              {contactEmail && (
+                <a
+                  href={`mailto:${contactEmail}`}
+                  className="inline-block mt-3 font-sans text-xs text-accent hover:text-fg transition-colors duration-200"
+                >
+                  {contactEmail}
+                </a>
+              )}
+              {contactPhone && (
+                <p className="font-sans text-xs text-fg-muted mt-1">
+                  Tel: {contactPhone}
+                </p>
+              )}
+            </div>
+
+            {/* University */}
+            <div className="border border-border p-6 bg-bg-muted/20">
+              <p className="font-sans text-xs uppercase tracking-widest text-accent mb-3">
+                Universität
+              </p>
+              <p className="font-serif text-lg text-fg mb-2">{universityInfo}</p>
+              <p className="font-sans text-sm text-fg-muted whitespace-pre-line">
+                {universityAddress}
+              </p>
+              <a
+                href="https://www.hawk.de"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mt-3 font-sans text-xs text-accent hover:text-fg transition-colors duration-200"
+              >
+                hawk.de
+              </a>
+            </div>
           </aside>
         </div>
       </div>

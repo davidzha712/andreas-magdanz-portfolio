@@ -1,39 +1,62 @@
 import type { Metadata } from "next";
+import { client } from "@/lib/sanity/client";
+import { siteSettingsQuery } from "@/lib/sanity/queries";
+import type { SiteSettings } from "@/types/sanity";
+import SanityImage from "@/components/shared/SanityImage";
+import type { PortableTextBlock } from "sanity";
 
 export const metadata: Metadata = {
   title: "About — Andreas Magdanz",
   description:
-    "Andreas Magdanz (born 1964, Munich) is a German photographer known for large-format documentary series examining historically and politically significant sites.",
+    "Andreas Magdanz — Fotograf, Professor an der HAWK Hildesheim. Dokumentarische Großformatfotografie zu historisch und politisch bedeutsamen Orten.",
 };
 
-const BIOGRAPHY = `Andreas Magdanz (born 1964, Munich) is a German photographer known for his large-format documentary series examining historically and politically significant sites. His work investigates architecture as a manifestation of power, ideology, and historical memory.
+function BlockRenderer({ blocks }: { blocks: PortableTextBlock[] }) {
+  return (
+    <>
+      {blocks.map((block, i) => {
+        if (block._type !== "block") return null;
+        const text = (block.children as { text: string }[])
+          ?.map((child) => child.text)
+          .join("");
+        if (!text) return null;
 
-After studying photography at Folkwangschule Essen and Hochschule für Bildende Künste Braunschweig, Magdanz gained international recognition with his project Dienststelle Marienthal, documenting the former West German government bunker.
+        const style = block.style || "normal";
+        if (style === "h2") {
+          return (
+            <h2 key={block._key ?? i} className="font-serif text-3xl text-fg mt-8 mb-4">
+              {text}
+            </h2>
+          );
+        }
+        if (style === "h3") {
+          return (
+            <h3 key={block._key ?? i} className="font-serif text-xl text-fg mt-6 mb-3">
+              {text}
+            </h3>
+          );
+        }
+        return (
+          <p key={block._key ?? i} className="font-serif text-lg text-fg leading-relaxed mb-4">
+            {text}
+          </p>
+        );
+      })}
+    </>
+  );
+}
 
-His subsequent projects — including Auschwitz-Birkenau, BND-Standort Pullach, NS-Ordensburg Vogelsang, and Stuttgart Stammheim — form a coherent body of work exploring the intersection of architecture, history, and collective memory.
+export default async function AboutPage() {
+  let settings: SiteSettings | null = null;
 
-Magdanz's work is held in numerous public and private collections, including SFMOMA San Francisco and Kunstpalast Düsseldorf. He is represented by Janet Borden Inc., New York.
+  try {
+    settings = await client.fetch<SiteSettings>(siteSettingsQuery);
+  } catch {
+    // Sanity not connected
+  }
 
-Since 2005, he has served as Professor of Photography at HAWK Hildesheim/Holzminden/Göttingen. He lives and works in Aachen, Germany.`;
-
-const TEACHING = [
-  {
-    period: "since 2005",
-    role: "Professor of Photography",
-    institution: "HAWK Hildesheim/Holzminden/Göttingen",
-    department: "Faculty of Design",
-    location: "Hildesheim, Germany",
-  },
-  {
-    period: "2000–2005",
-    role: "Visiting Lecturer, Photography",
-    institution: "RWTH Aachen",
-    location: "Aachen, Germany",
-  },
-];
-
-export default function AboutPage() {
-  const paragraphs = BIOGRAPHY.split("\n\n").filter(Boolean);
+  const hasBio = settings?.artistBio && (settings.artistBio as PortableTextBlock[]).length > 0;
+  const hasTeaching = settings?.teachingHistory && (settings.teachingHistory as PortableTextBlock[]).length > 0;
 
   return (
     <div className="px-8 md:px-12 lg:px-16 py-16">
@@ -41,37 +64,51 @@ export default function AboutPage() {
         {/* Page header */}
         <header className="mb-16">
           <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
-            About
+            Andreas Magdanz
           </h1>
-          <div className="mt-4 w-12 h-px bg-accent" />
+          <p className="mt-4 font-sans text-sm text-fg-muted tracking-wide">
+            Fotograf — Aachen, Germany
+          </p>
+          <div className="mt-6 w-12 h-px bg-accent" />
         </header>
 
         {/* Split layout: portrait + biography */}
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 mb-20">
-          {/* Left: portrait placeholder */}
+          {/* Left: portrait */}
           <div className="lg:w-1/3 shrink-0">
             <div className="sticky top-24">
-              <div className="relative aspect-[3/4] bg-bg-muted overflow-hidden">
-                {/* Placeholder portrait */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="48"
-                    height="48"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="0.75"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-fg-muted/20"
-                    aria-hidden="true"
-                  >
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
+              {settings?.artistPortrait ? (
+                <div className="relative aspect-[3/4] overflow-hidden">
+                  <SanityImage
+                    image={settings.artistPortrait}
+                    alt="Andreas Magdanz"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 33vw"
+                    className="object-cover"
+                  />
                 </div>
-              </div>
+              ) : (
+                <div className="relative aspect-[3/4] bg-bg-muted overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="48"
+                      height="48"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="0.75"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-fg-muted/20"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  </div>
+                </div>
+              )}
               <p className="mt-3 font-sans text-xs text-fg-muted">
                 Andreas Magdanz
                 <span className="block text-fg-muted/60">
@@ -81,66 +118,35 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Right: biography text */}
+          {/* Right: biography from CMS */}
           <div className="lg:w-2/3">
-            <div className="space-y-5">
-              {paragraphs.map((paragraph, i) => (
-                <p
-                  key={i}
-                  className="font-serif text-lg text-fg leading-relaxed"
-                >
-                  {paragraph}
+            {hasBio ? (
+              <BlockRenderer blocks={settings!.artistBio as PortableTextBlock[]} />
+            ) : (
+              <div className="space-y-5">
+                <p className="font-serif text-lg text-fg leading-relaxed">
+                  Andreas Magdanz (geb. 1964, Mönchengladbach) ist ein deutscher Fotograf, bekannt für seine dokumentarischen Großformatserien, die historisch und politisch bedeutsame Orte untersuchen.
                 </p>
-              ))}
-            </div>
+                <p className="font-serif text-lg text-fg leading-relaxed">
+                  Seine Arbeiten umfassen Projekte wie Dienststelle Marienthal, Auschwitz-Birkenau, BND-Standort Pullach, NS-Ordensburg Vogelsang und Stuttgart Stammheim.
+                </p>
+                <p className="font-serif text-lg text-fg leading-relaxed">
+                  Seit 2005 ist er Professor für Fotografie an der HAWK Hildesheim/Holzminden/Göttingen. Er lebt und arbeitet in Aachen.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Teaching section */}
-        <section className="border-t border-border pt-16">
-          <div className="mb-8">
-            <h2 className="font-serif text-3xl text-fg">Teaching</h2>
-            <div className="mt-3 w-10 h-px bg-accent" />
-          </div>
-
-          <div className="space-y-8">
-            {TEACHING.map((position, i) => (
-              <div
-                key={i}
-                className="sm:grid sm:grid-cols-[160px_1fr] sm:gap-8"
-              >
-                {/* Period */}
-                <div className="mb-1 sm:mb-0">
-                  <span className="font-sans text-sm text-fg-muted tracking-wide">
-                    {position.period}
-                  </span>
-                </div>
-
-                {/* Content */}
-                <div>
-                  <p className="font-serif text-lg text-fg">
-                    {position.role}
-                  </p>
-                  <p className="font-sans text-sm text-fg-muted mt-0.5">
-                    {position.institution}
-                    {position.department && (
-                      <span className="text-fg-muted/70">
-                        {" "}
-                        — {position.department}
-                      </span>
-                    )}
-                  </p>
-                  <p className="font-sans text-xs text-fg-muted/70 mt-0.5">
-                    {position.location}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* Teaching section from CMS */}
+        {hasTeaching && (
+          <section className="border-t border-border pt-16 mb-16">
+            <BlockRenderer blocks={settings!.teachingHistory as PortableTextBlock[]} />
+          </section>
+        )}
 
         {/* Gallery representation */}
-        <section className="border-t border-border pt-16 mt-16">
+        <section className="border-t border-border pt-16">
           <div className="mb-8">
             <h2 className="font-serif text-3xl text-fg">Representation</h2>
             <div className="mt-3 w-10 h-px bg-accent" />
@@ -151,12 +157,20 @@ export default function AboutPage() {
               New York
             </span>
             <div>
-              <p className="font-serif text-lg text-fg">Janet Borden Inc.</p>
-              <p className="font-sans text-sm text-fg-muted mt-0.5">
-                560 Broadway, Suite 601, New York, NY 10012
+              <p className="font-serif text-lg text-fg">
+                {settings?.galleryName ?? "Janet Borden Inc."}
               </p>
+              {settings?.galleryAddress ? (
+                <p className="font-sans text-sm text-fg-muted mt-0.5 whitespace-pre-line">
+                  {settings.galleryAddress}
+                </p>
+              ) : (
+                <p className="font-sans text-sm text-fg-muted mt-0.5">
+                  560 Broadway, Suite 601, New York, NY 10012
+                </p>
+              )}
               <a
-                href="https://www.janetbordeninc.com"
+                href={settings?.galleryUrl ?? "https://www.janetbordeninc.com"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-sans text-xs text-accent hover:text-fg transition-colors duration-200 mt-1 inline-block"
