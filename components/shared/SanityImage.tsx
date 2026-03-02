@@ -34,6 +34,13 @@ export default function SanityImage({
         .fit("max")
         .url();
 
+  // Apply Sanity hotspot as CSS object-position so object-cover
+  // crops around the photographer's chosen focal point
+  const hotspot = image.hotspot;
+  const objectPosition = hotspot
+    ? `${hotspot.x * 100}% ${hotspot.y * 100}%`
+    : undefined;
+
   if (fill) {
     return (
       <Image
@@ -42,6 +49,7 @@ export default function SanityImage({
         fill={true}
         sizes={sizes ?? "100vw"}
         className={className}
+        style={objectPosition ? { objectPosition } : undefined}
         priority={priority}
       />
     );
@@ -55,6 +63,7 @@ export default function SanityImage({
       height={height ?? 800}
       sizes={sizes}
       className={className}
+      style={objectPosition ? { objectPosition } : undefined}
       priority={priority}
     />
   );
