@@ -101,6 +101,7 @@ export default async function WorkDetailPage({ params }: PageProps) {
   }
 
   const hasImages = project.images && project.images.length > 0;
+  const hasStatement = project.artistStatement && project.artistStatement.length > 0;
 
   return (
     <article>
@@ -143,54 +144,51 @@ export default async function WorkDetailPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Main content: images + sidebar */}
-      {hasImages && (
-        <div className="px-8 md:px-12 lg:px-16 pb-24">
-          <div className="max-w-5xl mx-auto">
-            <div className="lg:grid lg:grid-cols-[1fr_280px] lg:gap-12 xl:gap-16">
-              {/* Left: image sequence + lightbox (client component) */}
-              <ProjectDetailClient project={project} />
+      {/* Main content: images + statement + meta */}
+      <div className="px-8 md:px-12 lg:px-16 pb-24">
+        <div className="max-w-5xl mx-auto">
+          <div className={hasImages ? "lg:grid lg:grid-cols-[1fr_280px] lg:gap-12 xl:gap-16" : ""}>
+            {/* Left: image sequence + lightbox (client component) */}
+            {hasImages && <ProjectDetailClient project={project} />}
 
-              {/* Right: sticky sidebar */}
-              <aside className="hidden lg:block">
-                <div className="sticky top-24 space-y-10">
-                  {/* Artist statement */}
-                  {project.artistStatement && project.artistStatement.length > 0 && (
-                    <div>
-                      <h2 className="font-sans text-xs tracking-widest uppercase text-fg-muted mb-4">
-                        Statement
-                      </h2>
-                      {/* Dynamically import to avoid SSR issues with PortableText */}
-                      <div className="font-serif text-base text-fg leading-relaxed space-y-3">
-                        <StatementRenderer blocks={project.artistStatement} />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Metadata */}
+            {/* Right: sticky sidebar (desktop) */}
+            <aside className={hasImages ? "hidden lg:block" : ""}>
+              <div className={hasImages ? "sticky top-24 space-y-10" : "space-y-10"}>
+                {/* Artist statement */}
+                {hasStatement && (
                   <div>
                     <h2 className="font-sans text-xs tracking-widest uppercase text-fg-muted mb-4">
-                      Details
+                      Statement
                     </h2>
-                    <ProjectMeta project={project} />
+                    <div className="font-serif text-base text-fg leading-relaxed space-y-3">
+                      <StatementRenderer blocks={project.artistStatement!} />
+                    </div>
                   </div>
+                )}
+
+                {/* Metadata */}
+                <div>
+                  <h2 className="font-sans text-xs tracking-widest uppercase text-fg-muted mb-4">
+                    Details
+                  </h2>
+                  <ProjectMeta project={project} />
                 </div>
-              </aside>
-            </div>
+              </div>
+            </aside>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Mobile statement + meta (shown below images on small screens) */}
+      {/* Mobile statement + meta (shown below images on small screens, only when we have the grid layout) */}
       {hasImages && (
         <div className="lg:hidden px-8 md:px-12 pb-16 space-y-10">
-          {project.artistStatement && project.artistStatement.length > 0 && (
+          {hasStatement && (
             <div>
               <h2 className="font-sans text-xs tracking-widest uppercase text-fg-muted mb-4">
                 Statement
               </h2>
               <div className="font-serif text-base text-fg leading-relaxed">
-                <StatementRenderer blocks={project.artistStatement} />
+                <StatementRenderer blocks={project.artistStatement!} />
               </div>
             </div>
           )}
