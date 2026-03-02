@@ -7,9 +7,10 @@ import type { Project } from "@/types/sanity";
 
 interface HeroSectionProps {
   project: Project;
+  scrollLabel?: string;
 }
 
-export default function HeroSection({ project }: HeroSectionProps) {
+export default function HeroSection({ project, scrollLabel = "Scroll" }: HeroSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
 
@@ -91,7 +92,7 @@ export default function HeroSection({ project }: HeroSectionProps) {
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-fg-muted/60">
         <span className="font-sans text-[10px] tracking-widest uppercase">
-          Scroll
+          {scrollLabel}
         </span>
         <ScrollChevron />
       </div>

@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps) {
   const { slug, locale } = await params;
 
   try {
-    const project = await client.fetch<Project>(projectBySlugQuery, { slug });
+    const project = await client.fetch<Project>(projectBySlugQuery, { slug, locale });
     if (!project) {
       const t = await getTranslations({ locale, namespace: "work" });
       return { title: `${t("title")} — Andreas Magdanz` };
@@ -63,7 +63,7 @@ export default async function WorkDetailPage({ params }: PageProps) {
   let project: Project | null = null;
 
   try {
-    project = await client.fetch<Project>(projectBySlugQuery, { slug });
+    project = await client.fetch<Project>(projectBySlugQuery, { slug, locale });
   } catch {
     // Sanity not connected
   }
@@ -206,7 +206,7 @@ export default async function WorkDetailPage({ params }: PageProps) {
 
       {/* Related exhibitions */}
       {(project as Project & { relatedExhibitions?: { _id: string; title: string; venue: string; city: string; year: number }[] }).relatedExhibitions?.length ? (
-        <RelatedSection title="Exhibitions">
+        <RelatedSection title={t("relatedExhibitions")}>
           <ul className="space-y-3">
             {(project as Project & { relatedExhibitions: { _id: string; title: string; venue: string; city: string; year: number }[] }).relatedExhibitions.map(
               (ex) => (
@@ -232,7 +232,7 @@ export default async function WorkDetailPage({ params }: PageProps) {
 
       {/* Related publications */}
       {(project as Project & { relatedPublications?: { _id: string; title: string; publisher: string; year: number; purchaseUrl?: string }[] }).relatedPublications?.length ? (
-        <RelatedSection title="Publications">
+        <RelatedSection title={t("relatedPublications")}>
           <ul className="space-y-3">
             {(project as Project & { relatedPublications: { _id: string; title: string; publisher: string; year: number; purchaseUrl?: string }[] }).relatedPublications.map(
               (pub) => (

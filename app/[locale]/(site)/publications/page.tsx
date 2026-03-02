@@ -80,7 +80,7 @@ export default async function PublicationsPage({ params }: { params: Promise<{ l
   let publications: Publication[] = [];
 
   try {
-    publications = await client.fetch<Publication[]>(allPublicationsQuery);
+    publications = await client.fetch<Publication[]>(allPublicationsQuery, { locale });
   } catch {
     // Sanity not connected — use fallback
   }

@@ -110,3 +110,42 @@ body {
 .press-overlay-content {
   animation: overlay-content-in 0.4s ease-out 0.1s both;
 }
+
+/* PDF Book Viewer */
+.pdf-book-container {
+  width: 100%;
+}
+
+.pdf-book {
+  margin: 0 auto;
+}
+
+.pdf-page {
+  background: #fff;
+  overflow: hidden;
+}
+
+.pdf-cover {
+  background: #141414;
+}
+
+.pdf-page canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Spine shadow for left/right pages */
+.pdf-page:nth-child(odd) {
+  box-shadow: inset -6px 0 12px -4px rgba(0, 0, 0, 0.08);
+}
+
+.pdf-page:nth-child(even) {
+  box-shadow: inset 6px 0 12px -4px rgba(0, 0, 0, 0.08);
+}
+
+/* Override react-pageflip defaults */
+.stf__parent {
+  margin: 0 auto;
+  z-index: 0 !important;
+}

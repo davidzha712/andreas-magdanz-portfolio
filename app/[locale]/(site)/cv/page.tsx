@@ -3,7 +3,7 @@ import { client } from "@/lib/sanity/client";
 import { allCVEntriesQuery } from "@/lib/sanity/queries";
 import type { CVEntry } from "@/types/sanity";
 import CVTimeline from "@/components/cv/CVTimeline";
-import CVDownloadButton from "@/components/cv/CVDownloadButton";
+
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -11,7 +11,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: `${t("title")} — Andreas Magdanz`,
     description:
-      "Curriculum vitae of Andreas Magdanz — exhibitions, awards, collections, teaching positions, and education.",
+      locale === "en"
+        ? "Curriculum vitae of Andreas Magdanz — exhibitions, awards, collections, teaching positions, and education."
+        : "Lebenslauf von Andreas Magdanz — Ausstellungen, Auszeichnungen, Sammlungen, Lehrpositionen und Ausbildung.",
   };
 }
 
@@ -115,7 +117,7 @@ export default async function CVPage({ params }: { params: Promise<{ locale: str
   let entries: CVEntry[] = [];
 
   try {
-    entries = await client.fetch<CVEntry[]>(allCVEntriesQuery);
+    entries = await client.fetch<CVEntry[]>(allCVEntriesQuery, { locale });
   } catch {
     // Sanity not connected — use fallback
   }
@@ -125,23 +127,18 @@ export default async function CVPage({ params }: { params: Promise<{ locale: str
   return (
     <div className="px-8 md:px-12 lg:px-16 py-16 max-w-4xl mx-auto">
       {/* Page header */}
-      <header className="mb-16 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
-        <div>
-          <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
-            {t("title")}
-          </h1>
-          <div className="mt-4 w-12 h-px bg-accent" />
-        </div>
-        <CVDownloadButton />
+      <header className="mb-16">
+        <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
+          {t("title")}
+        </h1>
+        <div className="mt-4 w-12 h-px bg-accent" />
       </header>
 
       {/* Timeline */}
       <CVTimeline entries={displayEntries} />
 
       {/* Footer spacer */}
-      <div className="mt-24 pt-16 border-t border-border flex justify-end">
-        <CVDownloadButton />
-      </div>
+      <div className="mt-24 pt-16 border-t border-border" />
     </div>
   );
 }

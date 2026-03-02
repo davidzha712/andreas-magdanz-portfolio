@@ -21,7 +21,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
   let settings: SiteSettings | null = null;
 
   try {
-    settings = await client.fetch<SiteSettings>(siteSettingsQuery);
+    settings = await client.fetch<SiteSettings>(siteSettingsQuery, { locale });
   } catch {
     // Sanity not connected
   }

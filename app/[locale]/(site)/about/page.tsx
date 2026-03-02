@@ -11,7 +11,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: `${t("title")} — ${t("subtitle")}`,
     description:
-      "Andreas Magdanz — Fotograf, Professor an der HAWK Hildesheim. Dokumentarische Grossformatfotografie zu historisch und politisch bedeutsamen Orten.",
+      locale === "en"
+        ? "Andreas Magdanz — Photographer, Professor at HAWK Hildesheim. Documentary large-format photography of historically and politically significant sites."
+        : "Andreas Magdanz — Fotograf, Professor an der HAWK Hildesheim. Dokumentarische Grossformatfotografie zu historisch und politisch bedeutsamen Orten.",
   };
 }
 
@@ -58,7 +60,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   let settings: SiteSettings | null = null;
 
   try {
-    settings = await client.fetch<SiteSettings>(siteSettingsQuery);
+    settings = await client.fetch<SiteSettings>(siteSettingsQuery, { locale });
   } catch {
     // Sanity not connected
   }
@@ -120,7 +122,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
               <p className="mt-3 font-sans text-xs text-fg-muted">
                 Andreas Magdanz
                 <span className="block text-fg-muted/60">
-                  Aachen, Germany
+                  {locale === "en" ? "Aachen, Germany" : "Aachen, Deutschland"}
                 </span>
               </p>
             </div>
@@ -132,15 +134,31 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
               <BlockRenderer blocks={settings!.artistBio as PortableTextBlock[]} />
             ) : (
               <div className="space-y-5">
-                <p className="font-serif text-lg text-fg leading-relaxed">
-                  Andreas Magdanz (geb. 1964, Monchengladbach) ist ein deutscher Fotograf, bekannt fur seine dokumentarischen Grossformatserien, die historisch und politisch bedeutsame Orte untersuchen.
-                </p>
-                <p className="font-serif text-lg text-fg leading-relaxed">
-                  Seine Arbeiten umfassen Projekte wie Dienststelle Marienthal, Auschwitz-Birkenau, BND-Standort Pullach, NS-Ordensburg Vogelsang und Stuttgart Stammheim.
-                </p>
-                <p className="font-serif text-lg text-fg leading-relaxed">
-                  Seit 2005 ist er Professor fur Fotografie an der HAWK Hildesheim/Holzminden/Gottingen. Er lebt und arbeitet in Aachen.
-                </p>
+                {locale === "en" ? (
+                  <>
+                    <p className="font-serif text-lg text-fg leading-relaxed">
+                      Andreas Magdanz (b. 1964, Monchengladbach) is a German photographer known for his documentary large-format series examining historically and politically significant sites.
+                    </p>
+                    <p className="font-serif text-lg text-fg leading-relaxed">
+                      His work includes projects such as Dienststelle Marienthal, Auschwitz-Birkenau, BND-Standort Pullach, NS-Ordensburg Vogelsang, and Stuttgart Stammheim.
+                    </p>
+                    <p className="font-serif text-lg text-fg leading-relaxed">
+                      Since 2005, he has been Professor of Photography at HAWK Hildesheim/Holzminden/Gottingen. He lives and works in Aachen.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-serif text-lg text-fg leading-relaxed">
+                      Andreas Magdanz (geb. 1964, Monchengladbach) ist ein deutscher Fotograf, bekannt fur seine dokumentarischen Grossformatserien, die historisch und politisch bedeutsame Orte untersuchen.
+                    </p>
+                    <p className="font-serif text-lg text-fg leading-relaxed">
+                      Seine Arbeiten umfassen Projekte wie Dienststelle Marienthal, Auschwitz-Birkenau, BND-Standort Pullach, NS-Ordensburg Vogelsang und Stuttgart Stammheim.
+                    </p>
+                    <p className="font-serif text-lg text-fg leading-relaxed">
+                      Seit 2005 ist er Professor fur Fotografie an der HAWK Hildesheim/Holzminden/Gottingen. Er lebt und arbeitet in Aachen.
+                    </p>
+                  </>
+                )}
               </div>
             )}
           </div>

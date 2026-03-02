@@ -30,7 +30,7 @@ export default async function MediaPage({
 
   let mediaItems: MediaItem[] = [];
   try {
-    mediaItems = await client.fetch<MediaItem[]>(allMediaItemsQuery);
+    mediaItems = await client.fetch<MediaItem[]>(allMediaItemsQuery, { locale });
   } catch {
     /* Sanity not connected */
   }
@@ -66,6 +66,7 @@ export default async function MediaPage({
                     source={item.source}
                     date={item.date}
                     embedUrl={item.embedUrl}
+                    locale={locale}
                   />
                 ) : null
               )}
@@ -86,6 +87,7 @@ export default async function MediaPage({
                     source={item.source}
                     date={item.date}
                     url={item.embedUrl}
+                    locale={locale}
                   />
                 ) : (
                   <div
@@ -127,12 +129,18 @@ export default async function MediaPage({
                 <PressArticleCard
                   key={item._id}
                   mediaItem={item}
+                  locale={locale}
                   translations={{
                     read: t("read"),
                     viewPdf: t("viewPdf"),
                     openArticle: t("openArticle"),
                     pdfAvailable: t("pdfAvailable"),
                     externalArticle: t("externalArticle"),
+                    loading: t("loading"),
+                    error: t("error"),
+                    pageOf: t("pageOf"),
+                    pageTotal: t("pageTotal"),
+                    downloadPdf: t("downloadPdf"),
                   }}
                 />
               ))}
@@ -142,7 +150,7 @@ export default async function MediaPage({
 
         {mediaItems.length === 0 && (
           <p className="font-sans text-sm text-fg-muted text-center py-16">
-            No media items found.
+            {t("noResults")}
           </p>
         )}
       </div>

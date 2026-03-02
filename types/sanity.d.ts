@@ -44,7 +44,9 @@ export interface Project {
   year: string;
   location?: string;
   artistStatement?: PortableTextBlock[];
+  artistStatementEn?: PortableTextBlock[];
   description?: PortableTextBlock[];
+  descriptionEn?: PortableTextBlock[];
   isFeatured: boolean;
   order?: number;
   seo?: SEOFields;
@@ -58,11 +60,13 @@ export interface Exhibition {
   venue: string;
   city: string;
   country: string;
+  countryEn?: string;
   year: number;
   endYear?: number;
   venueImage?: SanityImageAsset;
   relatedProject?: { _ref: string };
   description?: PortableTextBlock[];
+  descriptionEn?: PortableTextBlock[];
 }
 
 export interface Publication {
@@ -75,18 +79,32 @@ export interface Publication {
   coverImage?: SanityImageAsset;
   purchaseUrl?: string;
   description?: PortableTextBlock[];
+  descriptionEn?: PortableTextBlock[];
+}
+
+export interface SanityFileAsset {
+  _type: "file";
+  asset: {
+    _ref: string;
+    _type: "reference";
+    url?: string;
+  };
 }
 
 export interface MediaItem {
   _id: string;
   _type: "mediaItem";
   title: string;
+  titleEn?: string;
   mediaType: "audio" | "video" | "press";
   embedUrl?: string;
   externalUrl?: string;
+  pdfFile?: SanityFileAsset;
+  pdfUrl?: string;
   source: string;
   date: string;
   description?: PortableTextBlock[];
+  descriptionEn?: PortableTextBlock[];
   thumbnail?: SanityImageAsset;
 }
 
@@ -105,9 +123,11 @@ export interface CVEntry {
   year: number;
   endYear?: number;
   title: string;
+  titleEn?: string;
   institution?: string;
   location?: string;
   description?: string;
+  descriptionEn?: string;
 }
 
 export interface SiteSettings {
@@ -115,11 +135,15 @@ export interface SiteSettings {
   _type: "siteSettings";
   siteTitle: string;
   siteDescription: string;
+  siteDescriptionEn?: string;
   homeHeroProject?: Project;
+  heroImage?: SanityImageAsset;
   ogImage?: SanityImageAsset;
   artistBio?: unknown[];
+  artistBioEn?: unknown[];
   artistPortrait?: SanityImageAsset;
   teachingHistory?: unknown[];
+  teachingHistoryEn?: unknown[];
   galleryName?: string;
   galleryUrl?: string;
   galleryEmail?: string;
@@ -128,5 +152,6 @@ export interface SiteSettings {
   contactAddress?: string;
   contactPhone?: string;
   universityInfo?: string;
+  universityInfoEn?: string;
   universityAddress?: string;
 }

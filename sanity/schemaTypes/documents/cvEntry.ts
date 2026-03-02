@@ -47,9 +47,15 @@ export const cvEntry = defineType({
     }),
     defineField({
       name: "title",
-      title: "Title",
+      title: "Title (DE)",
       type: "string",
       validation: (r) => r.required(),
+    }),
+    defineField({
+      name: "titleEn",
+      title: "Title (EN)",
+      type: "string",
+      description: "English title — falls back to German if empty",
     }),
     defineField({
       name: "institution",
@@ -64,9 +70,16 @@ export const cvEntry = defineType({
     }),
     defineField({
       name: "description",
-      title: "Description",
+      title: "Description (DE)",
       type: "text",
       rows: 3,
+    }),
+    defineField({
+      name: "descriptionEn",
+      title: "Description (EN)",
+      type: "text",
+      rows: 3,
+      description: "English description — falls back to German if empty",
     }),
   ],
   preview: {

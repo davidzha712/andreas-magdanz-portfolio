@@ -7,6 +7,7 @@ interface AudioPlayerProps {
   source: string;
   date?: string;
   url: string;
+  locale?: string;
 }
 
 function resolveAudioUrl(url: string): string {
@@ -24,6 +25,7 @@ export default function AudioPlayer({
   source,
   date,
   url,
+  locale = "de",
 }: AudioPlayerProps) {
   const resolvedUrl = resolveAudioUrl(url);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -33,7 +35,7 @@ export default function AudioPlayer({
   const [currentTime, setCurrentTime] = useState(0);
 
   const formattedDate = date
-    ? new Date(date + "T00:00:00").toLocaleDateString("de-DE", {
+    ? new Date(date + "T00:00:00").toLocaleDateString(locale === "en" ? "en-US" : "de-DE", {
         year: "numeric",
       })
     : null;

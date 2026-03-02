@@ -40,9 +40,15 @@ export const exhibition = defineType({
     }),
     defineField({
       name: "country",
-      title: "Country",
+      title: "Country (DE)",
       type: "string",
       validation: (r) => r.required(),
+    }),
+    defineField({
+      name: "countryEn",
+      title: "Country (EN)",
+      type: "string",
+      description: "English country name — falls back to German if empty",
     }),
     defineField({
       name: "year",
@@ -80,8 +86,14 @@ export const exhibition = defineType({
     }),
     defineField({
       name: "description",
-      title: "Description",
+      title: "Description (DE)",
       type: "blockContent",
+    }),
+    defineField({
+      name: "descriptionEn",
+      title: "Description (EN)",
+      type: "blockContent",
+      description: "English description — falls back to German if empty",
     }),
   ],
   preview: {

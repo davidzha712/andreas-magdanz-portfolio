@@ -6,28 +6,36 @@ import PressOverlay from "./PressOverlay";
 
 interface PressArticleCardProps {
   mediaItem: MediaItem;
+  locale?: string;
   translations: {
     read: string;
     viewPdf: string;
     openArticle: string;
     pdfAvailable: string;
     externalArticle: string;
+    loading: string;
+    error: string;
+    pageOf: string;
+    pageTotal: string;
+    downloadPdf: string;
   };
 }
 
 export default function PressArticleCard({
   mediaItem,
+  locale = "de",
   translations,
 }: PressArticleCardProps) {
   const [showOverlay, setShowOverlay] = useState(false);
 
   const hasContent = mediaItem.description && mediaItem.description.length > 0;
+  const hasPdfViewer = !!mediaItem.pdfUrl;
   const isPdf =
-    mediaItem.externalUrl?.endsWith(".pdf") && !hasContent;
-  const canOpen = hasContent || mediaItem.externalUrl;
+    !hasPdfViewer && mediaItem.externalUrl?.endsWith(".pdf") && !hasContent;
+  const canOpen = hasContent || mediaItem.externalUrl || hasPdfViewer;
 
   const formattedDate = mediaItem.date
-    ? new Date(mediaItem.date + "T00:00:00").toLocaleDateString("de-DE", {
+    ? new Date(mediaItem.date + "T00:00:00").toLocaleDateString(locale === "en" ? "en-US" : "de-DE", {
         year: "numeric",
       })
     : null;
@@ -65,7 +73,23 @@ export default function PressArticleCard({
           {/* Action indicator */}
           {canOpen && (
             <span className="shrink-0 font-sans text-[11px] uppercase tracking-[0.15em] text-fg-muted group-hover:text-accent transition-colors duration-300 flex items-center gap-1.5">
-              {isPdf ? (
+              {hasPdfViewer ? (
+                <>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    className="opacity-60"
+                  >
+                    <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+                  </svg>
+                  PDF
+                </>
+              ) : isPdf ? (
                 <>
                   <svg
                     width="14"

@@ -6,6 +6,7 @@ import {
 } from "@/lib/sanity/queries";
 import type { SiteSettings, Project } from "@/types/sanity";
 import HeroSection from "@/components/home/HeroSection";
+import HeroPortrait from "@/components/home/HeroPortrait";
 import FeaturedWorksGrid from "@/components/home/FeaturedWorksGrid";
 import { Link } from "@/i18n/navigation";
 
@@ -39,126 +40,125 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   try {
     [siteSettings, featuredProjects] = await Promise.all([
-      client.fetch<SiteSettings>(siteSettingsQuery),
+      client.fetch<SiteSettings>(siteSettingsQuery, { locale }),
       client.fetch<Project[]>(featuredProjectsQuery),
     ]);
   } catch {
     // Sanity not connected — use fallback UI
   }
 
-  // CMS-connected path
+  // CMS-connected path — project hero
   if (siteSettings?.homeHeroProject && featuredProjects.length > 0) {
     return (
       <>
-        <HeroSection project={siteSettings.homeHeroProject as Project} />
+        <HeroSection project={siteSettings.homeHeroProject as Project} scrollLabel={t("scroll")} />
         <FeaturedWorksGrid projects={featuredProjects} title={t("selectedWorks")} />
       </>
     );
   }
 
-  // Fallback UI
+  // Portrait hero or gradient fallback
   return (
     <>
-      {/* Hero — full-screen dark placeholder */}
-      <section className="relative h-screen overflow-hidden flex items-end">
-        {/* Gradient background as placeholder */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 40%, #111111 70%, #0a0a0a 100%)",
-          }}
-          aria-hidden="true"
+      {siteSettings?.heroImage ? (
+        <HeroPortrait
+          image={siteSettings.heroImage}
+          scrollLabel={t("scroll")}
+          photographerLabel={t("photographer")}
+          locationLabel={t("location")}
         />
-        {/* Subtle noise-like texture overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 3px)",
-          }}
-          aria-hidden="true"
-        />
-
-        {/* Gradient fade at bottom */}
-        <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent" />
-
-        {/* Text */}
-        <div className="relative z-10 px-8 md:px-12 lg:px-16 pb-16">
-          <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl tracking-tight text-fg leading-none">
-            ANDREAS MAGDANZ
-          </h1>
-          <p className="mt-3 font-sans text-sm tracking-widest uppercase text-fg-muted">
-            {t("photographer")} — Aachen, Germany
-          </p>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-fg-muted/60">
-          <span className="font-sans text-[10px] tracking-widest uppercase">
-            {t("scroll")}
-          </span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+      ) : (
+        <section className="relative h-screen overflow-hidden flex items-end">
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 40%, #111111 70%, #0a0a0a 100%)",
+            }}
             aria-hidden="true"
-            className="animate-bounce"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </div>
-      </section>
-
-      {/* Featured works — placeholder cards */}
-      <section className="py-24 px-8 md:px-12 lg:px-16">
-        <h2 className="font-serif text-4xl text-center text-fg mb-16 tracking-tight">
-          {t("selectedWorks")}
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {PLACEHOLDER_PROJECTS.map((p) => (
-            <Link
-              key={p.id}
-              href={`/work/${p.slug}`}
-              className="group block"
+          />
+          <div
+            className="absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 3px)",
+            }}
+            aria-hidden="true"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent" />
+          <div className="relative z-10 px-8 md:px-12 lg:px-16 pb-16">
+            <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl tracking-tight text-fg leading-none">
+              ANDREAS MAGDANZ
+            </h1>
+            <p className="mt-3 font-sans text-sm tracking-widest uppercase text-fg-muted">
+              {t("photographer")} — {t("location")}
+            </p>
+          </div>
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-fg-muted/60">
+            <span className="font-sans text-[10px] tracking-widest uppercase">
+              {t("scroll")}
+            </span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="animate-bounce"
             >
-              {/* Placeholder image area */}
-              <div className="relative overflow-hidden aspect-[3/4] bg-bg-muted">
-                <div
-                  className="absolute inset-0 opacity-20"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.8) 100%)",
-                  }}
-                />
-                {/* Corner detail */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-serif text-fg-muted/30 text-lg text-center px-4 leading-tight">
-                    {p.title}
-                  </span>
-                </div>
-              </div>
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+        </section>
+      )}
 
-              {/* Text */}
-              <div className="mt-3">
-                <p className="font-serif text-lg text-fg group-hover:text-accent transition-colors duration-300">
-                  {p.title}
-                </p>
-                <p className="font-sans text-sm text-fg-muted mt-0.5">
-                  {p.year}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* Featured works from CMS or placeholders */}
+      {featuredProjects.length > 0 ? (
+        <FeaturedWorksGrid projects={featuredProjects} title={t("selectedWorks")} />
+      ) : (
+        <section className="py-24 px-8 md:px-12 lg:px-16">
+          <h2 className="font-serif text-4xl text-center text-fg mb-16 tracking-tight">
+            {t("selectedWorks")}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {PLACEHOLDER_PROJECTS.map((p) => (
+              <Link
+                key={p.id}
+                href={`/work/${p.slug}`}
+                className="group block"
+              >
+                <div className="relative overflow-hidden aspect-[3/4] bg-bg-muted">
+                  <div
+                    className="absolute inset-0 opacity-20"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.8) 100%)",
+                    }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="font-serif text-fg-muted/30 text-lg text-center px-4 leading-tight">
+                      {p.title}
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <p className="font-serif text-lg text-fg group-hover:text-accent transition-colors duration-300">
+                    {p.title}
+                  </p>
+                  <p className="font-sans text-sm text-fg-muted mt-0.5">
+                    {p.year}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </>
   );
 }

@@ -7,6 +7,7 @@ interface VideoEmbedProps {
   source: string;
   date?: string;
   embedUrl: string;
+  locale?: string;
 }
 
 function getYouTubeId(url: string): string | null {
@@ -42,12 +43,13 @@ export default function VideoEmbed({
   source,
   date,
   embedUrl,
+  locale = "de",
 }: VideoEmbedProps) {
   const [isActive, setIsActive] = useState(false);
   const youtubeId = getYouTubeId(embedUrl);
 
   const formattedDate = date
-    ? new Date(date + "T00:00:00").toLocaleDateString("de-DE", {
+    ? new Date(date + "T00:00:00").toLocaleDateString(locale === "en" ? "en-US" : "de-DE", {
         year: "numeric",
       })
     : null;
@@ -94,7 +96,7 @@ export default function VideoEmbed({
             </button>
           ) : (
             <iframe
-              src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0`}
+              src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&cc_load_policy=1&cc_lang_pref=${locale}`}
               title={title}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

@@ -11,7 +11,8 @@
   "home": {
     "selectedWorks": "Ausgewählte Arbeiten",
     "scroll": "Scrollen",
-    "photographer": "Fotograf"
+    "photographer": "Fotograf",
+    "location": "Aachen, Deutschland"
   },
   "work": {
     "title": "Arbeiten",
@@ -19,7 +20,9 @@
     "statement": "Statement",
     "details": "Details",
     "year": "Jahr",
-    "location": "Ort"
+    "location": "Ort",
+    "relatedExhibitions": "Ausstellungen",
+    "relatedPublications": "Publikationen"
   },
   "about": {
     "title": "Andreas Magdanz",
@@ -64,7 +67,13 @@
     "viewPdf": "PDF öffnen",
     "openArticle": "Artikel öffnen",
     "pdfAvailable": "Dieser Artikel ist als PDF verfügbar.",
-    "externalArticle": "Dieser Artikel ist auf der externen Website verfügbar."
+    "externalArticle": "Dieser Artikel ist auf der externen Website verfügbar.",
+    "loading": "Dokument wird geladen…",
+    "error": "Das Dokument konnte nicht geladen werden.",
+    "pageOf": "Seite",
+    "pageTotal": "von",
+    "downloadPdf": "PDF herunterladen",
+    "noResults": "Keine Medienbeiträge gefunden."
   },
   "contact": {
     "title": "Kontakt",

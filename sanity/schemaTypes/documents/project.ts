@@ -50,15 +50,27 @@ export const project = defineType({
     }),
     defineField({
       name: "artistStatement",
-      title: "Artist Statement",
+      title: "Artist Statement (DE)",
       type: "blockContent",
       description: "Artist statement specific to this project",
     }),
     defineField({
+      name: "artistStatementEn",
+      title: "Artist Statement (EN)",
+      type: "blockContent",
+      description: "English artist statement — falls back to German if empty",
+    }),
+    defineField({
       name: "description",
-      title: "Description",
+      title: "Description (DE)",
       type: "blockContent",
       description: "Detailed description of the project",
+    }),
+    defineField({
+      name: "descriptionEn",
+      title: "Description (EN)",
+      type: "blockContent",
+      description: "English description — falls back to German if empty",
     }),
     defineField({
       name: "isFeatured",

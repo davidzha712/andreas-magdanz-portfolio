@@ -106,7 +106,7 @@ export default async function ExhibitionsPage({ params }: { params: Promise<{ lo
   let exhibitions: Exhibition[] = [];
 
   try {
-    exhibitions = await client.fetch<Exhibition[]>(allExhibitionsQuery);
+    exhibitions = await client.fetch<Exhibition[]>(allExhibitionsQuery, { locale });
   } catch {
     // Sanity not connected — use fallback
   }

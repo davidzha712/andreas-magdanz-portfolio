@@ -15,11 +15,18 @@ export const siteSettings = defineType({
     }),
     defineField({
       name: "siteDescription",
-      title: "Site Description",
+      title: "Site Description (DE)",
       type: "text",
       rows: 3,
       description: "Default meta description for the site",
       validation: (r) => r.required(),
+    }),
+    defineField({
+      name: "siteDescriptionEn",
+      title: "Site Description (EN)",
+      type: "text",
+      rows: 3,
+      description: "English meta description — falls back to German if empty",
     }),
     defineField({
       name: "homeHeroProject",
@@ -27,6 +34,14 @@ export const siteSettings = defineType({
       type: "reference",
       to: [{ type: "project" }],
       description: "Project displayed as the hero on the homepage",
+    }),
+    defineField({
+      name: "heroImage",
+      title: "Home Hero Image",
+      type: "image",
+      description:
+        "Portrait or image displayed as the hero when no project is selected",
+      options: { hotspot: true },
     }),
     defineField({
       name: "ogImage",
@@ -70,17 +85,31 @@ export const siteSettings = defineType({
     }),
     defineField({
       name: "universityInfo",
-      title: "University / Academic Affiliation",
+      title: "University / Academic Affiliation (DE)",
       type: "text",
       rows: 3,
       description: "University position or academic affiliation details",
     }),
     defineField({
+      name: "universityInfoEn",
+      title: "University / Academic Affiliation (EN)",
+      type: "text",
+      rows: 3,
+      description: "English university info — falls back to German if empty",
+    }),
+    defineField({
       name: "artistBio",
-      title: "Artist Biography",
+      title: "Artist Biography (DE)",
       type: "array",
       of: [{ type: "block" }],
       description: "Full biography text displayed on the About page",
+    }),
+    defineField({
+      name: "artistBioEn",
+      title: "Artist Biography (EN)",
+      type: "array",
+      of: [{ type: "block" }],
+      description: "English biography — falls back to German if empty",
     }),
     defineField({
       name: "artistPortrait",
@@ -91,10 +120,17 @@ export const siteSettings = defineType({
     }),
     defineField({
       name: "teachingHistory",
-      title: "Teaching History",
+      title: "Teaching History (DE)",
       type: "array",
       of: [{ type: "block" }],
       description: "Teaching positions and academic history",
+    }),
+    defineField({
+      name: "teachingHistoryEn",
+      title: "Teaching History (EN)",
+      type: "array",
+      of: [{ type: "block" }],
+      description: "English teaching history — falls back to German if empty",
     }),
     defineField({
       name: "galleryAddress",

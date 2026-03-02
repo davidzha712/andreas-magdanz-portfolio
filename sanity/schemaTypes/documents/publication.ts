@@ -54,8 +54,14 @@ export const publication = defineType({
     }),
     defineField({
       name: "description",
-      title: "Description",
+      title: "Description (DE)",
       type: "blockContent",
+    }),
+    defineField({
+      name: "descriptionEn",
+      title: "Description (EN)",
+      type: "blockContent",
+      description: "English description — falls back to German if empty",
     }),
   ],
   preview: {

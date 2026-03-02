@@ -1,10 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import { createPortal } from "react-dom";
 import { useLocale } from "next-intl";
 import type { MediaItem } from "@/types/sanity";
 import PortableText from "@/components/shared/PortableText";
+
+const PdfBookViewer = dynamic(() => import("./PdfBookViewer"), { ssr: false });
 
 interface PressOverlayProps {
   item: MediaItem;
@@ -14,6 +17,11 @@ interface PressOverlayProps {
     openArticle: string;
     pdfAvailable: string;
     externalArticle: string;
+    loading: string;
+    error: string;
+    pageOf: string;
+    pageTotal: string;
+    downloadPdf: string;
   };
 }
 
@@ -55,7 +63,8 @@ export default function PressOverlay({
     : null;
 
   const hasContent = item.description && item.description.length > 0;
-  const isPdf = item.externalUrl?.endsWith(".pdf");
+  const hasPdfViewer = !!item.pdfUrl;
+  const isPdf = !hasPdfViewer && item.externalUrl?.endsWith(".pdf");
 
   return createPortal(
     <div
@@ -66,10 +75,13 @@ export default function PressOverlay({
       aria-modal="true"
       aria-label={item.title}
     >
-      {/* Close button */}
+      {/* Close button — z-[60] to stay above react-pageflip layers */}
       <button
-        onClick={onClose}
-        className="fixed top-6 right-6 md:top-8 md:right-8 z-50 w-10 h-10 flex items-center justify-center text-fg-muted hover:text-fg transition-colors duration-200"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+        className="fixed top-6 right-6 md:top-8 md:right-8 z-[60] w-10 h-10 flex items-center justify-center text-fg-muted hover:text-fg transition-colors duration-200 pointer-events-auto"
         aria-label="Close"
       >
         <svg
@@ -90,7 +102,11 @@ export default function PressOverlay({
         tabIndex={-1}
         className="h-full overflow-y-auto overscroll-contain outline-none"
       >
-        <article className="max-w-2xl mx-auto px-6 md:px-8 py-16 md:py-24 press-overlay-content">
+        <article
+          className={`mx-auto px-6 md:px-8 py-16 md:py-24 press-overlay-content ${
+            hasPdfViewer ? "max-w-5xl" : "max-w-2xl"
+          }`}
+        >
           {/* Source & date */}
           <div className="mb-8">
             <p className="font-sans text-xs uppercase tracking-[0.2em] text-accent">
@@ -111,8 +127,24 @@ export default function PressOverlay({
           {/* Divider */}
           <div className="mt-8 mb-10 w-16 h-px bg-accent" />
 
-          {/* Body */}
-          {hasContent ? (
+          {/* Body: PDF Book Viewer / Portable Text / External Link */}
+          {hasPdfViewer ? (
+            <div className="mt-6">
+              <PdfBookViewer
+                pdfUrl={item.pdfUrl!}
+                title={item.title}
+                source={item.source}
+                date={formattedDate ?? undefined}
+                translations={{
+                  loading: t.loading,
+                  error: t.error,
+                  pageOf: t.pageOf,
+                  pageTotal: t.pageTotal,
+                  downloadPdf: t.downloadPdf,
+                }}
+              />
+            </div>
+          ) : hasContent ? (
             <div className="article-body">
               <PortableText value={item.description!} />
             </div>

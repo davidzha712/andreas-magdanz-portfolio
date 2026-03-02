@@ -9,9 +9,16 @@ export const mediaItem = defineType({
   fields: [
     defineField({
       name: "title",
-      title: "Title",
+      title: "Title (DE)",
       type: "string",
+      description: "German title (default)",
       validation: (r) => r.required(),
+    }),
+    defineField({
+      name: "titleEn",
+      title: "Title (EN)",
+      type: "string",
+      description: "English title — falls back to German if empty",
     }),
     defineField({
       name: "mediaType",
@@ -69,9 +76,25 @@ export const mediaItem = defineType({
       },
     }),
     defineField({
+      name: "pdfFile",
+      title: "PDF File",
+      type: "file",
+      description: "Upload a PDF for inline viewing with the book viewer",
+      options: {
+        accept: "application/pdf",
+      },
+      hidden: ({ parent }) => parent?.mediaType !== "press",
+    }),
+    defineField({
       name: "description",
-      title: "Description",
+      title: "Description (DE)",
       type: "blockContent",
+    }),
+    defineField({
+      name: "descriptionEn",
+      title: "Description (EN)",
+      type: "blockContent",
+      description: "English description — falls back to German if empty",
     }),
   ],
   preview: {
