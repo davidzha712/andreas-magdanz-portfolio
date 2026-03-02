@@ -8,9 +8,10 @@ import type { Project } from "@/types/sanity";
 interface HeroSectionProps {
   project: Project;
   scrollLabel?: string;
+  heroImage?: import("@/types/sanity").SanityImageAsset;
 }
 
-export default function HeroSection({ project, scrollLabel = "Scroll" }: HeroSectionProps) {
+export default function HeroSection({ project, scrollLabel = "Scroll", heroImage }: HeroSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
 
@@ -61,8 +62,8 @@ export default function HeroSection({ project, scrollLabel = "Scroll" }: HeroSec
       {/* Full-bleed background image */}
       <div ref={containerRef} className="absolute inset-0">
         <SanityImage
-          image={project.coverImage.image}
-          alt={project.coverImage.alt}
+          image={heroImage ?? project.coverImage.image}
+          alt={heroImage ? "Andreas Magdanz" : project.coverImage.alt}
           fill
           sizes="100vw"
           className="object-cover"
