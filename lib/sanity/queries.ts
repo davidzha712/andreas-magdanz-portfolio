@@ -96,6 +96,41 @@ export const allMediaItemsQuery = defineQuery(
   }`
 );
 
+export const searchAllContentQuery = defineQuery(
+  `{
+    "projects": *[_type == "project"] | order(order asc, year desc){
+      _id, title, "slug": slug.current, year, location
+    },
+    "exhibitions": *[_type == "exhibition"] | order(year desc){
+      _id, title, venue, city,
+      "country": select(
+        $locale == "en" => coalesce(countryEn, country),
+        country
+      ),
+      year, type
+    },
+    "publications": *[_type == "publication"] | order(year desc){
+      _id, title, publisher, year
+    },
+    "cvEntries": *[_type == "cvEntry"] | order(year desc){
+      _id,
+      "title": select(
+        $locale == "en" => coalesce(titleEn, title),
+        title
+      ),
+      category, year, institution, location
+    },
+    "mediaItems": *[_type == "mediaItem"] | order(date desc){
+      _id,
+      "title": select(
+        $locale == "en" => coalesce(titleEn, title),
+        title
+      ),
+      mediaType, source, date
+    }
+  }`
+);
+
 export const allCVEntriesQuery = defineQuery(
   `*[_type == "cvEntry"] | order(year desc){
     ...,

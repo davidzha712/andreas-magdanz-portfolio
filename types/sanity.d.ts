@@ -130,6 +130,57 @@ export interface CVEntry {
   descriptionEn?: string;
 }
 
+// Search types (lightweight projections for client-side search)
+export interface SearchProject {
+  _id: string;
+  title: string;
+  slug: string;
+  year: string;
+  location?: string;
+}
+
+export interface SearchExhibition {
+  _id: string;
+  title: string;
+  venue: string;
+  city: string;
+  country: string;
+  year: number;
+  type: "solo" | "group";
+}
+
+export interface SearchPublication {
+  _id: string;
+  title: string;
+  publisher: string;
+  year: number;
+}
+
+export interface SearchCVEntry {
+  _id: string;
+  title: string;
+  category: string;
+  year: number;
+  institution?: string;
+  location?: string;
+}
+
+export interface SearchMediaItem {
+  _id: string;
+  title: string;
+  mediaType: "audio" | "video" | "press";
+  source: string;
+  date: string;
+}
+
+export interface SearchData {
+  projects: SearchProject[];
+  exhibitions: SearchExhibition[];
+  publications: SearchPublication[];
+  cvEntries: SearchCVEntry[];
+  mediaItems: SearchMediaItem[];
+}
+
 export interface SiteSettings {
   _id: string;
   _type: "siteSettings";

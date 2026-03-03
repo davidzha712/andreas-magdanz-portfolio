@@ -94,6 +94,16 @@
     "copyright": "© {year} Andreas Magdanz. Alle Rechte vorbehalten.",
     "gallery": "Vertreten durch"
   },
+  "search": {
+    "placeholder": "Suchen…",
+    "close": "Schließen",
+    "noResults": "Keine Ergebnisse gefunden.",
+    "work": "Arbeiten",
+    "exhibitions": "Ausstellungen",
+    "publications": "Publikationen",
+    "cv": "Lebenslauf",
+    "media": "Presse"
+  },
   "common": {
     "backToTop": "Nach oben",
     "viewAll": "Alle anzeigen",

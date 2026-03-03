@@ -19,9 +19,10 @@ const NAV_KEYS = [
 interface NavMobileProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenSearch: () => void;
 }
 
-export default function NavMobile({ isOpen, onClose }: NavMobileProps) {
+export default function NavMobile({ isOpen, onClose, onOpenSearch }: NavMobileProps) {
   const t = useTranslations("nav");
 
   return (
@@ -89,6 +90,27 @@ export default function NavMobile({ isOpen, onClose }: NavMobileProps) {
 
           {/* Footer row */}
           <div className="px-6 py-5 border-t border-border flex items-center justify-center gap-4">
+            <button
+              onClick={onOpenSearch}
+              aria-label="Search"
+              className="w-10 h-10 flex items-center justify-center text-fg-muted hover:text-fg transition-colors duration-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </button>
             <LanguageSwitcher />
             <ThemeToggle />
           </div>

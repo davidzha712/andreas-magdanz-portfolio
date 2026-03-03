@@ -94,6 +94,16 @@
     "copyright": "© {year} Andreas Magdanz. All rights reserved.",
     "gallery": "Represented by"
   },
+  "search": {
+    "placeholder": "Search…",
+    "close": "Close",
+    "noResults": "No results found.",
+    "work": "Work",
+    "exhibitions": "Exhibitions",
+    "publications": "Publications",
+    "cv": "CV",
+    "media": "Media"
+  },
   "common": {
     "backToTop": "Back to top",
     "viewAll": "View all",

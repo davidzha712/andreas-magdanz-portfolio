@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import NavMobile from "./NavMobile";
+import SearchOverlay from "../search/SearchOverlay";
 import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
 
@@ -20,6 +21,7 @@ const NAV_KEYS = [
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const t = useTranslations("nav");
 
   useEffect(() => {
@@ -29,6 +31,18 @@ export default function Nav() {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // ⌘K / Ctrl+K global shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   // Lock body scroll when mobile menu is open
@@ -73,6 +87,27 @@ export default function Nav() {
                 {t(link.key)}
               </Link>
             ))}
+            <button
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search"
+              className="w-8 h-8 flex items-center justify-center text-fg-muted hover:text-fg transition-colors duration-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </button>
             <LanguageSwitcher />
             <ThemeToggle />
           </nav>
@@ -81,6 +116,27 @@ export default function Nav() {
           <div className="flex md:hidden items-center gap-3">
             <LanguageSwitcher />
             <ThemeToggle />
+            <button
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search"
+              className="w-10 h-10 flex items-center justify-center text-fg-muted hover:text-fg transition-colors duration-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </button>
             <button
               onClick={() => setMobileOpen(true)}
               aria-label="Open menu"
@@ -108,7 +164,15 @@ export default function Nav() {
         </div>
       </header>
 
-      <NavMobile isOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <NavMobile
+        isOpen={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        onOpenSearch={() => {
+          setMobileOpen(false);
+          setTimeout(() => setSearchOpen(true), 350);
+        }}
+      />
+      <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }
