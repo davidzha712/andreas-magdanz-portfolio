@@ -138,6 +138,9 @@ export interface SiteSettings {
   siteDescriptionEn?: string;
   homeHeroProject?: Project;
   heroImage?: SanityImageAsset;
+  heroVideo?: SanityFileAsset;
+  heroVideoUrl?: string;
+  heroVideoPosition?: string;
   ogImage?: SanityImageAsset;
   artistBio?: unknown[];
   artistBioEn?: unknown[];

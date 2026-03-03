@@ -55,6 +55,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           project={siteSettings.homeHeroProject as Project}
           scrollLabel={t("scroll")}
           heroImage={siteSettings.heroImage}
+          heroVideoUrl={siteSettings.heroVideoUrl}
+          heroVideoPosition={siteSettings.heroVideoPosition}
         />
         <FeaturedWorksGrid projects={featuredProjects} title={t("selectedWorks")} />
       </>

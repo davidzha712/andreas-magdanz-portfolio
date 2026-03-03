@@ -19,6 +19,8 @@ export const siteSettingsQuery = defineQuery(
       $locale == "en" => coalesce(universityInfoEn, universityInfo),
       universityInfo
     ),
+    "heroVideoUrl": heroVideo.asset->url,
+    heroVideoPosition,
     "ogImageUrl": ogImage.asset->url + "?w=1200&h=630&fit=crop&auto=format",
     homeHeroProject->{
       _id, title, slug, coverImage, year, location

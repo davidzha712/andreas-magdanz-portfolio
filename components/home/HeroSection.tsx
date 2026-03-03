@@ -9,9 +9,11 @@ interface HeroSectionProps {
   project: Project;
   scrollLabel?: string;
   heroImage?: import("@/types/sanity").SanityImageAsset;
+  heroVideoUrl?: string;
+  heroVideoPosition?: string;
 }
 
-export default function HeroSection({ project, scrollLabel = "Scroll", heroImage }: HeroSectionProps) {
+export default function HeroSection({ project, scrollLabel = "Scroll", heroImage, heroVideoUrl, heroVideoPosition = "center" }: HeroSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
 
@@ -59,16 +61,30 @@ export default function HeroSection({ project, scrollLabel = "Scroll", heroImage
 
   return (
     <section className="relative h-screen overflow-hidden">
-      {/* Full-bleed background image */}
+      {/* Full-bleed background media */}
       <div ref={containerRef} className="absolute inset-0">
-        <SanityImage
-          image={heroImage ?? project.coverImage.image}
-          alt={heroImage ? "Andreas Magdanz" : project.coverImage.alt}
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority
-        />
+        {heroVideoUrl ? (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: heroVideoPosition }}
+            poster=""
+          >
+            <source src={heroVideoUrl} type={heroVideoUrl.endsWith(".webm") ? "video/webm" : "video/mp4"} />
+          </video>
+        ) : (
+          <SanityImage
+            image={heroImage ?? project.coverImage.image}
+            alt={heroImage ? "Andreas Magdanz" : project.coverImage.alt}
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+          />
+        )}
       </div>
 
       {/* Gradient overlay — transparent top, dark bottom */}

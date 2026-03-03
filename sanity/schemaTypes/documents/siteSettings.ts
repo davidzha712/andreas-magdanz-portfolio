@@ -44,6 +44,34 @@ export const siteSettings = defineType({
       options: { hotspot: true },
     }),
     defineField({
+      name: "heroVideo",
+      title: "Home Hero Video",
+      type: "file",
+      description:
+        "Video background for the hero section (overrides image when set)",
+      options: {
+        accept: "video/mp4,video/webm",
+      },
+    }),
+    defineField({
+      name: "heroVideoPosition",
+      title: "Hero Video Focus Position",
+      type: "string",
+      description: "Where to anchor the video when cropped to fit the screen",
+      options: {
+        list: [
+          { title: "Top", value: "top" },
+          { title: "Center", value: "center" },
+          { title: "Bottom", value: "bottom" },
+          { title: "Left", value: "left" },
+          { title: "Right", value: "right" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "center",
+      hidden: ({ parent }) => !parent?.heroVideo,
+    }),
+    defineField({
       name: "ogImage",
       title: "Default Open Graph Image",
       type: "image",
