@@ -11,7 +11,7 @@ import { pdfjs } from "react-pdf";
 import HTMLFlipBook from "react-pageflip";
 import Image from "next/image";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
 interface PdfBookViewerProps {
   pdfUrl: string;
@@ -377,7 +377,7 @@ export default function PdfBookViewer({
               showCover={true}
               mobileScrollSupport={false}
               onFlip={onFlip}
-              flippingTime={prefersReducedMotion ? 0 : 800}
+              flippingTime={prefersReducedMotion ? 1 : 800}
               usePortrait={isMobile}
               startPage={0}
               drawShadow={true}
