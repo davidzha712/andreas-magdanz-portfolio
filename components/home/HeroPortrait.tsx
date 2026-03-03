@@ -10,6 +10,8 @@ interface HeroPortraitProps {
   scrollLabel: string;
   photographerLabel: string;
   locationLabel?: string;
+  heroVideoUrl?: string;
+  heroVideoPosition?: string;
 }
 
 export default function HeroPortrait({
@@ -17,6 +19,8 @@ export default function HeroPortrait({
   scrollLabel,
   photographerLabel,
   locationLabel = "Aachen, Germany",
+  heroVideoUrl,
+  heroVideoPosition = "center",
 }: HeroPortraitProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const portraitRef = useRef<HTMLDivElement>(null);
@@ -66,41 +70,56 @@ export default function HeroPortrait({
 
   return (
     <section className="relative h-screen overflow-hidden">
-      {/* Blurred background fill — same image, zoomed + blurred */}
+      {/* Full-bleed background */}
       <div ref={containerRef} className="absolute inset-0 opacity-0">
-        <div className="absolute inset-0 scale-125">
-          <SanityImage
-            image={image}
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover blur-2xl brightness-[0.35]"
-            priority
-          />
-        </div>
+        {heroVideoUrl ? (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: heroVideoPosition }}
+          >
+            <source src={heroVideoUrl} type={heroVideoUrl.endsWith(".webm") ? "video/webm" : "video/mp4"} />
+          </video>
+        ) : (
+          <div className="absolute inset-0 scale-125">
+            <SanityImage
+              image={image}
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover blur-2xl brightness-[0.35]"
+              priority
+            />
+          </div>
+        )}
       </div>
 
       {/* Dark overlay for depth */}
       <div className="absolute inset-0 bg-black/30" />
 
-      {/* Centered portrait */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          ref={portraitRef}
-          className="relative w-[45vh] max-w-[360px] aspect-[3/4] opacity-0"
-        >
-          <SanityImage
-            image={image}
-            alt="Andreas Magdanz"
-            fill
-            sizes="(max-width: 768px) 60vw, 360px"
-            className="object-cover"
-            priority
-          />
-          {/* Subtle border */}
-          <div className="absolute inset-0 ring-1 ring-white/10" />
+      {/* Centered portrait (hidden when video is playing) */}
+      {!heroVideoUrl && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div
+            ref={portraitRef}
+            className="relative w-[45vh] max-w-[360px] aspect-[3/4] opacity-0"
+          >
+            <SanityImage
+              image={image}
+              alt="Andreas Magdanz"
+              fill
+              sizes="(max-width: 768px) 60vw, 360px"
+              className="object-cover"
+              priority
+            />
+            {/* Subtle border */}
+            <div className="absolute inset-0 ring-1 ring-white/10" />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Gradient fade at bottom */}
       <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-bg via-bg/60 to-transparent" />

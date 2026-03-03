@@ -72,6 +72,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           scrollLabel={t("scroll")}
           photographerLabel={t("photographer")}
           locationLabel={t("location")}
+          heroVideoUrl={siteSettings.heroVideoUrl}
+          heroVideoPosition={siteSettings.heroVideoPosition}
         />
       ) : (
         <section className="relative h-screen overflow-hidden flex items-end">
