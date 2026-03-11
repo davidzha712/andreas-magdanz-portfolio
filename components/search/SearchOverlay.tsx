@@ -106,7 +106,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 100);
     } else {
-      setQuery("");
+      setTimeout(() => setQuery(""), 0);
     }
   }, [isOpen]);
 

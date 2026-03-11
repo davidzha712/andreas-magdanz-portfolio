@@ -741,6 +741,7 @@ interface PublicationData {
   year: number;
   isbn?: string;
   purchaseUrl?: string;
+  coverImageFile?: string;
 }
 
 const PUBLICATIONS: PublicationData[] = [
@@ -749,6 +750,8 @@ const PUBLICATIONS: PublicationData[] = [
     title: "Dienststelle Marienthal \u2014 eine Geb\u00e4udemonographie",
     publisher: "Selbstverlag / MagBook",
     year: 2000,
+    isbn: "978-3000059230",
+    coverImageFile: "marienthal_real_cover.jpg",
     purchaseUrl: "http://www.dienststellemarienthal.de",
   },
   {
@@ -762,6 +765,8 @@ const PUBLICATIONS: PublicationData[] = [
     title: "BND - Standort Pullach",
     publisher: "DuMont, K\u00f6ln",
     year: 2006,
+    isbn: "978-3832176808",
+    coverImageFile: "bnd_real_cover.jpg",
     purchaseUrl: "http://www.bnd-standortpullach.de/",
   },
   {
@@ -769,6 +774,8 @@ const PUBLICATIONS: PublicationData[] = [
     title: "NS-Ordensburg Vogelsang",
     publisher: "MagBook / Mus\u00e9e Royal de l'Arm\u00e9e",
     year: 2010,
+    isbn: "978-2870510489",
+    coverImageFile: "vogelsang_real_cover.jpg",
     purchaseUrl: "http://www.magbooks.de/",
   },
   {
@@ -776,6 +783,8 @@ const PUBLICATIONS: PublicationData[] = [
     title: "STAMMHEIM \u2014 eine Geb\u00e4udemonographie",
     publisher: "Hartmann Books",
     year: 2012,
+    isbn: "978-3775734578",
+    coverImageFile: "stammheim_real_cover.jpg",
     purchaseUrl: "mailto:stammheimbuch@andreasmagdanz.de",
   },
   {
@@ -842,6 +851,18 @@ async function seedPublications(sanity: SanityClient): Promise<void> {
     };
     if (pub.isbn) doc.isbn = pub.isbn;
     if (pub.purchaseUrl) doc.purchaseUrl = pub.purchaseUrl;
+    
+    // @ts-ignore
+    if (pub.coverImageFile) {
+      // @ts-ignore
+      const assetRef = await getImageRef(sanity, pub.coverImageFile);
+      if (assetRef) {
+        doc.coverImage = {
+          _type: "image",
+          asset: assetRef,
+        };
+      }
+    }
 
     await sanity.createOrReplace(doc as any);
   }
