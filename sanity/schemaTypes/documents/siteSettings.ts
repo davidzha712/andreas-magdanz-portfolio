@@ -44,14 +44,19 @@ export const siteSettings = defineType({
       options: { hotspot: true },
     }),
     defineField({
-      name: "heroVideo",
-      title: "Home Hero Video",
-      type: "file",
+      name: "heroVideos",
+      title: "Home Hero Videos",
+      type: "array",
+      of: [
+        {
+          type: "file",
+          options: {
+            accept: "video/mp4,video/webm",
+          },
+        },
+      ],
       description:
-        "Video background for the hero section (overrides image when set)",
-      options: {
-        accept: "video/mp4,video/webm",
-      },
+        "Multiple video backgrounds for the hero section. One will be randomly selected on each refresh.",
     }),
     defineField({
       name: "heroVideoPosition",
@@ -69,7 +74,7 @@ export const siteSettings = defineType({
         layout: "radio",
       },
       initialValue: "center",
-      hidden: ({ parent }) => !parent?.heroVideo,
+      hidden: ({ parent }) => !parent?.heroVideos || parent.heroVideos.length === 0,
     }),
     defineField({
       name: "ogImage",

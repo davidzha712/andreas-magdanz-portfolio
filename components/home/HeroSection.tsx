@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "@/lib/gsap/gsapPlugins";
 import SanityImage from "@/components/shared/SanityImage";
 import type { Project } from "@/types/sanity";
@@ -9,13 +9,21 @@ interface HeroSectionProps {
   project: Project;
   scrollLabel?: string;
   heroImage?: import("@/types/sanity").SanityImageAsset;
-  heroVideoUrl?: string;
+  heroVideoUrls?: string[];
   heroVideoPosition?: string;
 }
 
-export default function HeroSection({ project, scrollLabel = "Scroll", heroImage, heroVideoUrl, heroVideoPosition = "center" }: HeroSectionProps) {
+export default function HeroSection({ project, scrollLabel = "Scroll", heroImage, heroVideoUrls, heroVideoPosition = "center" }: HeroSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
+  const [randomVideoUrl, setRandomVideoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (heroVideoUrls && heroVideoUrls.length > 0) {
+      const randomIndex = Math.floor(Math.random() * heroVideoUrls.length);
+      setRandomVideoUrl(heroVideoUrls[randomIndex]);
+    }
+  }, [heroVideoUrls]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -63,8 +71,9 @@ export default function HeroSection({ project, scrollLabel = "Scroll", heroImage
     <section className="relative h-screen overflow-hidden">
       {/* Full-bleed background media */}
       <div ref={containerRef} className="absolute inset-0">
-        {heroVideoUrl ? (
+        {randomVideoUrl ? (
           <video
+            key={randomVideoUrl}
             autoPlay
             muted
             loop
@@ -73,7 +82,7 @@ export default function HeroSection({ project, scrollLabel = "Scroll", heroImage
             style={{ objectPosition: heroVideoPosition }}
             poster=""
           >
-            <source src={heroVideoUrl} type={heroVideoUrl.endsWith(".webm") ? "video/webm" : "video/mp4"} />
+            <source src={randomVideoUrl} type={randomVideoUrl.endsWith(".webm") ? "video/webm" : "video/mp4"} />
           </video>
         ) : (
           <SanityImage

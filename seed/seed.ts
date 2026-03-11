@@ -911,6 +911,7 @@ const PUBLICATIONS: PublicationData[] = [
     title: "Hans und Grete, Bilder der RAF, 1967-77",
     publisher: "MagBook",
     year: 2012,
+    coverImageFile: "hans_grete_real_cover.jpg",
     relatedProjectId: "project-stuttgart-stammheim"
   },
   {
@@ -924,6 +925,7 @@ const PUBLICATIONS: PublicationData[] = [
     title: "Der Regierungsbunker (Katalog)",
     publisher: "Bundesamt f\u00fcr Bauwesen und Raumordnung",
     year: 2007,
+    coverImageFile: "regierungsbunker_real_cover.jpg",
     relatedProjectId: "project-dienststelle-marienthal"
   },
 ];
@@ -932,6 +934,14 @@ async function seedPublications(sanity: SanityClient): Promise<void> {
   log("PUBLICATIONS", `Seeding ${PUBLICATIONS.length} publications...`);
 
   for (const pub of PUBLICATIONS) {
+    // Try to get existing document first to avoid overwriting manual changes
+    let existingDoc: any = null;
+    try {
+      existingDoc = await sanity.getDocument(pub.id);
+    } catch {
+      // Document doesn't exist yet
+    }
+
     const doc: Record<string, unknown> = {
       _id: pub.id,
       _type: "publication",
@@ -956,6 +966,9 @@ async function seedPublications(sanity: SanityClient): Promise<void> {
           asset: assetRef,
         };
       }
+    } else if (existingDoc?.coverImage) {
+      // Preserve existing cover image if not explicitly provided in script
+      doc.coverImage = existingDoc.coverImage;
     }
 
     await sanity.createOrReplace(doc as any);
@@ -976,6 +989,8 @@ async function seedSiteSettings(sanity: SanityClient): Promise<void> {
     _type: "siteSettings",
     siteTitle: "Andreas Magdanz",
     siteDescription:
+      "Photography by Andreas Magdanz. Documentary and conceptual work exploring institutional memory, architecture, and historical sites.",
+    siteDescriptionEn:
       "Photography by Andreas Magdanz. Documentary and conceptual work exploring institutional memory, architecture, and historical sites.",
     contactEmail: "magdanz@andreasmagdanz.de",
     contactAddress: "Kapellenstra\u00dfe 66\nD-52066 Aachen\nGermany",

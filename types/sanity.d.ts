@@ -189,8 +189,9 @@ export interface SiteSettings {
   siteDescriptionEn?: string;
   homeHeroProject?: Project;
   heroImage?: SanityImageAsset;
-  heroVideo?: SanityFileAsset;
-  heroVideoUrl?: string;
+  heroVideos?: SanityFileAsset[];
+  heroVideoUrl?: string; // This will now represent the randomly selected URL
+  heroVideoUrls?: string[]; // Add this to hold all URLs if needed
   heroVideoPosition?: string;
   ogImage?: SanityImageAsset;
   artistBio?: unknown[];

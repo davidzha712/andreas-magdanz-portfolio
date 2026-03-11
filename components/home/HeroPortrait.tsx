@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "@/lib/gsap/gsapPlugins";
 import SanityImage from "@/components/shared/SanityImage";
 import type { SanityImageAsset } from "@/types/sanity";
@@ -10,7 +10,7 @@ interface HeroPortraitProps {
   scrollLabel: string;
   photographerLabel: string;
   locationLabel?: string;
-  heroVideoUrl?: string;
+  heroVideoUrls?: string[];
   heroVideoPosition?: string;
 }
 
@@ -19,12 +19,20 @@ export default function HeroPortrait({
   scrollLabel,
   photographerLabel,
   locationLabel = "Aachen, Germany",
-  heroVideoUrl,
+  heroVideoUrls,
   heroVideoPosition = "center",
 }: HeroPortraitProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const portraitRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
+  const [randomVideoUrl, setRandomVideoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (heroVideoUrls && heroVideoUrls.length > 0) {
+      const randomIndex = Math.floor(Math.random() * heroVideoUrls.length);
+      setRandomVideoUrl(heroVideoUrls[randomIndex]);
+    }
+  }, [heroVideoUrls]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -72,8 +80,9 @@ export default function HeroPortrait({
     <section className="relative h-screen overflow-hidden">
       {/* Full-bleed background */}
       <div ref={containerRef} className="absolute inset-0 opacity-0">
-        {heroVideoUrl ? (
+        {randomVideoUrl ? (
           <video
+            key={randomVideoUrl}
             autoPlay
             muted
             loop
@@ -81,7 +90,7 @@ export default function HeroPortrait({
             className="absolute inset-0 h-full w-full object-cover"
             style={{ objectPosition: heroVideoPosition }}
           >
-            <source src={heroVideoUrl} type={heroVideoUrl.endsWith(".webm") ? "video/webm" : "video/mp4"} />
+            <source src={randomVideoUrl} type={randomVideoUrl.endsWith(".webm") ? "video/webm" : "video/mp4"} />
           </video>
         ) : (
           <div className="absolute inset-0 scale-125">
@@ -101,7 +110,7 @@ export default function HeroPortrait({
       <div className="absolute inset-0 bg-black/30" />
 
       {/* Centered portrait (hidden when video is playing) */}
-      {!heroVideoUrl && (
+      {!randomVideoUrl && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div
             ref={portraitRef}
