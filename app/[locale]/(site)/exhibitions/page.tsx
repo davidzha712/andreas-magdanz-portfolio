@@ -2,6 +2,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
 import { allExhibitionsQuery } from "@/lib/sanity/queries";
 import type { Exhibition } from "@/types/sanity";
+
+export const revalidate = 60;
 import ExhibitionTimeline from "@/components/exhibitions/ExhibitionTimeline";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {

@@ -2,6 +2,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
 import { allCVEntriesQuery } from "@/lib/sanity/queries";
 import type { CVEntry } from "@/types/sanity";
+
+export const revalidate = 60;
 import CVTimeline from "@/components/cv/CVTimeline";
 
 

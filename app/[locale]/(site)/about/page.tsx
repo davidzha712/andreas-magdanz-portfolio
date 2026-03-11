@@ -2,6 +2,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
 import { siteSettingsQuery } from "@/lib/sanity/queries";
 import type { SiteSettings } from "@/types/sanity";
+
+export const revalidate = 60;
 import SanityImage from "@/components/shared/SanityImage";
 import type { PortableTextBlock } from "sanity";
 

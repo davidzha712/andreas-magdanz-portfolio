@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
+
+const LOCALES = ["de", "en"];
+
+function revalidateLocalized(path: string) {
+  for (const locale of LOCALES) {
+    revalidatePath(`/${locale}${path}`, "page");
+  }
+}
 
 export async function POST(request: NextRequest) {
   const secret = process.env.SANITY_REVALIDATE_SECRET;
@@ -27,43 +35,38 @@ export async function POST(request: NextRequest) {
     const documentType = body?._type;
     const slug = body?.slug?.current;
 
-    // Revalidate by document type
     switch (documentType) {
       case "project":
-        revalidateTag("project", "default");
-        revalidatePath("/work", "page");
+        revalidateLocalized("/work");
         if (slug) {
-          revalidatePath(`/work/${slug}`, "page");
+          revalidateLocalized(`/work/${slug}`);
         }
         break;
 
       case "exhibition":
-        revalidateTag("exhibition", "default");
-        revalidatePath("/exhibitions", "page");
+        revalidateLocalized("/exhibitions");
         break;
 
       case "publication":
-        revalidateTag("publication", "default");
-        revalidatePath("/publications", "page");
+        revalidateLocalized("/publications");
         break;
 
       case "mediaItem":
-        revalidateTag("mediaItem", "default");
-        revalidatePath("/media", "page");
+        revalidateLocalized("/media");
         break;
 
       case "cvEntry":
-        revalidateTag("cvEntry", "default");
-        revalidatePath("/cv", "page");
+        revalidateLocalized("/cv");
         break;
 
       case "siteSettings":
-        revalidateTag("siteSettings", "default");
-        revalidatePath("/", "page");
+        for (const locale of LOCALES) {
+          revalidatePath(`/${locale}`, "page");
+        }
         break;
 
       default:
-        // Revalidate all known paths
+        // Revalidate root layout (covers all localized paths)
         revalidatePath("/", "layout");
         break;
     }

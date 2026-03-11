@@ -2,6 +2,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
 import { allMediaItemsQuery } from "@/lib/sanity/queries";
 import type { MediaItem } from "@/types/sanity";
+
+export const revalidate = 60;
 import AudioPlayer from "@/components/media/AudioPlayer";
 import VideoEmbed from "@/components/media/VideoEmbed";
 import PressArticleCard from "@/components/media/PressArticleCard";

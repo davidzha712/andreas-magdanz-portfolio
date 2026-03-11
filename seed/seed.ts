@@ -82,6 +82,27 @@ async function uploadImage(
   }
 }
 
+/** Upload a video from the local seed/media/video directory and return an asset reference. */
+async function uploadVideo(
+  sanity: SanityClient,
+  filename: string,
+): Promise<{ _type: "reference"; _ref: string } | null> {
+  const videoPath = path.join(__dirname, "media", "video", filename);
+  if (!fs.existsSync(videoPath)) {
+    console.warn(`  [WARN] Video not found: ${videoPath}`);
+    return null;
+  }
+  try {
+    const asset = await sanity.assets.upload("file", fs.createReadStream(videoPath), {
+      filename,
+    });
+    return { _type: "reference", _ref: asset._id };
+  } catch (err) {
+    console.warn(`  [WARN] Failed to upload video ${filename}:`, (err as Error).message);
+    return null;
+  }
+}
+
 /** Build a projectImage object for the Sanity schema. */
 function projectImage(
   assetRef: { _type: "reference"; _ref: string },
@@ -965,9 +986,12 @@ async function seedPublications(sanity: SanityClient): Promise<void> {
           _type: "image",
           asset: assetRef,
         };
+      } else if (existingDoc?.coverImage) {
+        // Image file missing locally — preserve whatever is already in Sanity
+        doc.coverImage = existingDoc.coverImage;
       }
     } else if (existingDoc?.coverImage) {
-      // Preserve existing cover image if not explicitly provided in script
+      // No image file specified — preserve existing cover
       doc.coverImage = existingDoc.coverImage;
     }
 
@@ -983,6 +1007,24 @@ async function seedPublications(sanity: SanityClient): Promise<void> {
 
 async function seedSiteSettings(sanity: SanityClient): Promise<void> {
   log("SETTINGS", "Creating site settings...");
+
+  const heroVideoFiles = [
+    "shadow_cyclist.mp4",
+    "photographer_hero.mp4",
+    "hands_camera.mp4",
+  ];
+
+  const heroVideos = [];
+  for (const filename of heroVideoFiles) {
+    const assetRef = await uploadVideo(sanity, filename);
+    if (assetRef) {
+      heroVideos.push({
+        _key: key(),
+        _type: "file",
+        asset: assetRef,
+      });
+    }
+  }
 
   const doc: Record<string, unknown> = {
     _id: "siteSettings",
@@ -1002,11 +1044,11 @@ async function seedSiteSettings(sanity: SanityClient): Promise<void> {
       _type: "reference",
       _ref: "project-dienststelle-marienthal",
     },
-    heroVideos: [], // Initialize as empty array
+    heroVideos,
   };
 
   await sanity.createOrReplace(doc as any);
-  log("SETTINGS", "Site settings created.");
+  log("SETTINGS", `Site settings created with ${heroVideos.length} hero videos.`);
 }
 
 // ---------------------------------------------------------------------------

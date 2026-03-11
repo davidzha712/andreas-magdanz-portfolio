@@ -10,6 +10,8 @@ import HeroPortrait from "@/components/home/HeroPortrait";
 import FeaturedWorksGrid from "@/components/home/FeaturedWorksGrid";
 import { Link } from "@/i18n/navigation";
 
+export const revalidate = 60;
+
 // Placeholder projects shown when Sanity is not connected
 const PLACEHOLDER_PROJECTS = [
   { id: "1", title: "Dienststelle Marienthal", year: "1999-2000", slug: "dienststelle-marienthal" },

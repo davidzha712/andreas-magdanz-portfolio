@@ -1,6 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { client } from "@/lib/sanity/client";
+
+export const revalidate = 60;
 import {
   projectBySlugQuery,
   allProjectsQuery,

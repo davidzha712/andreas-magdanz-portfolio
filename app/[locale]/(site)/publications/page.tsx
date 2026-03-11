@@ -4,6 +4,8 @@ import { allPublicationsQuery } from "@/lib/sanity/queries";
 import type { Publication } from "@/types/sanity";
 import PublicationGrid from "@/components/publications/PublicationGrid";
 
+export const revalidate = 60;
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "publications" });

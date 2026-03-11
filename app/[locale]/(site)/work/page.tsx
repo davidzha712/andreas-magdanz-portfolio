@@ -5,6 +5,8 @@ import type { Project } from "@/types/sanity";
 import WorkGrid from "@/components/work/WorkGrid";
 import { Link } from "@/i18n/navigation";
 
+export const revalidate = 60;
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "work" });

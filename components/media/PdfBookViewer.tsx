@@ -5,7 +5,6 @@ import React, {
   useEffect,
   useRef,
   useCallback,
-  forwardRef,
 } from "react";
 import { pdfjs } from "react-pdf";
 import HTMLFlipBook from "react-pageflip";
@@ -168,11 +167,18 @@ function renderBackCover(w: number, h: number): string {
   return c.toDataURL("image/jpeg", 0.95);
 }
 
-/* ── A single book page — just an <img>, no react-pdf dependency ── */
-const BookPage = forwardRef<
-  HTMLDivElement,
-  { src: string; number: number; isCover?: boolean }
->(function BookPage({ src, number, isCover }, ref) {
+/* ── A single book page — React 19: ref as a regular prop ── */
+function BookPage({
+  src,
+  number,
+  isCover,
+  ref,
+}: {
+  src: string;
+  number: number;
+  isCover?: boolean;
+  ref?: React.Ref<HTMLDivElement>;
+}) {
   return (
     <div ref={ref} className={`pdf-page${isCover ? " pdf-cover" : ""} relative w-full h-full`}>
       <Image
@@ -185,7 +191,7 @@ const BookPage = forwardRef<
       />
     </div>
   );
-});
+}
 
 /* ── Main Book Viewer ── */
 export default function PdfBookViewer({
