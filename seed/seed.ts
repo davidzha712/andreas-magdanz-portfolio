@@ -668,21 +668,79 @@ interface ExhibitionData {
   year: number;
   endYear?: number;
   relatedProjectId?: string;
+  description?: string;
+  descriptionEn?: string;
+  venueImageFile?: string;
 }
 
 const EXHIBITIONS: ExhibitionData[] = [
   // Key solo exhibitions
-  { id: "exh-stammheim-stuttgart", title: "Stuttgart Stammheim", type: "solo", venue: "Kunstmuseum Stuttgart", city: "Stuttgart", country: "Germany", year: 2012, endYear: 2013, relatedProjectId: "project-stuttgart-stammheim" },
-  { id: "exh-vogelsang-brussels", title: "Camp Vogelsang", type: "solo", venue: "Mus\u00e9e Royal de l'Arm\u00e9e", city: "Br\u00fcssel", country: "Belgium", year: 2010, relatedProjectId: "project-vogelsang" },
-  { id: "exh-bnd-ludwig", title: "BND Standort Pullach", type: "solo", venue: "Ludwig Forum f\u00fcr Internationale Kunst", city: "Aachen", country: "Germany", year: 2008, relatedProjectId: "project-bnd-pullach" },
-  { id: "exh-marienthal-einstein", title: "Dienststelle Marienthal", type: "solo", venue: "Einstein Forum", city: "Potsdam", country: "Germany", year: 2008, relatedProjectId: "project-dienststelle-marienthal" },
-  { id: "exh-imaging-ludwig", title: "Imaging the Distance", type: "solo", venue: "Ludwig Forum f\u00fcr Internationale Kunst", city: "Aachen", country: "Germany", year: 2007 },
-  { id: "exh-borden-ny-2007", title: "Dienststelle Marienthal / BND Pullach", type: "solo", venue: "Gallery Janet Borden, Inc.", city: "New York", country: "USA", year: 2007 },
-  { id: "exh-arlington", title: "Imaging the Distance", type: "solo", venue: "Arlington Arts Center", city: "Arlington, Virginia", country: "USA", year: 2007 },
-  { id: "exh-borden-ny-2004", title: "Auschwitz-Birkenau", type: "solo", venue: "Gallery Janet Borden, Inc.", city: "New York", country: "USA", year: 2004, relatedProjectId: "project-auschwitz-birkenau" },
-  { id: "exh-paris-photo-2002", title: "Paris Photo", type: "solo", venue: "Gallery Janet Borden, Inc.", city: "Paris", country: "France", year: 2002 },
-  { id: "exh-arles-2002", title: "Les Rencontres de la Photographie", type: "solo", venue: "Rencontres d'Arles", city: "Arles", country: "France", year: 2002 },
-  { id: "exh-marienthal-bonn", title: "Dienststelle Marienthal", type: "solo", venue: "Rheinisches Landesmuseum", city: "Bonn", country: "Germany", year: 2001, relatedProjectId: "project-dienststelle-marienthal" },
+  { 
+    id: "exh-stammheim-stuttgart", 
+    title: "Stuttgart Stammheim", 
+    type: "solo", 
+    venue: "Kunstmuseum Stuttgart", 
+    city: "Stuttgart", 
+    country: "Germany", 
+    year: 2012, 
+    endYear: 2013, 
+    relatedProjectId: "project-stuttgart-stammheim",
+    description: "Die Justizvollzugsanstalt Stuttgart-Stammheim ist ein geschichtsträchtiger Ort. Andreas Magdanz dokumentierte diesen Ort in Hunderten von Fotografien und untersuchte, inwieweit bauliche Orte kollektives Gedächtnis und soziale Praktiken manifestieren.",
+    descriptionEn: "The Stuttgart-Stammheim correctional facility is a history-laden place. Andreas Magdanz documented this site in hundreds of photographs, investigating the extent to which built places manifest collective memory.",
+    venueImageFile: "stammheim_exh.jpg"
+  },
+  { 
+    id: "exh-vogelsang-brussels", 
+    title: "Camp Vogelsang", 
+    type: "solo", 
+    venue: "Mus\u00e9e Royal de l'Arm\u00e9e", 
+    city: "Br\u00fcssel", 
+    country: "Belgium", 
+    year: 2010, 
+    relatedProjectId: "project-vogelsang",
+    description: "Dokumentation der ehemaligen NS-Ordensburg Vogelsang in der Eifel. Das Projekt folgt einer Dreigliederung, die Natur, Architektur und militärische Elemente des Geländes erfasst.",
+    descriptionEn: "Documentation of the former Nazi elite school (Ordensburg) Vogelsang in the Eifel. The project follows a three-part structure capturing nature, architecture, and military elements.",
+    venueImageFile: "vogelsang_exh.jpg"
+  },
+  { 
+    id: "exh-bnd-ludwig", 
+    title: "BND Standort Pullach", 
+    type: "solo", 
+    venue: "Ludwig Forum f\u00fcr Internationale Kunst", 
+    city: "Aachen", 
+    country: "Germany", 
+    year: 2008, 
+    relatedProjectId: "project-bnd-pullach",
+    description: "Erste umfassende fotografische Dokumentation der Zentrale des Bundesnachrichtendienstes (BND) in Pullach, die die Architektur der Geheimhaltung offenbart.",
+    descriptionEn: "First comprehensive photographic documentation of the headquarters of the German foreign intelligence service (BND) in Pullach, revealing the architecture of secrecy.",
+    venueImageFile: "bnd_exh.jpg"
+  },
+  { 
+    id: "exh-marienthal-bonn", 
+    title: "Dienststelle Marienthal", 
+    type: "solo", 
+    venue: "Rheinisches Landesmuseum", 
+    city: "Bonn", 
+    country: "Germany", 
+    year: 2001, 
+    relatedProjectId: "project-dienststelle-marienthal",
+    description: "Gebäudemonographie des geheimen Atombunkers der Bundesregierung bei Bonn, die die Ästhetik der Verteidigungsarchitektur des Kalten Krieges erforscht.",
+    descriptionEn: "A building monograph of the West German government's secret nuclear bunker near Bonn, exploring the aesthetics of Cold War defense architecture.",
+    venueImageFile: "marienthal_exh.jpg"
+  },
+  { 
+    id: "exh-borden-ny-2004", 
+    title: "Auschwitz-Birkenau", 
+    type: "solo", 
+    venue: "Gallery Janet Borden, Inc.", 
+    city: "New York", 
+    country: "USA", 
+    year: 2004, 
+    relatedProjectId: "project-auschwitz-birkenau",
+    description: "Eine Gebäudemonographie des ehemaligen Konzentrationslagers, im Auftrag von Marceline Loridan-Ivens, mit Fokus auf die Bewahrung der Erinnerung durch architektonische Dokumentation.",
+    descriptionEn: "A building monograph of the former concentration camp, commissioned by Marceline Loridan-Ivens, focusing on the preservation of memory through architectural documentation.",
+    venueImageFile: "auschwitz_exh.jpg"
+  },
   { id: "exh-paris-photo-2001", title: "Paris Photo", type: "solo", venue: "Carrousel du Louvre", city: "Paris", country: "France", year: 2001 },
   { id: "exh-suermondt-1994", title: "Ausstellung, Neubau", type: "solo", venue: "Suermondt Ludwig Museum", city: "Aachen", country: "Germany", year: 1994, relatedProjectId: "project-suermondt-ludwig-museum" },
   { id: "exh-suermondt-1992", title: "Ausstellung", type: "solo", venue: "Suermondt Ludwig Museum", city: "Aachen", country: "Germany", year: 1992 },
@@ -723,6 +781,21 @@ async function seedExhibitions(sanity: SanityClient): Promise<void> {
         _ref: exh.relatedProjectId,
       };
     }
+    if (exh.description) {
+      doc.description = toPortableText(exh.description);
+    }
+    if (exh.descriptionEn) {
+      doc.descriptionEn = toPortableText(exh.descriptionEn);
+    }
+    if (exh.venueImageFile) {
+      const assetRef = await getImageRef(sanity, exh.venueImageFile);
+      if (assetRef) {
+        doc.venueImage = {
+          _type: "image",
+          asset: assetRef,
+        };
+      }
+    }
 
     await sanity.createOrReplace(doc as any);
   }
@@ -742,6 +815,7 @@ interface PublicationData {
   isbn?: string;
   purchaseUrl?: string;
   coverImageFile?: string;
+  relatedProjectId?: string;
 }
 
 const PUBLICATIONS: PublicationData[] = [
@@ -753,12 +827,15 @@ const PUBLICATIONS: PublicationData[] = [
     isbn: "978-3000059230",
     coverImageFile: "marienthal_real_cover.jpg",
     purchaseUrl: "http://www.dienststellemarienthal.de",
+    relatedProjectId: "project-dienststelle-marienthal"
   },
   {
     id: "pub-auschwitz-birkenau",
     title: "Auschwitz-Birkenau \u2014 Hommage \u00e0 Marceline Loridan-Ivens",
     publisher: "Selbstverlag",
     year: 2003,
+    coverImageFile: "auschwitz_real_cover.jpg",
+    relatedProjectId: "project-auschwitz-birkenau"
   },
   {
     id: "pub-bnd-pullach",
@@ -768,6 +845,7 @@ const PUBLICATIONS: PublicationData[] = [
     isbn: "978-3832176808",
     coverImageFile: "bnd_real_cover.jpg",
     purchaseUrl: "http://www.bnd-standortpullach.de/",
+    relatedProjectId: "project-bnd-pullach"
   },
   {
     id: "pub-vogelsang",
@@ -777,6 +855,7 @@ const PUBLICATIONS: PublicationData[] = [
     isbn: "978-2870510489",
     coverImageFile: "vogelsang_real_cover.jpg",
     purchaseUrl: "http://www.magbooks.de/",
+    relatedProjectId: "project-vogelsang"
   },
   {
     id: "pub-stammheim",
@@ -786,12 +865,15 @@ const PUBLICATIONS: PublicationData[] = [
     isbn: "978-3775734578",
     coverImageFile: "stammheim_real_cover.jpg",
     purchaseUrl: "mailto:stammheimbuch@andreasmagdanz.de",
+    relatedProjectId: "project-stuttgart-stammheim"
   },
   {
     id: "pub-eifel",
     title: "Eifel (Buch/Unikat)",
     publisher: "Selbstverlag",
     year: 1991,
+    coverImageFile: "eifel_real_cover.jpg",
+    relatedProjectId: "project-eifel"
   },
   {
     id: "pub-garzweiler-zeitung",
@@ -799,30 +881,37 @@ const PUBLICATIONS: PublicationData[] = [
     publisher: "Selbstverlag (Zeitungspapier)",
     year: 1997,
     purchaseUrl: "mailto:garzweilerzeitung@andreasmagdanz.de",
+    relatedProjectId: "project-hambach-tagebau"
   },
   {
     id: "pub-hambacher-forst",
     title: "Immerath / Hambacher Forst",
     publisher: "book on demand, studentisches Projekt",
     year: 2014,
+    relatedProjectId: "project-hambach-tagebau"
   },
   {
     id: "pub-lindt",
     title: "Lindt & Spr\u00fcngli Chocoladefabriken",
     publisher: "Buch/Print",
     year: 1992,
+    coverImageFile: "lindt_real_cover.jpg",
+    relatedProjectId: "project-industriephotographie"
   },
   {
     id: "pub-photograph-katalog",
     title: "Andreas Magdanz \u2014 Photograph (Katalog)",
     publisher: "Selbstverlag",
     year: 1994,
+    coverImageFile: "photograph_real_cover.jpg",
+    relatedProjectId: "project-suermondt-ludwig-museum"
   },
   {
     id: "pub-hans-und-grete",
     title: "Hans und Grete, Bilder der RAF, 1967-77",
     publisher: "MagBook",
     year: 2012,
+    relatedProjectId: "project-stuttgart-stammheim"
   },
   {
     id: "pub-imaging-distance",
@@ -835,6 +924,7 @@ const PUBLICATIONS: PublicationData[] = [
     title: "Der Regierungsbunker (Katalog)",
     publisher: "Bundesamt f\u00fcr Bauwesen und Raumordnung",
     year: 2007,
+    relatedProjectId: "project-dienststelle-marienthal"
   },
 ];
 
@@ -851,10 +941,14 @@ async function seedPublications(sanity: SanityClient): Promise<void> {
     };
     if (pub.isbn) doc.isbn = pub.isbn;
     if (pub.purchaseUrl) doc.purchaseUrl = pub.purchaseUrl;
+    if (pub.relatedProjectId) {
+      doc.relatedProject = {
+        _type: "reference",
+        _ref: pub.relatedProjectId,
+      };
+    }
     
-    // @ts-ignore
     if (pub.coverImageFile) {
-      // @ts-ignore
       const assetRef = await getImageRef(sanity, pub.coverImageFile);
       if (assetRef) {
         doc.coverImage = {

@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { gsap, ScrollTrigger } from "@/lib/gsap/gsapPlugins";
 import type { Exhibition } from "@/types/sanity";
+import SanityImage from "@/components/shared/SanityImage";
+import PortableText from "@/components/shared/PortableText";
 
 interface ExhibitionTimelineProps {
   exhibitions: Exhibition[];
@@ -162,6 +164,7 @@ function ExhibitionCard({
       <div className="flex items-center justify-between mb-4">
         <span className="font-sans text-xs text-fg-muted tabular-nums tracking-wider">
           {exhibition.year}
+          {exhibition.endYear && exhibition.endYear !== exhibition.year ? `–${exhibition.endYear}` : ""}
         </span>
         <span
           className={[
@@ -175,10 +178,19 @@ function ExhibitionCard({
         </span>
       </div>
 
-      {/* Accent dot / venue image placeholder */}
+      {/* Venue image */}
       <div className="mb-4">
-        <div className="w-full aspect-[16/7] bg-bg-muted flex items-center justify-center overflow-hidden">
-          <div className="w-3 h-3 rounded-full bg-accent/60 group-hover:bg-accent transition-colors duration-300" />
+        <div className="w-full aspect-[16/9] bg-bg-muted flex items-center justify-center overflow-hidden relative">
+          {exhibition.venueImage ? (
+            <SanityImage
+              image={exhibition.venueImage}
+              alt={`${exhibition.title} at ${exhibition.venue}`}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          ) : (
+            <div className="w-3 h-3 rounded-full bg-accent/60 group-hover:bg-accent transition-colors duration-300" />
+          )}
         </div>
       </div>
 
@@ -193,6 +205,15 @@ function ExhibitionCard({
           .filter(Boolean)
           .join(", ")}
       </p>
+
+      {/* Description */}
+      {exhibition.description && exhibition.description.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-border/50">
+          <div className="font-sans text-xs text-fg-muted/80 leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
+            <PortableText value={exhibition.description} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

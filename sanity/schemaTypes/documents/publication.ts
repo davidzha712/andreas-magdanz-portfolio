@@ -53,6 +53,13 @@ export const publication = defineType({
         r.uri({ scheme: ["http", "https"] }),
     }),
     defineField({
+      name: "relatedProject",
+      title: "Related Project",
+      type: "reference",
+      to: [{ type: "project" }],
+      description: "Link to the project featured in this publication",
+    }),
+    defineField({
       name: "description",
       title: "Description (DE)",
       type: "blockContent",
