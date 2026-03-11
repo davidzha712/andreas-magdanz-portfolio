@@ -49,6 +49,8 @@ export const siteSettings = defineType({
       type: "array",
       of: [
         {
+          name: "heroVideo",
+          title: "Hero Video",
           type: "file",
           options: {
             accept: "video/mp4,video/webm",

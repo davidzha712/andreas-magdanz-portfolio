@@ -1002,6 +1002,7 @@ async function seedSiteSettings(sanity: SanityClient): Promise<void> {
       _type: "reference",
       _ref: "project-dienststelle-marienthal",
     },
+    heroVideos: [], // Initialize as empty array
   };
 
   await sanity.createOrReplace(doc as any);
