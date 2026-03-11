@@ -8,7 +8,6 @@ import React, {
 } from "react";
 import { pdfjs } from "react-pdf";
 import HTMLFlipBook from "react-pageflip";
-import Image from "next/image";
 
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
@@ -180,17 +179,35 @@ function BookPage({
   ref?: React.Ref<HTMLDivElement>;
 }) {
   return (
-    <div ref={ref} className={`pdf-page${isCover ? " pdf-cover" : ""} relative w-full h-full`}>
-      <Image
+    <div
+      ref={ref}
+      className={`pdf-page${isCover ? " pdf-cover" : ""}`}
+      style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}
+    >
+      {/* Plain <img> handles data: URLs and cdn URLs equally without Next.js constraints */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={src}
         alt={`Page ${number}`}
         draggable={false}
-        fill
-        unoptimized
-        className="block"
+        style={{
+          display: "block",
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          userSelect: "none",
+        }}
       />
     </div>
   );
+}
+
+/** Route all Sanity CDN file requests through a same-origin proxy to avoid CORS blocks. */
+function resolveProxiedUrl(url: string): string {
+  if (url.startsWith("https://cdn.sanity.io/files/")) {
+    return `/api/pdf?url=${encodeURIComponent(url)}`;
+  }
+  return url;
 }
 
 /* ── Main Book Viewer ── */
@@ -201,6 +218,7 @@ export default function PdfBookViewer({
   date,
   translations: t,
 }: PdfBookViewerProps) {
+  const proxiedUrl = resolveProxiedUrl(pdfUrl);
   const [pageImages, setPageImages] = useState<string[]>([]);
   const [pdfPageCount, setPdfPageCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -245,7 +263,7 @@ export default function PdfBookViewer({
 
     async function loadPdf() {
       try {
-        const pdf = await pdfjs.getDocument(pdfUrl).promise;
+        const pdf = await pdfjs.getDocument(proxiedUrl).promise;
         const numPages = pdf.numPages;
         const contentImages: string[] = [];
         let coverW = 0;
@@ -299,7 +317,7 @@ export default function PdfBookViewer({
     return () => {
       cancelled = true;
     };
-  }, [pdfUrl, title, source, date, t.error]);
+  }, [proxiedUrl, title, source, date, t.error]);
 
   /* ── Keyboard nav ── */
   const handleKey = useCallback((e: KeyboardEvent) => {

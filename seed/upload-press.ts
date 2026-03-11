@@ -71,7 +71,7 @@ function textToPortableText(raw: string): Array<Record<string, unknown>> {
   // Decode ISO-8859-1 chars (already decoded via latin1 buffer toString)
   // Remove title tag (we already have title in Sanity)
   let text = raw
-    .replace(/<titel>.*?<titelende>/gsi, "")
+    .replace(/<titel>[^<]*<titelende>/gi, "")
     .replace(/\r\n/g, "\n")
     .replace(/\r/g, "\n");
 
