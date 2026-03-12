@@ -171,6 +171,8 @@ export interface SearchMediaItem {
   mediaType: "audio" | "video" | "press";
   source: string;
   date: string;
+  descriptionText?: string;
+  externalUrl?: string;
 }
 
 export interface SearchData {

@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
 import { allMediaItemsQuery } from "@/lib/sanity/queries";
+import { getMediaItemAnchorId } from "@/lib/search/searchUtils";
 import type { MediaItem } from "@/types/sanity";
 
 export const revalidate = 60;
@@ -62,14 +63,19 @@ export default async function MediaPage({
             <div className="space-y-16 md:space-y-20">
               {videoItems.map((item) =>
                 item.embedUrl ? (
-                  <VideoEmbed
+                  <div
                     key={item._id}
-                    title={item.title}
-                    source={item.source}
-                    date={item.date}
-                    embedUrl={item.embedUrl}
-                    locale={locale}
-                  />
+                    id={getMediaItemAnchorId(item)}
+                    className="scroll-mt-28 md:scroll-mt-36"
+                  >
+                    <VideoEmbed
+                      title={item.title}
+                      source={item.source}
+                      date={item.date}
+                      embedUrl={item.embedUrl}
+                      locale={locale}
+                    />
+                  </div>
                 ) : null
               )}
             </div>
@@ -83,18 +89,24 @@ export default async function MediaPage({
             <div className="space-y-3">
               {audioItems.map((item) =>
                 item.embedUrl ? (
-                  <AudioPlayer
+                  <div
                     key={item._id}
-                    title={item.title}
-                    source={item.source}
-                    date={item.date}
-                    url={item.embedUrl}
-                    locale={locale}
-                  />
+                    id={getMediaItemAnchorId(item)}
+                    className="scroll-mt-28 md:scroll-mt-36"
+                  >
+                    <AudioPlayer
+                      title={item.title}
+                      source={item.source}
+                      date={item.date}
+                      url={item.embedUrl}
+                      locale={locale}
+                    />
+                  </div>
                 ) : (
                   <div
                     key={item._id}
-                    className="py-4 border-b border-border/50 flex items-center justify-between gap-4"
+                    id={getMediaItemAnchorId(item)}
+                    className="scroll-mt-28 md:scroll-mt-36 py-4 border-b border-border/50 flex items-center justify-between gap-4"
                   >
                     <div className="min-w-0">
                       <p className="font-sans text-[11px] uppercase tracking-[0.2em] text-accent mb-1">
@@ -128,23 +140,28 @@ export default async function MediaPage({
             <SectionHeader title={t("press")} />
             <div>
               {pressItems.map((item) => (
-                <PressArticleCard
+                <div
                   key={item._id}
-                  mediaItem={item}
-                  locale={locale}
-                  translations={{
-                    read: t("read"),
-                    viewPdf: t("viewPdf"),
-                    openArticle: t("openArticle"),
-                    pdfAvailable: t("pdfAvailable"),
-                    externalArticle: t("externalArticle"),
-                    loading: t("loading"),
-                    error: t("error"),
-                    pageOf: t("pageOf"),
-                    pageTotal: t("pageTotal"),
-                    downloadPdf: t("downloadPdf"),
-                  }}
-                />
+                  id={getMediaItemAnchorId(item)}
+                  className="scroll-mt-28 md:scroll-mt-36"
+                >
+                  <PressArticleCard
+                    mediaItem={item}
+                    locale={locale}
+                    translations={{
+                      read: t("read"),
+                      viewPdf: t("viewPdf"),
+                      openArticle: t("openArticle"),
+                      pdfAvailable: t("pdfAvailable"),
+                      externalArticle: t("externalArticle"),
+                      loading: t("loading"),
+                      error: t("error"),
+                      pageOf: t("pageOf"),
+                      pageTotal: t("pageTotal"),
+                      downloadPdf: t("downloadPdf"),
+                    }}
+                  />
+                </div>
               ))}
             </div>
           </section>

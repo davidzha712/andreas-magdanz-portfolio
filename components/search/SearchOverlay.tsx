@@ -6,6 +6,10 @@ import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { client } from "@/lib/sanity/client";
 import { searchAllContentQuery } from "@/lib/sanity/queries";
+import {
+  getMediaItemHref,
+  getMediaItemSearchableText,
+} from "@/lib/search/searchUtils";
 import type {
   SearchData,
   SearchProject,
@@ -69,7 +73,7 @@ function getSearchableText(result: SearchResult): string[] {
         String(result.item.year),
       ];
     case "mediaItem":
-      return [result.item.title, result.item.source];
+      return getMediaItemSearchableText(result.item);
   }
 }
 
@@ -195,7 +199,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
       case "cvEntry":
         return "/cv";
       case "mediaItem":
-        return "/media";
+        return getMediaItemHref(result.item);
     }
   }
 
@@ -219,7 +223,9 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
           .filter(Boolean)
           .join(" · ");
       case "mediaItem":
-        return [result.item.source, result.item.date].filter(Boolean).join(" · ");
+        return [result.item.mediaType, result.item.source, result.item.date]
+          .filter(Boolean)
+          .join(" · ");
     }
   }
 

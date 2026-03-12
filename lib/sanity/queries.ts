@@ -126,7 +126,16 @@ export const searchAllContentQuery = defineQuery(
         $locale == "en" => coalesce(titleEn, title),
         title
       ),
-      mediaType, source, date
+      mediaType,
+      source,
+      date,
+      externalUrl,
+      "descriptionText": pt::text(
+        select(
+          $locale == "en" => coalesce(descriptionEn, description),
+          description
+        )
+      )
     }
   }`
 );
