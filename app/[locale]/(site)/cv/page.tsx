@@ -1,7 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { client } from "@/lib/sanity/client";
-import { allCVEntriesQuery } from "@/lib/sanity/queries";
-import type { CVEntry } from "@/types/sanity";
+import { allCVEntriesQuery, siteSettingsQuery } from "@/lib/sanity/queries";
+import type { CVEntry, SiteSettings } from "@/types/sanity";
+import SanityImage from "@/components/shared/SanityImage";
 
 export const revalidate = 60;
 import CVTimeline from "@/components/cv/CVTimeline";
@@ -117,9 +118,13 @@ export default async function CVPage({ params }: { params: Promise<{ locale: str
   const t = await getTranslations("cv");
 
   let entries: CVEntry[] = [];
+  let settings: SiteSettings | null = null;
 
   try {
-    entries = await client.fetch<CVEntry[]>(allCVEntriesQuery, { locale });
+    [entries, settings] = await Promise.all([
+      client.fetch<CVEntry[]>(allCVEntriesQuery, { locale }),
+      client.fetch<SiteSettings>(siteSettingsQuery, { locale }),
+    ]);
   } catch {
     // Sanity not connected — use fallback
   }
@@ -128,12 +133,29 @@ export default async function CVPage({ params }: { params: Promise<{ locale: str
 
   return (
     <div className="px-8 md:px-12 lg:px-16 py-16 max-w-4xl mx-auto">
-      {/* Page header */}
+      {/* Page header with optional portrait */}
       <header className="mb-16">
-        <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
-          {t("title")}
-        </h1>
-        <div className="mt-4 w-12 h-px bg-accent" />
+        <div className="flex flex-col sm:flex-row sm:items-end gap-8">
+          {settings?.artistPortrait && (
+            <div className="shrink-0 w-32 sm:w-40">
+              <div className="relative aspect-[3/4] overflow-hidden">
+                <SanityImage
+                  image={settings.artistPortrait}
+                  alt="Andreas Magdanz"
+                  fill
+                  sizes="160px"
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          )}
+          <div>
+            <h1 className="font-serif text-5xl md:text-6xl text-fg tracking-tight leading-none">
+              {t("title")}
+            </h1>
+            <div className="mt-4 w-12 h-px bg-accent" />
+          </div>
+        </div>
       </header>
 
       {/* Timeline */}
