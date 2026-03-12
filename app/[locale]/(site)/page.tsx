@@ -61,6 +61,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           heroVideoPosition={siteSettings.heroVideoPosition}
         />
         <FeaturedWorksGrid projects={featuredProjects} title={t("selectedWorks")} />
+        <div className="flex justify-center pb-16">
+          <Link
+            href="/work"
+            className="font-sans text-sm tracking-widest uppercase text-fg-muted hover:text-accent transition-colors duration-300 flex items-center gap-2"
+          >
+            {t("allWorks")}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
       </>
     );
   }
@@ -129,7 +140,20 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {/* Featured works from CMS or placeholders */}
       {featuredProjects.length > 0 ? (
-        <FeaturedWorksGrid projects={featuredProjects} title={t("selectedWorks")} />
+        <>
+          <FeaturedWorksGrid projects={featuredProjects} title={t("selectedWorks")} />
+          <div className="flex justify-center pb-16">
+            <Link
+              href="/work"
+              className="font-sans text-sm tracking-widest uppercase text-fg-muted hover:text-accent transition-colors duration-300 flex items-center gap-2"
+            >
+              {t("allWorks")}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </>
       ) : (
         <section className="py-24 px-8 md:px-12 lg:px-16">
           <h2 className="font-serif text-4xl text-center text-fg mb-16 tracking-tight">

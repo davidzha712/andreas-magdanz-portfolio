@@ -18,29 +18,32 @@ export default function FeaturedWorksGrid({ projects, title }: FeaturedWorksGrid
     const grid = gridRef.current;
     if (!grid) return;
 
+    const cards = grid.querySelectorAll(".work-card");
+
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
-    if (prefersReduced) return;
 
-    const cards = grid.querySelectorAll(".work-card");
+    if (prefersReduced) {
+      gsap.set(cards, { opacity: 1, y: 0 });
+      return;
+    }
 
-    gsap.fromTo(
-      cards,
-      { opacity: 0, y: 50 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: grid,
-          start: "top 80%",
-          once: true,
-        },
-      }
-    );
+    // Set invisible via JS (not CSS) so cards are visible if GSAP never runs
+    gsap.set(cards, { opacity: 0, y: 50 });
+
+    gsap.to(cards, {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      stagger: 0.1,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: grid,
+        start: "top 85%",
+        once: true,
+      },
+    });
 
     return () => {
       ScrollTrigger.getAll().forEach((t) => t.kill());
@@ -69,7 +72,7 @@ function FeaturedCard({ project }: { project: Project }) {
   return (
     <Link
       href={`/work/${project.slug.current}`}
-      className="work-card group block relative overflow-hidden aspect-[3/4] opacity-0"
+      className="work-card group block relative overflow-hidden aspect-[3/4]"
     >
       {/* Image */}
       <div className="absolute inset-0 transition-transform duration-500 ease-out group-hover:scale-[1.03]">
