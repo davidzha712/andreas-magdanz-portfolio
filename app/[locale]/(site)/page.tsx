@@ -5,23 +5,11 @@ import {
   featuredProjectsQuery,
 } from "@/lib/sanity/queries";
 import type { SiteSettings, Project } from "@/types/sanity";
-import HeroSection from "@/components/home/HeroSection";
-import HeroPortrait from "@/components/home/HeroPortrait";
 import Hero3DWrapper from "@/components/hero3d/Hero3DWrapper";
 import FeaturedWorksGrid from "@/components/home/FeaturedWorksGrid";
 import { Link } from "@/i18n/navigation";
 
 export const revalidate = 60;
-
-// Placeholder projects shown when Sanity is not connected
-const PLACEHOLDER_PROJECTS = [
-  { id: "1", title: "Dienststelle Marienthal", year: "1999-2000", slug: "dienststelle-marienthal" },
-  { id: "2", title: "Auschwitz-Birkenau", year: "2002-2003", slug: "auschwitz-birkenau" },
-  { id: "3", title: "BND-Standort Pullach", year: "2005-2006", slug: "bnd-standort-pullach" },
-  { id: "4", title: "Stuttgart Stammheim", year: "2010-2012", slug: "stuttgart-stammheim" },
-  { id: "5", title: "Garzweiler", year: "2003-2006", slug: "garzweiler" },
-  { id: "6", title: "Eifel", year: "1995-1998", slug: "eifel" },
-];
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -50,131 +38,20 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     // Sanity not connected — use fallback UI
   }
 
-  // 3D panorama hero — head tracking + drag exploration
-  if (true) {
-    const heroProject = siteSettings?.homeHeroProject as Project | undefined;
-    return (
-      <>
-        <Hero3DWrapper
-          title="ANDREAS MAGDANZ"
-          subtitle={
-            heroProject
-              ? `${heroProject.title}${heroProject.year ? ` — ${heroProject.year}` : ""}`
-              : `${t("photographer")} — ${t("location")}`
-          }
-          scrollLabel={t("scroll")}
-        />
-        {featuredProjects.length > 0 && (
-          <>
-            <FeaturedWorksGrid projects={featuredProjects} title={t("selectedWorks")} />
-            <div className="flex justify-center pb-16">
-              <Link
-                href="/work"
-                className="font-sans text-sm tracking-widest uppercase text-fg-muted hover:text-accent transition-colors duration-300 flex items-center gap-2"
-              >
-                {t("allWorks")}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-          </>
-        )}
-      </>
-    );
-  }
+  const heroProject = siteSettings?.homeHeroProject as Project | undefined;
 
-  // CMS-connected path — project hero
-  if (siteSettings?.homeHeroProject && featuredProjects.length > 0) {
-    return (
-      <>
-        <HeroSection
-          project={siteSettings.homeHeroProject as Project}
-          scrollLabel={t("scroll")}
-          heroImage={siteSettings.heroImage}
-          heroVideoUrls={siteSettings.heroVideoUrls}
-          heroVideoPosition={siteSettings.heroVideoPosition}
-        />
-        <FeaturedWorksGrid projects={featuredProjects} title={t("selectedWorks")} />
-        <div className="flex justify-center pb-16">
-          <Link
-            href="/work"
-            className="font-sans text-sm tracking-widest uppercase text-fg-muted hover:text-accent transition-colors duration-300 flex items-center gap-2"
-          >
-            {t("allWorks")}
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </Link>
-        </div>
-      </>
-    );
-  }
-
-  // Portrait hero or gradient fallback
   return (
     <>
-      {siteSettings?.heroImage ? (
-        <HeroPortrait
-          image={siteSettings.heroImage}
-          scrollLabel={t("scroll")}
-          photographerLabel={t("photographer")}
-          locationLabel={t("location")}
-          heroVideoUrls={siteSettings.heroVideoUrls}
-          heroVideoPosition={siteSettings.heroVideoPosition}
-        />
-      ) : (
-        <section className="relative h-screen overflow-hidden flex items-end">
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 40%, #111111 70%, #0a0a0a 100%)",
-            }}
-            aria-hidden="true"
-          />
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 3px)",
-            }}
-            aria-hidden="true"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent" />
-          <div className="relative z-10 px-8 md:px-12 lg:px-16 pb-16">
-            <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl tracking-tight text-fg leading-none">
-              ANDREAS MAGDANZ
-            </h1>
-            <p className="mt-3 font-sans text-sm tracking-widest uppercase text-fg-muted">
-              {t("photographer")} — {t("location")}
-            </p>
-          </div>
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-fg-muted/60">
-            <span className="font-sans text-[10px] tracking-widest uppercase">
-              {t("scroll")}
-            </span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              className="animate-bounce"
-            >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
-        </section>
-      )}
-
-      {/* Featured works from CMS or placeholders */}
-      {featuredProjects.length > 0 ? (
+      <Hero3DWrapper
+        title="ANDREAS MAGDANZ"
+        subtitle={
+          heroProject
+            ? `${heroProject.title}${heroProject.year ? ` — ${heroProject.year}` : ""}`
+            : `${t("photographer")} — ${t("location")}`
+        }
+        scrollLabel={t("scroll")}
+      />
+      {featuredProjects.length > 0 && (
         <>
           <FeaturedWorksGrid projects={featuredProjects} title={t("selectedWorks")} />
           <div className="flex justify-center pb-16">
@@ -189,44 +66,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </Link>
           </div>
         </>
-      ) : (
-        <section className="py-24 px-8 md:px-12 lg:px-16">
-          <h2 className="font-serif text-4xl text-center text-fg mb-16 tracking-tight">
-            {t("selectedWorks")}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {PLACEHOLDER_PROJECTS.map((p) => (
-              <Link
-                key={p.id}
-                href={`/work/${p.slug}`}
-                className="group block"
-              >
-                <div className="relative overflow-hidden aspect-[3/4] bg-bg-muted">
-                  <div
-                    className="absolute inset-0 opacity-20"
-                    style={{
-                      background:
-                        "linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.8) 100%)",
-                    }}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="font-serif text-fg-muted/30 text-lg text-center px-4 leading-tight">
-                      {p.title}
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-3">
-                  <p className="font-serif text-lg text-fg group-hover:text-accent transition-colors duration-300">
-                    {p.title}
-                  </p>
-                  <p className="font-sans text-sm text-fg-muted mt-0.5">
-                    {p.year}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
       )}
     </>
   );
