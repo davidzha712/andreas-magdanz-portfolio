@@ -12,7 +12,6 @@
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@mediapipe/tasks-vision": "^0.10.34",
-    "@mkkellogg/gaussian-splats-3d": "^0.4.7",
     "@portabletext/react": "^6.0.2",
     "@sanity/image-url": "^2.0.3",
     "@sanity/vision": "^5.12.0",

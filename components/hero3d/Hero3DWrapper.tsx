@@ -12,7 +12,7 @@ const Hero3DScene = dynamic(() => import("./Hero3DScene"), {
 });
 
 interface Hero3DWrapperProps {
-  splatUrl?: string;
+  panoramaUrl?: string;
   title?: string;
   subtitle?: string;
   scrollLabel?: string;

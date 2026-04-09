@@ -4,18 +4,17 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import * as THREE from "three";
 import { gsap } from "@/lib/gsap/gsapPlugins";
 import { useHeadTracking } from "./useHeadTracking";
-import { useOffAxisCamera } from "./useOffAxisCamera";
 import { useInputFallback } from "./useInputFallback";
 
 interface Hero3DSceneProps {
-  splatUrl?: string;
+  panoramaUrl?: string;
   title?: string;
   subtitle?: string;
   scrollLabel?: string;
 }
 
 export default function Hero3DScene({
-  splatUrl = "/models/hero.splat",
+  panoramaUrl = "/models/hambacher-forst-panorama.jpg",
   title = "ANDREAS MAGDANZ",
   subtitle,
   scrollLabel = "Scroll",
@@ -23,26 +22,20 @@ export default function Hero3DScene({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rafRef = useRef<number>(0);
-  const splatViewerRef = useRef<unknown>(null);
 
   const headTracking = useHeadTracking();
   const fallbackInput = useInputFallback();
-  const { updateCamera } = useOffAxisCamera();
 
   const [isLoaded, setIsLoaded] = useState(false);
-  const [usingSplat, setUsingSplat] = useState(false);
   const [cameraPrompted, setCameraPrompted] = useState(false);
 
-  // Active input source: prefer head tracking, fallback to mouse/gyro
   const activeInput = headTracking.isTracking
     ? headTracking.position
     : fallbackInput;
 
-  // Initialize Three.js scene
+  // Initialize Three.js + load panorama
   const initScene = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -55,114 +48,50 @@ export default function Hero3DScene({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
-    rendererRef.current = renderer;
+    renderer.toneMappingExposure = 1.2;
 
     const scene = new THREE.Scene();
-    sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(
-      60,
+      75,
       window.innerWidth / window.innerHeight,
       0.1,
       100
     );
-    camera.position.set(0, 0, 0.6);
+    camera.position.set(0, 0, 0);
     cameraRef.current = camera;
 
-    // Ambient light for the scene
-    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    dirLight.position.set(5, 5, 5);
-    scene.add(dirLight);
-
-    return { renderer, scene, camera };
-  }, []);
-
-  // Load Gaussian Splat
-  const loadSplat = useCallback(
-    async (scene: THREE.Scene, renderer: THREE.WebGLRenderer) => {
-      try {
-        const response = await fetch(splatUrl, { method: "HEAD" });
-        if (!response.ok) {
-          throw new Error(`Splat file not found: ${splatUrl}`);
-        }
-
-        const GaussianSplats3D = await import(
-          "@mkkellogg/gaussian-splats-3d"
-        );
-        const viewer = new GaussianSplats3D.Viewer({
-          selfDrivenMode: false,
-          renderer,
-          camera: cameraRef.current!,
-          scene,
-          useBuiltInControls: false,
-          sharedMemoryForWorkers: false,
-        });
-
-        await viewer.addSplatScene(splatUrl, {
-          showLoadingUI: false,
-        });
-
-        splatViewerRef.current = viewer;
-        setUsingSplat(true);
-        setIsLoaded(true);
-      } catch {
-        // Splat not available — fall back to panorama cube map
-        loadPanoramaCube(scene);
-      }
-    },
-    [splatUrl]
-  );
-
-  // Fallback: load panorama as a cube-textured sphere (equirectangular)
-  const loadPanoramaCube = useCallback((scene: THREE.Scene) => {
+    // Load equirectangular panorama onto an inverted sphere
     const textureLoader = new THREE.TextureLoader();
     textureLoader.load(
-      "/models/hambacher-forst-panorama.jpg",
+      panoramaUrl,
       (texture) => {
-        texture.mapping = THREE.EquirectangularReflectionMapping;
         texture.colorSpace = THREE.SRGBColorSpace;
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
 
-        // Create an inside-out sphere with the panorama
-        const geometry = new THREE.SphereGeometry(10, 64, 32);
-        geometry.scale(-1, 1, 1); // Invert so we see the inside
+        const geometry = new THREE.SphereGeometry(50, 64, 32);
+        geometry.scale(-1, 1, 1); // Invert normals to see inside
         const material = new THREE.MeshBasicMaterial({ map: texture });
-        const sphere = new THREE.Mesh(geometry, material);
-        scene.add(sphere);
+        scene.add(new THREE.Mesh(geometry, material));
 
         setIsLoaded(true);
       },
       undefined,
       () => {
-        // Even panorama failed — show dark background
         scene.background = new THREE.Color(0x0a0a0a);
         setIsLoaded(true);
       }
     );
-  }, []);
-
-  // Main setup effect
-  useEffect(() => {
-    const result = initScene();
-    if (!result) return;
-
-    const { renderer, scene, camera } = result;
-
-    loadSplat(scene, renderer);
 
     // Render loop
     const animate = () => {
-      if (splatViewerRef.current) {
-        const viewer = splatViewerRef.current as { update: () => void };
-        viewer.update();
-      }
       renderer.render(scene, camera);
       rafRef.current = requestAnimationFrame(animate);
     };
     rafRef.current = requestAnimationFrame(animate);
 
-    // Resize handler
+    // Resize
     const onResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -174,37 +103,33 @@ export default function Hero3DScene({
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", onResize);
       renderer.dispose();
-      if (splatViewerRef.current) {
-        const viewer = splatViewerRef.current as { dispose: () => void };
-        try {
-          viewer.dispose();
-        } catch {
-          // Viewer disposal can throw
-        }
-      }
     };
-  }, [initScene, loadSplat]);
+  }, [panoramaUrl]);
 
-  // Update camera based on head/mouse/gyro input
   useEffect(() => {
-    if (!cameraRef.current || !isLoaded) return;
+    const cleanup = initScene();
+    return cleanup;
+  }, [initScene]);
 
-    // For panorama sphere (non-splat), we do simpler rotation instead of off-axis
-    if (!usingSplat) {
-      const camera = cameraRef.current;
-      // Rotate camera to look around the panorama sphere
-      const targetLon = activeInput.x * 30 * (Math.PI / 180); // +-30 degrees
-      const targetLat = activeInput.y * 15 * (Math.PI / 180); // +-15 degrees
+  // Update camera rotation from head / mouse / gyro input
+  useEffect(() => {
+    const camera = cameraRef.current;
+    if (!camera || !isLoaded) return;
 
-      camera.rotation.set(0, 0, 0);
-      camera.rotateY(-targetLon);
-      camera.rotateX(targetLat);
-      return;
-    }
+    // Map input to look-around angles
+    // Head tracking: +-40 degrees horizontal, +-20 degrees vertical
+    // Creates a natural "window" feel
+    const lon = -activeInput.x * 40 * (Math.PI / 180);
+    const lat = activeInput.y * 20 * (Math.PI / 180);
 
-    // For splat scenes, use full off-axis projection
-    updateCamera(cameraRef.current, activeInput);
-  }, [activeInput, isLoaded, usingSplat, updateCamera]);
+    // Spherical to cartesian — camera looks at point on sphere
+    const target = new THREE.Vector3(
+      -Math.sin(lon) * Math.cos(lat),
+      Math.sin(lat),
+      -Math.cos(lon) * Math.cos(lat)
+    );
+    camera.lookAt(target);
+  }, [activeInput, isLoaded]);
 
   // GSAP entrance animation
   useEffect(() => {
@@ -223,31 +148,18 @@ export default function Hero3DScene({
     }
 
     const tl = gsap.timeline();
-
     tl.fromTo(
       container,
       { clipPath: "inset(15%)", opacity: 0 },
-      {
-        clipPath: "inset(0%)",
-        opacity: 1,
-        duration: 1.5,
-        ease: "power3.inOut",
-      }
+      { clipPath: "inset(0%)", opacity: 1, duration: 1.5, ease: "power3.inOut" }
     ).fromTo(
       textEl,
       { opacity: 0, y: 20 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: "power2.out",
-      },
+      { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" },
       "-=0.8"
     );
 
-    return () => {
-      tl.kill();
-    };
+    return () => { tl.kill(); };
   }, [isLoaded]);
 
   const handleEnableCamera = () => {
@@ -262,7 +174,7 @@ export default function Hero3DScene({
         <canvas ref={canvasRef} className="h-full w-full" />
       </div>
 
-      {/* Loading state */}
+      {/* Loading spinner */}
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-fg-muted/30 border-t-fg-muted" />
@@ -272,7 +184,7 @@ export default function Hero3DScene({
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent pointer-events-none" />
 
-      {/* Camera enable prompt */}
+      {/* Camera enable button */}
       {isLoaded && !headTracking.isTracking && !cameraPrompted && (
         <button
           onClick={handleEnableCamera}
@@ -283,7 +195,7 @@ export default function Hero3DScene({
         </button>
       )}
 
-      {/* Tracking active indicator */}
+      {/* Tracking indicator */}
       {headTracking.isTracking && (
         <div className="absolute top-6 right-6 z-10 flex items-center gap-2 rounded-full bg-green-500/10 px-3 py-1.5 font-sans text-[10px] tracking-wider text-green-400/80">
           <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
@@ -291,7 +203,7 @@ export default function Hero3DScene({
         </div>
       )}
 
-      {/* Text overlay — bottom left (matches HeroSection style) */}
+      {/* Text overlay */}
       <div
         ref={textRef}
         className="absolute bottom-16 left-8 md:left-12 lg:left-16 opacity-0 z-10"

@@ -57,7 +57,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     return (
       <>
         <Hero3DWrapper
-          splatUrl="/models/hero.splat"
           title="ANDREAS MAGDANZ"
           subtitle={
             heroProject
