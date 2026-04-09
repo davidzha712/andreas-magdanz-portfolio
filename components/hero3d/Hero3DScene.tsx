@@ -5,16 +5,17 @@ import * as THREE from "three";
 import { gsap } from "@/lib/gsap/gsapPlugins";
 import { useHeadTracking } from "./useHeadTracking";
 
-// --- Constants ---
+// --- Tuned constants (based on Pannellum/krpano/OrbitControls best practices) ---
 const DEG = Math.PI / 180;
-const DRIFT_SPEED = 0.8; // deg/sec auto-rotate
-const DRIFT_RESUME_PASSIVE = 4000; // ms before drift resumes after gaze
-const DRIFT_RESUME_DRAG = 6000; // ms before drift resumes after drag
-const GAZE_RANGE_H = 60; // deg horizontal range for gaze
-const GAZE_RANGE_V = 50; // deg vertical range for gaze
-const GAZE_DAMPING = 0.05; // lerp per frame (cinematic lag)
-const DRAG_SENSITIVITY = 0.15; // deg per pixel
-const DRAG_DECAY = 0.92; // momentum friction per frame
+const DRIFT_SPEED = 1.2; // deg/sec — slightly faster for more life
+const DRIFT_RESUME_PASSIVE = 4000;
+const DRIFT_RESUME_DRAG = 6000;
+const GAZE_RANGE_H = 60;
+const GAZE_RANGE_V = 50;
+const GAZE_DAMPING = 0.04; // lower = heavier cinematic lag (Three.js recommends 0.04-0.05)
+const DRAG_SENSITIVITY_DESKTOP = 0.25; // deg/px — matched to OrbitControls rotateSpeed ~0.15
+const DRAG_SENSITIVITY_MOBILE = 0.35; // higher for fat fingers on small screens
+const DRAG_DECAY = 0.95; // 0.92→0.95 — more inertia like krpano mousefriction ~0.95
 const MOUSE_GAZE_STRENGTH = 0.8;
 
 function lerp(a: number, b: number, t: number): number {
@@ -50,26 +51,25 @@ export default function Hero3DScene({
   const [cameraPrompted, setCameraPrompted] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const isMobileRef = useRef(false);
 
   // --- Rotation state (mutable refs for animation loop) ---
-  const driftLon = useRef(0); // ambient drift longitude (degrees)
+  const driftLon = useRef(0);
   const driftActive = useRef(true);
   const driftResumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const gazeTargetH = useRef(0); // raw gaze target (degrees)
+  const gazeTargetH = useRef(0);
   const gazeTargetV = useRef(0);
-  const gazeCurrentH = useRef(0); // smoothed gaze (degrees)
+  const gazeCurrentH = useRef(0);
   const gazeCurrentV = useRef(0);
+  const gyroActive = useRef(false);
 
-  const dragLon = useRef(0); // accumulated drag offset (degrees)
+  const dragLon = useRef(0);
   const dragLat = useRef(0);
-  const dragVelLon = useRef(0); // drag momentum
+  const dragVelLon = useRef(0);
   const dragVelLat = useRef(0);
   const isDragging = useRef(false);
 
-  const lastInputTime = useRef(0);
-
-  // Pause drift and schedule resume
   const pauseDrift = useCallback((resumeDelay: number) => {
     driftActive.current = false;
     if (driftResumeTimer.current) clearTimeout(driftResumeTimer.current);
@@ -132,15 +132,15 @@ export default function Hero3DScene({
     // --- Main animation loop ---
     const animate = () => {
       const now = performance.now();
-      const dt = (now - lastTime) / 1000; // seconds
+      const dt = (now - lastTime) / 1000;
       lastTime = now;
 
-      // Layer 1: Ambient drift
-      if (driftActive.current && !isDragging.current) {
+      // Layer 1: Ambient drift (disabled on mobile when gyro active)
+      if (driftActive.current && !isDragging.current && !gyroActive.current) {
         driftLon.current += DRIFT_SPEED * dt;
       }
 
-      // Layer 2: Gaze smoothing (heavy damping for cinematic feel)
+      // Layer 2: Gaze smoothing
       gazeCurrentH.current = lerp(gazeCurrentH.current, gazeTargetH.current, GAZE_DAMPING);
       gazeCurrentV.current = lerp(gazeCurrentV.current, gazeTargetV.current, GAZE_DAMPING);
 
@@ -150,12 +150,11 @@ export default function Hero3DScene({
         dragLat.current += dragVelLat.current;
         dragVelLon.current *= DRAG_DECAY;
         dragVelLat.current *= DRAG_DECAY;
-        // Kill tiny velocities
-        if (Math.abs(dragVelLon.current) < 0.001) dragVelLon.current = 0;
-        if (Math.abs(dragVelLat.current) < 0.001) dragVelLat.current = 0;
+        if (Math.abs(dragVelLon.current) < 0.005) dragVelLon.current = 0;
+        if (Math.abs(dragVelLat.current) < 0.005) dragVelLat.current = 0;
       }
 
-      // Combine all layers → final camera angles
+      // Combine all layers
       const finalLon = (driftLon.current + gazeCurrentH.current + dragLon.current) * DEG;
       const finalLat = clamp(gazeCurrentV.current + dragLat.current, -85, 85) * DEG;
 
@@ -172,7 +171,6 @@ export default function Hero3DScene({
     };
     rafRef.current = requestAnimationFrame(animate);
 
-    // Resize
     const onResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -188,29 +186,29 @@ export default function Hero3DScene({
   }, [panoramaUrl]);
 
   useEffect(() => {
-    setIsMobile(
+    const mobile =
       /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-      ("ontouchstart" in window && window.innerWidth < 1024)
-    );
+      ("ontouchstart" in window && window.innerWidth < 1024);
+    setIsMobile(mobile);
+    isMobileRef.current = mobile;
     const cleanup = initScene();
     return cleanup;
   }, [initScene]);
 
-  // --- Layer 2: Update gaze target from head tracking or mouse ---
+  // --- Layer 2: Gaze from head tracking / mouse / gyroscope ---
   useEffect(() => {
     if (!isLoaded) return;
 
     if (headTracking.isTracking) {
-      // Head tracking → gaze offset
       gazeTargetH.current = -headTracking.position.x * GAZE_RANGE_H;
       gazeTargetV.current = headTracking.position.y * GAZE_RANGE_V;
       pauseDrift(DRIFT_RESUME_PASSIVE);
       return;
     }
 
-    // Mouse position → gaze offset (passive, always listening)
+    // Mouse → gaze (desktop)
     const onMouseMove = (e: MouseEvent) => {
-      if (isDragging.current) return;
+      if (isDragging.current || gyroActive.current) return;
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = -((e.clientY / window.innerHeight) * 2 - 1);
       gazeTargetH.current = -x * GAZE_RANGE_H * MOUSE_GAZE_STRENGTH;
@@ -218,11 +216,21 @@ export default function Hero3DScene({
       pauseDrift(DRIFT_RESUME_PASSIVE);
     };
 
-    // Device orientation → gaze offset (mobile)
+    // Gyroscope → gaze (mobile)
+    // iOS requires explicit permission via user gesture
     const onOrientation = (e: DeviceOrientationEvent) => {
       if (e.gamma === null || e.beta === null) return;
-      gazeTargetH.current = clamp((-e.gamma / 45) * GAZE_RANGE_H, -GAZE_RANGE_H, GAZE_RANGE_H);
-      gazeTargetV.current = clamp(((e.beta - 45) / 45) * GAZE_RANGE_V, -GAZE_RANGE_V, GAZE_RANGE_V);
+      gyroActive.current = true;
+      gazeTargetH.current = clamp(
+        (-e.gamma / 45) * GAZE_RANGE_H,
+        -GAZE_RANGE_H,
+        GAZE_RANGE_H
+      );
+      gazeTargetV.current = clamp(
+        ((e.beta - 60) / 40) * GAZE_RANGE_V, // 60 = typical phone holding angle
+        -GAZE_RANGE_V,
+        GAZE_RANGE_V
+      );
     };
 
     window.addEventListener("mousemove", onMouseMove);
@@ -234,13 +242,17 @@ export default function Hero3DScene({
     };
   }, [isLoaded, headTracking.isTracking, headTracking.position, pauseDrift]);
 
-  // --- Layer 3: Click-drag / touch-drag ---
+  // --- Layer 3: Drag / touch-drag ---
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !isLoaded) return;
 
     let lastX = 0;
     let lastY = 0;
+
+    const sensitivity = isMobileRef.current
+      ? DRAG_SENSITIVITY_MOBILE
+      : DRAG_SENSITIVITY_DESKTOP;
 
     const onPointerDown = (e: PointerEvent) => {
       isDragging.current = true;
@@ -257,9 +269,8 @@ export default function Hero3DScene({
       if (!isDragging.current) return;
       const dx = e.clientX - lastX;
       const dy = e.clientY - lastY;
-      // Drag left → view pans left (positive longitude)
-      dragVelLon.current = dx * DRAG_SENSITIVITY;
-      dragVelLat.current = -dy * DRAG_SENSITIVITY;
+      dragVelLon.current = dx * sensitivity;
+      dragVelLat.current = -dy * sensitivity;
       dragLon.current += dragVelLon.current;
       dragLat.current += dragVelLat.current;
       dragLat.current = clamp(dragLat.current, -85, 85);
@@ -273,11 +284,12 @@ export default function Hero3DScene({
       pauseDrift(DRIFT_RESUME_DRAG);
     };
 
-    // Prevent default touch scrolling on canvas so drag works on mobile
-    const onTouchStart = (e: TouchEvent) => { e.preventDefault(); };
+    const onTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
+    };
 
     canvas.style.cursor = "grab";
-    canvas.style.touchAction = "none"; // Critical for mobile drag
+    canvas.style.touchAction = "none";
     canvas.addEventListener("pointerdown", onPointerDown);
     canvas.addEventListener("pointermove", onPointerMove);
     canvas.addEventListener("pointerup", onPointerUp);
@@ -292,6 +304,24 @@ export default function Hero3DScene({
       canvas.removeEventListener("touchstart", onTouchStart);
     };
   }, [isLoaded, pauseDrift]);
+
+  // --- iOS gyroscope permission request ---
+  const requestGyroPermission = useCallback(async () => {
+    const DOE = DeviceOrientationEvent as unknown as {
+      requestPermission?: () => Promise<string>;
+    };
+    if (typeof DOE.requestPermission === "function") {
+      try {
+        const permission = await DOE.requestPermission();
+        if (permission === "granted") {
+          gyroActive.current = true;
+        }
+      } catch {
+        // User denied
+      }
+    }
+    setHasInteracted(true);
+  }, []);
 
   // GSAP entrance animation
   useEffect(() => {
@@ -347,7 +377,7 @@ export default function Hero3DScene({
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent pointer-events-none" />
 
-      {/* Camera enable button (desktop only) */}
+      {/* Desktop: head tracking button */}
       {isLoaded && !isMobile && !headTracking.isTracking && !cameraPrompted && (
         <button
           onClick={handleEnableCamera}
@@ -355,6 +385,17 @@ export default function Hero3DScene({
         >
           <CameraIcon />
           <span>ENABLE HEAD TRACKING</span>
+        </button>
+      )}
+
+      {/* Mobile: gyroscope enable button (needed for iOS permission) */}
+      {isLoaded && isMobile && !gyroActive.current && !hasInteracted && (
+        <button
+          onClick={requestGyroPermission}
+          className="absolute top-6 right-6 z-10 flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 font-sans text-xs tracking-wider text-fg-muted backdrop-blur-sm transition-colors hover:bg-white/20"
+        >
+          <GyroIcon />
+          <span>ENABLE GYROSCOPE</span>
         </button>
       )}
 
@@ -366,12 +407,12 @@ export default function Hero3DScene({
         </div>
       )}
 
-      {/* Drag hint — fades after first interaction */}
+      {/* Drag hint */}
       {isLoaded && !hasInteracted && (
         <div className="absolute bottom-28 right-8 z-10 flex items-center gap-2 text-fg-muted/50 animate-pulse pointer-events-none">
           <DragIcon />
           <span className="font-sans text-[10px] tracking-widest uppercase">
-            DRAG TO EXPLORE
+            {isMobile ? "SWIPE TO EXPLORE" : "DRAG TO EXPLORE"}
           </span>
         </div>
       )}
@@ -396,19 +437,9 @@ export default function Hero3DScene({
         <span className="font-sans text-[10px] tracking-widest uppercase">
           {scrollLabel}
         </span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-          className="animate-bounce"
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
+          strokeLinejoin="round" aria-hidden="true" className="animate-bounce">
           <polyline points="6 9 12 15 18 9" />
         </svg>
       </div>
@@ -422,6 +453,17 @@ function CameraIcon() {
       fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
       <circle cx="12" cy="13" r="3" />
+    </svg>
+  );
+}
+
+function GyroIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
     </svg>
   );
 }
