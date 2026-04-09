@@ -7,6 +7,7 @@ import {
 import type { SiteSettings, Project } from "@/types/sanity";
 import HeroSection from "@/components/home/HeroSection";
 import HeroPortrait from "@/components/home/HeroPortrait";
+import Hero3DWrapper from "@/components/hero3d/Hero3DWrapper";
 import FeaturedWorksGrid from "@/components/home/FeaturedWorksGrid";
 import { Link } from "@/i18n/navigation";
 
@@ -47,6 +48,42 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     ]);
   } catch {
     // Sanity not connected — use fallback UI
+  }
+
+  // 3D panorama hero — off-axis projection with head tracking
+  const enable3DHero = process.env.NEXT_PUBLIC_ENABLE_3D_HERO === "true";
+  if (enable3DHero) {
+    const heroProject = siteSettings?.homeHeroProject as Project | undefined;
+    return (
+      <>
+        <Hero3DWrapper
+          splatUrl="/models/hero.splat"
+          title="ANDREAS MAGDANZ"
+          subtitle={
+            heroProject
+              ? `${heroProject.title}${heroProject.year ? ` — ${heroProject.year}` : ""}`
+              : `${t("photographer")} — ${t("location")}`
+          }
+          scrollLabel={t("scroll")}
+        />
+        {featuredProjects.length > 0 && (
+          <>
+            <FeaturedWorksGrid projects={featuredProjects} title={t("selectedWorks")} />
+            <div className="flex justify-center pb-16">
+              <Link
+                href="/work"
+                className="font-sans text-sm tracking-widest uppercase text-fg-muted hover:text-accent transition-colors duration-300 flex items-center gap-2"
+              >
+                {t("allWorks")}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+          </>
+        )}
+      </>
+    );
   }
 
   // CMS-connected path — project hero
