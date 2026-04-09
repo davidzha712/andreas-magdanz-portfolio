@@ -11,11 +11,11 @@ const DRIFT_SPEED = 0.8; // deg/sec auto-rotate
 const DRIFT_RESUME_PASSIVE = 4000; // ms before drift resumes after gaze
 const DRIFT_RESUME_DRAG = 6000; // ms before drift resumes after drag
 const GAZE_RANGE_H = 60; // deg horizontal range for gaze
-const GAZE_RANGE_V = 30; // deg vertical range for gaze
+const GAZE_RANGE_V = 50; // deg vertical range for gaze
 const GAZE_DAMPING = 0.05; // lerp per frame (cinematic lag)
 const DRAG_SENSITIVITY = 0.15; // deg per pixel
 const DRAG_DECAY = 0.92; // momentum friction per frame
-const MOUSE_GAZE_STRENGTH = 0.6;
+const MOUSE_GAZE_STRENGTH = 0.8;
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
@@ -252,8 +252,9 @@ export default function Hero3DScene({
       if (!isDragging.current) return;
       const dx = e.clientX - lastX;
       const dy = e.clientY - lastY;
-      dragVelLon.current = -dx * DRAG_SENSITIVITY;
-      dragVelLat.current = dy * DRAG_SENSITIVITY;
+      // Drag left → view pans left (positive longitude)
+      dragVelLon.current = dx * DRAG_SENSITIVITY;
+      dragVelLat.current = -dy * DRAG_SENSITIVITY;
       dragLon.current += dragVelLon.current;
       dragLat.current += dragVelLat.current;
       dragLat.current = clamp(dragLat.current, -85, 85);
@@ -267,17 +268,23 @@ export default function Hero3DScene({
       pauseDrift(DRIFT_RESUME_DRAG);
     };
 
+    // Prevent default touch scrolling on canvas so drag works on mobile
+    const onTouchStart = (e: TouchEvent) => { e.preventDefault(); };
+
     canvas.style.cursor = "grab";
+    canvas.style.touchAction = "none"; // Critical for mobile drag
     canvas.addEventListener("pointerdown", onPointerDown);
     canvas.addEventListener("pointermove", onPointerMove);
     canvas.addEventListener("pointerup", onPointerUp);
     canvas.addEventListener("pointerleave", onPointerUp);
+    canvas.addEventListener("touchstart", onTouchStart, { passive: false });
 
     return () => {
       canvas.removeEventListener("pointerdown", onPointerDown);
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerup", onPointerUp);
       canvas.removeEventListener("pointerleave", onPointerUp);
+      canvas.removeEventListener("touchstart", onTouchStart);
     };
   }, [isLoaded, pauseDrift]);
 
