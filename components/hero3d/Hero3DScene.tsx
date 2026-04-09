@@ -49,6 +49,7 @@ export default function Hero3DScene({
   const [isLoaded, setIsLoaded] = useState(false);
   const [cameraPrompted, setCameraPrompted] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // --- Rotation state (mutable refs for animation loop) ---
   const driftLon = useRef(0); // ambient drift longitude (degrees)
@@ -187,6 +188,10 @@ export default function Hero3DScene({
   }, [panoramaUrl]);
 
   useEffect(() => {
+    setIsMobile(
+      /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+      ("ontouchstart" in window && window.innerWidth < 1024)
+    );
     const cleanup = initScene();
     return cleanup;
   }, [initScene]);
@@ -328,7 +333,7 @@ export default function Hero3DScene({
   return (
     <section className="relative h-screen overflow-hidden bg-black">
       {/* 3D Canvas */}
-      <div ref={containerRef} className="absolute inset-0 opacity-0">
+      <div ref={containerRef} className="absolute inset-0 z-0 opacity-0">
         <canvas ref={canvasRef} className="h-full w-full" />
       </div>
 
@@ -342,8 +347,8 @@ export default function Hero3DScene({
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent pointer-events-none" />
 
-      {/* Camera enable button */}
-      {isLoaded && !headTracking.isTracking && !cameraPrompted && (
+      {/* Camera enable button (desktop only) */}
+      {isLoaded && !isMobile && !headTracking.isTracking && !cameraPrompted && (
         <button
           onClick={handleEnableCamera}
           className="absolute top-6 right-6 z-10 flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 font-sans text-xs tracking-wider text-fg-muted backdrop-blur-sm transition-colors hover:bg-white/20"

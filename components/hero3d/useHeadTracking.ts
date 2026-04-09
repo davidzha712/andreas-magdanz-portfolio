@@ -102,21 +102,35 @@ export function useHeadTracking(): HeadTrackingState {
         if (results.faceLandmarks?.length > 0) {
           const landmarks = results.faceLandmarks[0];
 
-          // Nose tip (landmark 1) as face center
+          // Nose tip (landmark 1)
           const noseTip = landmarks[1];
           // Left eye outer (landmark 33), right eye outer (landmark 263)
           const leftEye = landmarks[33];
           const rightEye = landmarks[263];
+          // Forehead (landmark 10)
+          const forehead = landmarks[10];
 
-          // Normalized x/y from nose position (0-1 range from MediaPipe)
-          const rawX = -(noseTip.x - 0.5) * 2; // Invert X: webcam is mirrored
-          const rawY = -(noseTip.y - 0.5) * 2; // Invert Y: webcam Y is top-down
+          // X: horizontal head position (left/right turn)
+          const eyeCenterX = (leftEye.x + rightEye.x) / 2;
+          const rawX = -(eyeCenterX - 0.5) * 2; // Invert: webcam is mirrored
+
+          // Y: head pitch (nod up/down) — measured by angle between
+          // forehead-to-nose vector vs vertical. When looking down,
+          // nose drops below eye line; when looking up, nose rises.
+          const eyeCenterY = (leftEye.y + rightEye.y) / 2;
+          const noseOffsetY = noseTip.y - eyeCenterY; // positive = nose below eyes
+          const foreheadToEyeY = eyeCenterY - forehead.y; // face height reference
+          // Normalize pitch: 0 = neutral, negative = looking up, positive = looking down
+          const pitchRatio = foreheadToEyeY > 0.01
+            ? (noseOffsetY / foreheadToEyeY - 1.2) // 1.2 = neutral nose-below-eyes ratio
+            : 0;
+          const rawY = clamp(-pitchRatio * 1.5, -1, 1); // Invert: look down → view down
 
           // Depth from inter-ocular distance (closer = larger distance)
           const eyeDist = Math.sqrt(
             (rightEye.x - leftEye.x) ** 2 + (rightEye.y - leftEye.y) ** 2
           );
-          const baseEyeDist = 0.15; // Typical inter-ocular distance at ~60cm
+          const baseEyeDist = 0.15;
           const rawZ = clamp(baseEyeDist / eyeDist, 0.5, 2.0);
 
           positionRef.current = {
