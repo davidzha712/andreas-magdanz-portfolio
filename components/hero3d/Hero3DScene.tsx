@@ -4,7 +4,26 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import * as THREE from "three";
 import { gsap } from "@/lib/gsap/gsapPlugins";
 import { useHeadTracking } from "./useHeadTracking";
-import { useInputFallback } from "./useInputFallback";
+
+// --- Constants ---
+const DEG = Math.PI / 180;
+const DRIFT_SPEED = 0.8; // deg/sec auto-rotate
+const DRIFT_RESUME_PASSIVE = 4000; // ms before drift resumes after gaze
+const DRIFT_RESUME_DRAG = 6000; // ms before drift resumes after drag
+const GAZE_RANGE_H = 60; // deg horizontal range for gaze
+const GAZE_RANGE_V = 30; // deg vertical range for gaze
+const GAZE_DAMPING = 0.05; // lerp per frame (cinematic lag)
+const DRAG_SENSITIVITY = 0.15; // deg per pixel
+const DRAG_DECAY = 0.92; // momentum friction per frame
+const MOUSE_GAZE_STRENGTH = 0.6;
+
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
+}
+
+function clamp(v: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, v));
+}
 
 interface Hero3DSceneProps {
   panoramaUrl?: string;
@@ -26,14 +45,37 @@ export default function Hero3DScene({
   const rafRef = useRef<number>(0);
 
   const headTracking = useHeadTracking();
-  const fallbackInput = useInputFallback();
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [cameraPrompted, setCameraPrompted] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
-  const activeInput = headTracking.isTracking
-    ? headTracking.position
-    : fallbackInput;
+  // --- Rotation state (mutable refs for animation loop) ---
+  const driftLon = useRef(0); // ambient drift longitude (degrees)
+  const driftActive = useRef(true);
+  const driftResumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const gazeTargetH = useRef(0); // raw gaze target (degrees)
+  const gazeTargetV = useRef(0);
+  const gazeCurrentH = useRef(0); // smoothed gaze (degrees)
+  const gazeCurrentV = useRef(0);
+
+  const dragLon = useRef(0); // accumulated drag offset (degrees)
+  const dragLat = useRef(0);
+  const dragVelLon = useRef(0); // drag momentum
+  const dragVelLat = useRef(0);
+  const isDragging = useRef(false);
+
+  const lastInputTime = useRef(0);
+
+  // Pause drift and schedule resume
+  const pauseDrift = useCallback((resumeDelay: number) => {
+    driftActive.current = false;
+    if (driftResumeTimer.current) clearTimeout(driftResumeTimer.current);
+    driftResumeTimer.current = setTimeout(() => {
+      driftActive.current = true;
+    }, resumeDelay);
+  }, []);
 
   // Initialize Three.js + load panorama
   const initScene = useCallback(() => {
@@ -61,7 +103,7 @@ export default function Hero3DScene({
     camera.position.set(0, 0, 0);
     cameraRef.current = camera;
 
-    // Load equirectangular panorama onto an inverted sphere
+    // Load equirectangular panorama onto inverted sphere
     const textureLoader = new THREE.TextureLoader();
     textureLoader.load(
       panoramaUrl,
@@ -71,7 +113,7 @@ export default function Hero3DScene({
         texture.magFilter = THREE.LinearFilter;
 
         const geometry = new THREE.SphereGeometry(50, 64, 32);
-        geometry.scale(-1, 1, 1); // Invert normals to see inside
+        geometry.scale(-1, 1, 1);
         const material = new THREE.MeshBasicMaterial({ map: texture });
         scene.add(new THREE.Mesh(geometry, material));
 
@@ -84,8 +126,46 @@ export default function Hero3DScene({
       }
     );
 
-    // Render loop
+    let lastTime = performance.now();
+
+    // --- Main animation loop ---
     const animate = () => {
+      const now = performance.now();
+      const dt = (now - lastTime) / 1000; // seconds
+      lastTime = now;
+
+      // Layer 1: Ambient drift
+      if (driftActive.current && !isDragging.current) {
+        driftLon.current += DRIFT_SPEED * dt;
+      }
+
+      // Layer 2: Gaze smoothing (heavy damping for cinematic feel)
+      gazeCurrentH.current = lerp(gazeCurrentH.current, gazeTargetH.current, GAZE_DAMPING);
+      gazeCurrentV.current = lerp(gazeCurrentV.current, gazeTargetV.current, GAZE_DAMPING);
+
+      // Layer 3: Drag momentum decay
+      if (!isDragging.current) {
+        dragLon.current += dragVelLon.current;
+        dragLat.current += dragVelLat.current;
+        dragVelLon.current *= DRAG_DECAY;
+        dragVelLat.current *= DRAG_DECAY;
+        // Kill tiny velocities
+        if (Math.abs(dragVelLon.current) < 0.001) dragVelLon.current = 0;
+        if (Math.abs(dragVelLat.current) < 0.001) dragVelLat.current = 0;
+      }
+
+      // Combine all layers → final camera angles
+      const finalLon = (driftLon.current + gazeCurrentH.current + dragLon.current) * DEG;
+      const finalLat = clamp(gazeCurrentV.current + dragLat.current, -85, 85) * DEG;
+
+      // Spherical to cartesian
+      const target = new THREE.Vector3(
+        -Math.sin(finalLon) * Math.cos(finalLat),
+        Math.sin(finalLat),
+        -Math.cos(finalLon) * Math.cos(finalLat)
+      );
+      camera.lookAt(target);
+
       renderer.render(scene, camera);
       rafRef.current = requestAnimationFrame(animate);
     };
@@ -111,25 +191,95 @@ export default function Hero3DScene({
     return cleanup;
   }, [initScene]);
 
-  // Update camera rotation from head / mouse / gyro input
+  // --- Layer 2: Update gaze target from head tracking or mouse ---
   useEffect(() => {
-    const camera = cameraRef.current;
-    if (!camera || !isLoaded) return;
+    if (!isLoaded) return;
 
-    // Map input to look-around angles
-    // Head tracking: +-40 degrees horizontal, +-20 degrees vertical
-    // Creates a natural "window" feel
-    const lon = -activeInput.x * 40 * (Math.PI / 180);
-    const lat = activeInput.y * 20 * (Math.PI / 180);
+    if (headTracking.isTracking) {
+      // Head tracking → gaze offset
+      gazeTargetH.current = -headTracking.position.x * GAZE_RANGE_H;
+      gazeTargetV.current = headTracking.position.y * GAZE_RANGE_V;
+      pauseDrift(DRIFT_RESUME_PASSIVE);
+      return;
+    }
 
-    // Spherical to cartesian — camera looks at point on sphere
-    const target = new THREE.Vector3(
-      -Math.sin(lon) * Math.cos(lat),
-      Math.sin(lat),
-      -Math.cos(lon) * Math.cos(lat)
-    );
-    camera.lookAt(target);
-  }, [activeInput, isLoaded]);
+    // Mouse position → gaze offset (passive, always listening)
+    const onMouseMove = (e: MouseEvent) => {
+      if (isDragging.current) return;
+      const x = (e.clientX / window.innerWidth) * 2 - 1;
+      const y = -((e.clientY / window.innerHeight) * 2 - 1);
+      gazeTargetH.current = -x * GAZE_RANGE_H * MOUSE_GAZE_STRENGTH;
+      gazeTargetV.current = y * GAZE_RANGE_V * MOUSE_GAZE_STRENGTH;
+      pauseDrift(DRIFT_RESUME_PASSIVE);
+    };
+
+    // Device orientation → gaze offset (mobile)
+    const onOrientation = (e: DeviceOrientationEvent) => {
+      if (e.gamma === null || e.beta === null) return;
+      gazeTargetH.current = clamp((-e.gamma / 45) * GAZE_RANGE_H, -GAZE_RANGE_H, GAZE_RANGE_H);
+      gazeTargetV.current = clamp(((e.beta - 45) / 45) * GAZE_RANGE_V, -GAZE_RANGE_V, GAZE_RANGE_V);
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("deviceorientation", onOrientation);
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("deviceorientation", onOrientation);
+    };
+  }, [isLoaded, headTracking.isTracking, headTracking.position, pauseDrift]);
+
+  // --- Layer 3: Click-drag / touch-drag ---
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !isLoaded) return;
+
+    let lastX = 0;
+    let lastY = 0;
+
+    const onPointerDown = (e: PointerEvent) => {
+      isDragging.current = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      dragVelLon.current = 0;
+      dragVelLat.current = 0;
+      canvas.setPointerCapture(e.pointerId);
+      canvas.style.cursor = "grabbing";
+      setHasInteracted(true);
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isDragging.current) return;
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      dragVelLon.current = -dx * DRAG_SENSITIVITY;
+      dragVelLat.current = dy * DRAG_SENSITIVITY;
+      dragLon.current += dragVelLon.current;
+      dragLat.current += dragVelLat.current;
+      dragLat.current = clamp(dragLat.current, -85, 85);
+      lastX = e.clientX;
+      lastY = e.clientY;
+    };
+
+    const onPointerUp = () => {
+      isDragging.current = false;
+      canvas.style.cursor = "grab";
+      pauseDrift(DRIFT_RESUME_DRAG);
+    };
+
+    canvas.style.cursor = "grab";
+    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerup", onPointerUp);
+    canvas.addEventListener("pointerleave", onPointerUp);
+
+    return () => {
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", onPointerUp);
+      canvas.removeEventListener("pointerleave", onPointerUp);
+    };
+  }, [isLoaded, pauseDrift]);
 
   // GSAP entrance animation
   useEffect(() => {
@@ -164,6 +314,7 @@ export default function Hero3DScene({
 
   const handleEnableCamera = () => {
     setCameraPrompted(true);
+    setHasInteracted(true);
     headTracking.requestPermission();
   };
 
@@ -200,6 +351,16 @@ export default function Hero3DScene({
         <div className="absolute top-6 right-6 z-10 flex items-center gap-2 rounded-full bg-green-500/10 px-3 py-1.5 font-sans text-[10px] tracking-wider text-green-400/80">
           <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
           TRACKING
+        </div>
+      )}
+
+      {/* Drag hint — fades after first interaction */}
+      {isLoaded && !hasInteracted && (
+        <div className="absolute bottom-28 right-8 z-10 flex items-center gap-2 text-fg-muted/50 animate-pulse pointer-events-none">
+          <DragIcon />
+          <span className="font-sans text-[10px] tracking-widest uppercase">
+            DRAG TO EXPLORE
+          </span>
         </div>
       )}
 
@@ -245,19 +406,21 @@ export default function Hero3DScene({
 
 function CameraIcon() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
       <circle cx="12" cy="13" r="3" />
+    </svg>
+  );
+}
+
+function DragIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 9l-3 3 3 3" />
+      <path d="M19 9l3 3-3 3" />
+      <path d="M2 12h20" />
     </svg>
   );
 }
