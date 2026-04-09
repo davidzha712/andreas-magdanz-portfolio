@@ -50,9 +50,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     // Sanity not connected — use fallback UI
   }
 
-  // 3D panorama hero — off-axis projection with head tracking
-  const enable3DHero = process.env.NEXT_PUBLIC_ENABLE_3D_HERO === "true";
-  if (enable3DHero) {
+  // 3D panorama hero — head tracking + drag exploration
+  if (true) {
     const heroProject = siteSettings?.homeHeroProject as Project | undefined;
     return (
       <>
