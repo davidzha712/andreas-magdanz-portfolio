@@ -21,8 +21,8 @@ const SMOOTHING = 0.15;
 // Blend weights: rotation (yaw/pitch) vs position (face location in frame)
 const ROTATION_WEIGHT = 0.85;
 const POSITION_WEIGHT = 0.15;
-const YAW_SENSITIVITY = 2.5; // ~30 deg head turn → full pan
-const PITCH_SENSITIVITY = 2.0; // pitch feels less natural, lower gain
+const YAW_SENSITIVITY = 1.8; // ~40 deg head turn → full pan (was 2.5, too twitchy)
+const PITCH_SENSITIVITY = 3.0; // boosted: nodding has smaller range than turning (was 2.0)
 const POSITION_SENSITIVITY = 0.4; // subtle parallax from position
 
 function lerp(a: number, b: number, t: number): number {

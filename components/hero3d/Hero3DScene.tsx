@@ -297,7 +297,7 @@ export default function Hero3DScene({
       if (!isDragging.current) return;
       const dx = e.clientX - lastX;
       const dy = e.clientY - lastY;
-      dragVelLon.current = -dx * sensitivity;
+      dragVelLon.current = dx * sensitivity;
       dragVelLat.current = dy * sensitivity;
       dragLon.current += dragVelLon.current;
       dragLat.current += dragVelLat.current;
