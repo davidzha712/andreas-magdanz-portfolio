@@ -28,8 +28,7 @@
   "about": {
     "title": "Andreas Magdanz",
     "subtitle": "Fotograf — Aachen, Deutschland",
-    "representation": "Vertretung",
-    "teaching": "Lehre"
+    "representation": "Vertretung"
   },
   "cv": {
     "title": "Lebenslauf",
@@ -48,8 +47,7 @@
     "description": "Ausgewählte Einzel- und Gruppenausstellungen.",
     "solo": "Einzelausstellung",
     "group": "Gruppenausstellung",
-    "all": "Alle",
-    "filter": "Filter"
+    "all": "Alle"
   },
   "publications": {
     "title": "Publikationen",
@@ -62,9 +60,7 @@
     "video": "Video",
     "press": "Presse",
     "read": "Lesen",
-    "close": "Schließen",
     "listen": "Anhören",
-    "watchVideo": "Video ansehen",
     "viewPdf": "PDF öffnen",
     "openArticle": "Artikel öffnen",
     "pdfAvailable": "Dieser Artikel ist als PDF verfügbar.",
@@ -93,23 +89,19 @@
   },
   "footer": {
     "copyright": "© {year} Andreas Magdanz. Alle Rechte vorbehalten.",
-    "gallery": "Vertreten durch"
+    "gallery": "Vertreten durch",
+    "impressum": "Impressum",
+    "datenschutz": "Datenschutz"
   },
-  "search": {
-    "placeholder": "Suchen…",
-    "close": "Schließen",
-    "noResults": "Keine Ergebnisse gefunden.",
-    "work": "Arbeiten",
-    "exhibitions": "Ausstellungen",
-    "publications": "Publikationen",
-    "cv": "Lebenslauf",
-    "media": "Presse"
+  "errors": {
+    "title": "Etwas ist schiefgelaufen",
+    "description": "Es ist ein unerwarteter Fehler aufgetreten.",
+    "retry": "Erneut versuchen"
   },
-  "common": {
-    "backToTop": "Nach oben",
-    "viewAll": "Alle anzeigen",
-    "readMore": "Weiterlesen",
-    "noResults": "Keine Ergebnisse gefunden."
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "description": "Die angeforderte Seite existiert nicht.",
+    "home": "Zur Startseite"
   },
   "legal": {
     "impressumTitle": "Impressum",
@@ -219,5 +211,14 @@
         "body": "Wir behalten uns vor, diese Datenschutzerklärung gelegentlich anzupassen, damit sie stets den aktuellen rechtlichen Anforderungen entspricht oder um Änderungen unserer Leistungen in der Datenschutzerklärung umzusetzen, z. B. bei der Einführung neuer Dienste. Für Ihren erneuten Besuch gilt dann die neue Datenschutzerklärung."
       }
     }
+  },
+  "search": {
+    "placeholder": "Suchen…",
+    "noResults": "Keine Ergebnisse gefunden.",
+    "work": "Arbeiten",
+    "exhibitions": "Ausstellungen",
+    "publications": "Publikationen",
+    "cv": "Lebenslauf",
+    "media": "Presse"
   }
 }

@@ -28,8 +28,7 @@
   "about": {
     "title": "Andreas Magdanz",
     "subtitle": "Photographer — Aachen, Germany",
-    "representation": "Representation",
-    "teaching": "Teaching"
+    "representation": "Representation"
   },
   "cv": {
     "title": "Curriculum Vitae",
@@ -48,8 +47,7 @@
     "description": "Selected solo and group exhibitions.",
     "solo": "Solo",
     "group": "Group",
-    "all": "All",
-    "filter": "Filter"
+    "all": "All"
   },
   "publications": {
     "title": "Publications",
@@ -62,9 +60,7 @@
     "video": "Video",
     "press": "Press",
     "read": "Read",
-    "close": "Close",
     "listen": "Listen",
-    "watchVideo": "Watch Video",
     "viewPdf": "Open PDF",
     "openArticle": "Open article",
     "pdfAvailable": "This article is available as a PDF.",
@@ -93,23 +89,19 @@
   },
   "footer": {
     "copyright": "© {year} Andreas Magdanz. All rights reserved.",
-    "gallery": "Represented by"
+    "gallery": "Represented by",
+    "impressum": "Imprint",
+    "datenschutz": "Privacy"
   },
-  "search": {
-    "placeholder": "Search…",
-    "close": "Close",
-    "noResults": "No results found.",
-    "work": "Work",
-    "exhibitions": "Exhibitions",
-    "publications": "Publications",
-    "cv": "CV",
-    "media": "Media"
+  "errors": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred.",
+    "retry": "Try again"
   },
-  "common": {
-    "backToTop": "Back to top",
-    "viewAll": "View all",
-    "readMore": "Read more",
-    "noResults": "No results found."
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist.",
+    "home": "Back to home"
   },
   "legal": {
     "impressumTitle": "Imprint",
@@ -219,5 +211,14 @@
         "body": "We reserve the right to adapt this privacy policy occasionally so that it always complies with current legal requirements or to implement changes to our services in the privacy policy, e.g. when introducing new services. The new privacy policy will then apply to your next visit."
       }
     }
+  },
+  "search": {
+    "placeholder": "Search…",
+    "noResults": "No results found.",
+    "work": "Work",
+    "exhibitions": "Exhibitions",
+    "publications": "Publications",
+    "cv": "CV",
+    "media": "Media"
   }
 }

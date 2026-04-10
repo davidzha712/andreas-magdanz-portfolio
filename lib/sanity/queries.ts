@@ -51,6 +51,7 @@ export const projectBySlugQuery = defineQuery(
       $locale == "en" => coalesce(descriptionEn, description),
       description
     ),
+    "seoOgImageUrl": seo.ogImage.asset->url + "?w=1200&h=630&fit=crop&auto=format",
     "relatedExhibitions": *[_type == "exhibition" && references(^._id)] | order(year desc),
     "relatedPublications": *[_type == "publication" && references(^._id)] | order(year desc)
   }`
@@ -67,7 +68,6 @@ export const allExhibitionsQuery = defineQuery(
       $locale == "en" => coalesce(descriptionEn, description),
       description
     ),
-    relatedProject->{ _id, title, slug }
   }`
 );
 

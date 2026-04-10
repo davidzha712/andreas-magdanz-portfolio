@@ -2,15 +2,28 @@ import { NextRequest, NextResponse } from "next/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
+export const runtime = "nodejs";
+
 interface ContactPayload {
   name: string;
   email: string;
   subject: string;
   message: string;
+  website?: string; // honeypot
 }
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Escape HTML special characters to prevent injection in the email HTML body
+function escapeHtml(input: string): string {
+  return input
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 // ---------------------------------------------------------------------------
@@ -59,6 +72,19 @@ async function checkRateLimit(ip: string): Promise<{ allowed: boolean }> {
     return { allowed: false };
   }
   inMemoryHits.set(ip, [...hits, now]);
+
+  // Opportunistic cleanup to prevent unbounded growth
+  if (inMemoryHits.size > 5000) {
+    inMemoryHits.forEach((times, key) => {
+      const kept = times.filter((t) => now - t < IN_MEMORY_WINDOW_MS);
+      if (kept.length === 0) {
+        inMemoryHits.delete(key);
+      } else {
+        inMemoryHits.set(key, kept);
+      }
+    });
+  }
+
   return { allowed: true };
 }
 
@@ -71,7 +97,22 @@ function getClientIp(request: NextRequest): string {
 }
 
 export async function POST(request: NextRequest) {
-  // Rate limit before touching the body
+  // Origin check — reject cross-origin requests
+  const origin = request.headers.get("origin");
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const host = request.headers.get("host");
+  const expectedOrigins = new Set<string>();
+  if (siteUrl) expectedOrigins.add(siteUrl.replace(/\/$/, ""));
+  if (host) {
+    expectedOrigins.add(`https://${host}`);
+    expectedOrigins.add(`http://${host}`);
+  }
+
+  if (origin && expectedOrigins.size > 0 && !expectedOrigins.has(origin)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  // Rate limit per IP (Upstash with in-memory fallback)
   const ip = getClientIp(request);
   const { allowed } = await checkRateLimit(ip);
   if (!allowed) {
@@ -92,7 +133,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { name, email, subject, message } = body;
+  const { name, email, subject, message, website } = body;
+
+  // Honeypot — silently succeed to avoid tipping off bots
+  if (typeof website === "string" && website.trim() !== "") {
+    return NextResponse.json({ success: true }, { status: 200 });
+  }
 
   // Validate required fields
   if (!name?.trim() || !email?.trim() || !subject?.trim() || !message?.trim()) {
@@ -109,26 +155,44 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const trimmedEmail = email.trim();
+
+  // Reject header-injection attempts in the replyTo address
+  if (/[\r\n]/.test(trimmedEmail)) {
+    return NextResponse.json(
+      { error: "Invalid email address" },
+      { status: 400 }
+    );
+  }
+
+  const trimmedName = name.trim();
+  const trimmedSubject = subject.trim();
+  const trimmedMessage = message.trim();
+
   // Attempt to send via Resend if API key is configured
   const resendApiKey = process.env.RESEND_API_KEY;
-  const toEmail =
-    process.env.CONTACT_EMAIL ?? "studio@andreasmagdanz.de";
+  const toEmail = process.env.CONTACT_EMAIL ?? "studio@andreasmagdanz.de";
 
   if (resendApiKey) {
     try {
       const { Resend } = await import("resend");
       const resend = new Resend(resendApiKey);
 
+      const safeName = escapeHtml(trimmedName);
+      const safeEmail = escapeHtml(trimmedEmail);
+      const safeSubject = escapeHtml(trimmedSubject);
+      const safeMessage = escapeHtml(trimmedMessage);
+
       const { error } = await resend.emails.send({
         from: "Portfolio Contact <noreply@andreasmagdanz.de>",
         to: toEmail,
-        replyTo: email.trim(),
-        subject: `[Contact] ${subject.trim()}`,
+        replyTo: trimmedEmail,
+        subject: `[Contact] ${trimmedSubject}`,
         text: [
-          `From: ${name.trim()} <${email.trim()}>`,
-          `Subject: ${subject.trim()}`,
+          `From: ${trimmedName} <${trimmedEmail}>`,
+          `Subject: ${trimmedSubject}`,
           "",
-          message.trim(),
+          trimmedMessage,
         ].join("\n"),
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
@@ -138,15 +202,15 @@ export async function POST(request: NextRequest) {
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
               <tr>
                 <td style="padding: 6px 12px 6px 0; font-size: 12px; color: #6b7280; white-space: nowrap; vertical-align: top;">From</td>
-                <td style="padding: 6px 0; font-size: 14px; color: #0a0a0a;">${name.trim()} &lt;${email.trim()}&gt;</td>
+                <td style="padding: 6px 0; font-size: 14px; color: #0a0a0a;">${safeName} &lt;${safeEmail}&gt;</td>
               </tr>
               <tr>
                 <td style="padding: 6px 12px 6px 0; font-size: 12px; color: #6b7280; white-space: nowrap; vertical-align: top;">Subject</td>
-                <td style="padding: 6px 0; font-size: 14px; color: #0a0a0a;">${subject.trim()}</td>
+                <td style="padding: 6px 0; font-size: 14px; color: #0a0a0a;">${safeSubject}</td>
               </tr>
             </table>
             <div style="border-top: 1px solid #e5e5e0; padding-top: 16px;">
-              <p style="font-size: 14px; color: #0a0a0a; white-space: pre-wrap; line-height: 1.6;">${message.trim()}</p>
+              <p style="font-size: 14px; color: #0a0a0a; white-space: pre-wrap; line-height: 1.6;">${safeMessage}</p>
             </div>
           </div>
         `,
@@ -163,9 +227,9 @@ export async function POST(request: NextRequest) {
   } else {
     // Placeholder mode: log to server console
     console.info("[contact route] RESEND_API_KEY not set — placeholder mode");
-    console.info(`  From: ${name.trim()} <${email.trim()}>`);
-    console.info(`  Subject: ${subject.trim()}`);
-    console.info(`  Message: ${message.trim()}`);
+    console.info(`  From: ${trimmedName} <${trimmedEmail}>`);
+    console.info(`  Subject: ${trimmedSubject}`);
+    console.info(`  Message: ${trimmedMessage}`);
   }
 
   return NextResponse.json({ success: true }, { status: 200 });

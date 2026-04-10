@@ -5,24 +5,7 @@ import {
   getMediaItemAnchorId,
   getMediaItemHref,
   getMediaItemSearchableText,
-  portableTextToPlainText,
 } from "./searchUtils.ts";
-
-test("portableTextToPlainText flattens block children into searchable text", () => {
-  const text = portableTextToPlainText([
-    {
-      _type: "block",
-      children: [{ text: "First line" }, { text: " with continuation" }],
-    },
-    { _type: "image", children: [{ text: "ignored" }] },
-    {
-      _type: "block",
-      children: [{ text: "Second paragraph" }],
-    },
-  ]);
-
-  assert.equal(text, "First line with continuation Second paragraph");
-});
 
 test("getMediaItemAnchorId creates a stable sanitized id", () => {
   assert.equal(

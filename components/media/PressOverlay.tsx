@@ -42,12 +42,17 @@ export default function PressOverlay({
   );
 
   useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
     document.addEventListener("keydown", handleKeyDown);
     document.body.style.overflow = "hidden";
     contentRef.current?.focus();
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
+      // Restore focus to the element that opened the overlay
+      if (previouslyFocused && typeof previouslyFocused.focus === "function") {
+        previouslyFocused.focus();
+      }
     };
   }, [handleKeyDown]);
 

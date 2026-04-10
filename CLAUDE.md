@@ -48,7 +48,6 @@ app/layout.tsx                         # Passthrough (no html/body)
 
 - `POST /api/contact` — contact form, sends email via Resend (falls back to console logging without `RESEND_API_KEY`)
 - `POST /api/revalidate` — Sanity webhook for on-demand ISR
-- `GET /api/og` — OG image generation
 - `GET /api/pdf` — PDF proxy
 
 ### Key Libraries
