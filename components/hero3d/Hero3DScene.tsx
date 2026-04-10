@@ -241,12 +241,12 @@ export default function Hero3DScene({
 
       // Map to gaze angles
       gazeTargetH.current = clamp(
-        -(filteredGamma.current / 45) * GAZE_RANGE_H, // tilt right → look right (negative lon)
+        (filteredGamma.current / 45) * GAZE_RANGE_H,
         -GAZE_RANGE_H,
         GAZE_RANGE_H
       );
       gazeTargetV.current = clamp(
-        -((filteredBeta.current - 60) / 40) * GAZE_RANGE_V,
+        ((filteredBeta.current - 60) / 40) * GAZE_RANGE_V,
         -GAZE_RANGE_V,
         GAZE_RANGE_V
       );
