@@ -196,40 +196,57 @@ export default function Hero3DScene({
   }, [initScene]);
 
   // --- Layer 2: Gaze from head tracking / mouse / gyroscope ---
+
+  // Low-pass filter state for gyroscope (prevents erratic jumps)
+  const filteredGamma = useRef(0);
+  const filteredBeta = useRef(60); // neutral = ~60 deg (phone held upright)
+  const GYRO_FILTER = 0.15; // lower = smoother but laggier
+
   useEffect(() => {
     if (!isLoaded) return;
 
     if (headTracking.isTracking) {
-      gazeTargetH.current = -headTracking.position.x * GAZE_RANGE_H;
+      gazeTargetH.current = headTracking.position.x * GAZE_RANGE_H;
       gazeTargetV.current = headTracking.position.y * GAZE_RANGE_V;
       pauseDrift(DRIFT_RESUME_PASSIVE);
       return;
     }
 
     // Mouse → gaze (desktop)
+    // mouse right (x>0) → look right (positive lon) → positive gazeH
+    // mouse up (y>0 after flip) → look up (positive lat) → positive gazeV
     const onMouseMove = (e: MouseEvent) => {
       if (isDragging.current || gyroActive.current) return;
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = -((e.clientY / window.innerHeight) * 2 - 1);
-      gazeTargetH.current = -x * GAZE_RANGE_H * MOUSE_GAZE_STRENGTH;
+      gazeTargetH.current = x * GAZE_RANGE_H * MOUSE_GAZE_STRENGTH;
       gazeTargetV.current = y * GAZE_RANGE_V * MOUSE_GAZE_STRENGTH;
       pauseDrift(DRIFT_RESUME_PASSIVE);
     };
 
     // Gyroscope → gaze (mobile)
-    // iOS requires explicit permission via user gesture
+    // gamma: -90..90, positive = tilt right → look right
+    // beta: -180..180, ~60 = phone held upright, tilt forward (beta↑) → look down
     const onOrientation = (e: DeviceOrientationEvent) => {
       if (e.gamma === null || e.beta === null) return;
       gyroActive.current = true;
-      // gamma: positive = tilt right → look right (positive H)
+
+      // Clamp to safe range to avoid gimbal lock discontinuities
+      const gamma = clamp(e.gamma, -80, 80);
+      const beta = clamp(e.beta, -10, 130);
+
+      // Low-pass filter: smooth out noisy sensor data
+      filteredGamma.current += (gamma - filteredGamma.current) * GYRO_FILTER;
+      filteredBeta.current += (beta - filteredBeta.current) * GYRO_FILTER;
+
+      // Map to gaze angles
       gazeTargetH.current = clamp(
-        (e.gamma / 45) * GAZE_RANGE_H,
+        (filteredGamma.current / 45) * GAZE_RANGE_H,
         -GAZE_RANGE_H,
         GAZE_RANGE_H
       );
-      // beta: ~60 = vertical hold neutral, tilt forward → look down
       gazeTargetV.current = clamp(
-        -((e.beta - 60) / 40) * GAZE_RANGE_V,
+        -((filteredBeta.current - 60) / 40) * GAZE_RANGE_V,
         -GAZE_RANGE_V,
         GAZE_RANGE_V
       );
