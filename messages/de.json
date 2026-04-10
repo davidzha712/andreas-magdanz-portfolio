@@ -89,7 +89,24 @@
   },
   "footer": {
     "copyright": "© {year} Andreas Magdanz. Alle Rechte vorbehalten.",
-    "gallery": "Vertreten durch"
+    "gallery": "Vertreten durch",
+    "impressum": "Impressum",
+    "datenschutz": "Datenschutz"
+  },
+  "errors": {
+    "title": "Etwas ist schiefgelaufen",
+    "description": "Es ist ein unerwarteter Fehler aufgetreten.",
+    "retry": "Erneut versuchen"
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "description": "Die angeforderte Seite existiert nicht.",
+    "home": "Zur Startseite"
+  },
+  "legal": {
+    "draftNotice": "Diese Seite ist ein Entwurf und bedarf juristischer Prüfung vor Veröffentlichung.",
+    "impressumTitle": "Impressum",
+    "datenschutzTitle": "Datenschutz"
   },
   "search": {
     "placeholder": "Suchen…",

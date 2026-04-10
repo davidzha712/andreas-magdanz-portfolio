@@ -202,7 +202,26 @@ export default function Hero3DScene({
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", onResize);
       window.visualViewport?.removeEventListener("resize", onResize);
+
+      // Dispose all GPU resources to prevent memory leaks
+      scene.traverse((obj) => {
+        if (obj instanceof THREE.Mesh) {
+          obj.geometry?.dispose();
+          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+          mats.forEach((m) => {
+            if (!m) return;
+            Object.values(m).forEach((v) => {
+              if (v instanceof THREE.Texture) v.dispose();
+            });
+            m.dispose();
+          });
+        }
+      });
+
       renderer.dispose();
+      if (renderer.domElement.parentNode) {
+        renderer.domElement.remove();
+      }
     };
   }, [panoramaUrl, getViewportHeight]);
 
@@ -331,24 +350,18 @@ export default function Hero3DScene({
       pauseDrift(DRIFT_RESUME_DRAG);
     };
 
-    const onTouchStart = (e: TouchEvent) => {
-      e.preventDefault();
-    };
-
     canvas.style.cursor = "grab";
     canvas.style.touchAction = "none";
     canvas.addEventListener("pointerdown", onPointerDown);
     canvas.addEventListener("pointermove", onPointerMove);
     canvas.addEventListener("pointerup", onPointerUp);
     canvas.addEventListener("pointerleave", onPointerUp);
-    canvas.addEventListener("touchstart", onTouchStart, { passive: false });
 
     return () => {
       canvas.removeEventListener("pointerdown", onPointerDown);
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerup", onPointerUp);
       canvas.removeEventListener("pointerleave", onPointerUp);
-      canvas.removeEventListener("touchstart", onTouchStart);
     };
   }, [isLoaded, pauseDrift]);
 

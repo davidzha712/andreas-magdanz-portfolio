@@ -7,10 +7,33 @@ import {
   projectBySlugQuery,
   allProjectsQuery,
 } from "@/lib/sanity/queries";
-import type { Project } from "@/types/sanity";
+import type { Project, Exhibition, Publication } from "@/types/sanity";
+import { urlFor } from "@/lib/sanity/image";
+import { Link } from "@/i18n/navigation";
 import SanityImage from "@/components/shared/SanityImage";
 import ProjectMeta from "@/components/work/ProjectMeta";
 import ProjectDetailClient from "@/components/work/ProjectDetailClient";
+
+type RelatedExhibition = Pick<
+  Exhibition,
+  "_id" | "title" | "venue" | "city" | "year"
+>;
+
+type RelatedPublication = Pick<
+  Publication,
+  "_id" | "title" | "publisher" | "year" | "purchaseUrl"
+>;
+
+type ProjectWithRelations = Project & {
+  seoOgImageUrl?: string;
+  relatedExhibitions?: RelatedExhibition[];
+  relatedPublications?: RelatedPublication[];
+};
+
+type ProjectListItem = Pick<
+  Project,
+  "_id" | "title" | "slug" | "year" | "location"
+>;
 
 interface PageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -31,7 +54,10 @@ export async function generateMetadata({ params }: PageProps) {
   const { slug, locale } = await params;
 
   try {
-    const project = await client.fetch<Project>(projectBySlugQuery, { slug, locale });
+    const project = await client.fetch<ProjectWithRelations>(projectBySlugQuery, {
+      slug,
+      locale,
+    });
     if (!project) {
       const t = await getTranslations({ locale, namespace: "work" });
       return { title: `${t("title")} — Andreas Magdanz` };
@@ -41,12 +67,23 @@ export async function generateMetadata({ params }: PageProps) {
       project.seo?.metaDescription ??
       `${project.title}${project.year ? ` (${project.year})` : ""}${project.location ? ` — ${project.location}` : ""} — Photography by Andreas Magdanz`;
 
+    const ogImageUrl =
+      project.seoOgImageUrl ??
+      (project.coverImage?.image
+        ? urlFor(project.coverImage.image)
+            .width(1200)
+            .height(630)
+            .fit("crop")
+            .auto("format")
+            .url()
+        : undefined);
+
     return {
       title: `${project.title} — Andreas Magdanz`,
       description,
-      openGraph: project.seo?.ogImage
+      openGraph: ogImageUrl
         ? {
-            images: [{ url: project.seo.ogImage.asset._ref }],
+            images: [{ url: ogImageUrl, width: 1200, height: 630 }],
           }
         : undefined,
     };
@@ -62,10 +99,14 @@ export default async function WorkDetailPage({ params }: PageProps) {
   setRequestLocale(locale);
   const t = await getTranslations("work");
 
-  let project: Project | null = null;
+  let project: ProjectWithRelations | null = null;
+  let allProjects: ProjectListItem[] = [];
 
   try {
-    project = await client.fetch<Project>(projectBySlugQuery, { slug, locale });
+    [project, allProjects] = await Promise.all([
+      client.fetch<ProjectWithRelations>(projectBySlugQuery, { slug, locale }),
+      client.fetch<ProjectListItem[]>(allProjectsQuery),
+    ]);
   } catch {
     // Sanity not connected
   }
@@ -108,8 +149,52 @@ export default async function WorkDetailPage({ params }: PageProps) {
   const hasImages = project.images && project.images.length > 0;
   const hasStatement = project.artistStatement && project.artistStatement.length > 0;
 
+  // Prev/next navigation
+  const currentIndex = allProjects.findIndex(
+    (p) => p.slug?.current === slug
+  );
+  const prevProject =
+    currentIndex > 0 ? allProjects[currentIndex - 1] : null;
+  const nextProject =
+    currentIndex >= 0 && currentIndex < allProjects.length - 1
+      ? allProjects[currentIndex + 1]
+      : null;
+
+  // JSON-LD VisualArtwork
+  const descriptionText = Array.isArray(project.description)
+    ? project.description
+        .map((block) => {
+          if (block._type !== "block") return "";
+          const children = (block as { children?: { text?: string }[] })
+            .children;
+          return children?.map((c) => c.text ?? "").join("") ?? "";
+        })
+        .filter(Boolean)
+        .join(" ")
+    : undefined;
+
+  const ldJsonImage = project.coverImage?.image
+    ? urlFor(project.coverImage.image).width(1600).auto("format").url()
+    : undefined;
+
+  const ldJson: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "VisualArtwork",
+    name: project.title,
+    creator: { "@type": "Person", name: "Andreas Magdanz" },
+    artform: "Photography",
+  };
+  if (project.year) ldJson.dateCreated = project.year;
+  if (ldJsonImage) ldJson.image = ldJsonImage;
+  if (descriptionText) ldJson.description = descriptionText;
+  if (project.location) ldJson.locationCreated = project.location;
+
   return (
     <article>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
+      />
       {/* Full-width hero image */}
       {project.coverImage && (
         <div className="relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden">
@@ -207,64 +292,102 @@ export default async function WorkDetailPage({ params }: PageProps) {
       )}
 
       {/* Related exhibitions */}
-      {(project as Project & { relatedExhibitions?: { _id: string; title: string; venue: string; city: string; year: number }[] }).relatedExhibitions?.length ? (
+      {project.relatedExhibitions?.length ? (
         <RelatedSection title={t("relatedExhibitions")}>
           <ul className="space-y-3">
-            {(project as Project & { relatedExhibitions: { _id: string; title: string; venue: string; city: string; year: number }[] }).relatedExhibitions.map(
-              (ex) => (
-                <li key={ex._id} className="flex items-baseline gap-3 font-sans text-sm">
-                  <span className="text-fg-muted tabular-nums shrink-0">
-                    {ex.year}
-                  </span>
-                  <span className="text-fg">
-                    {ex.title}
-                    {ex.venue && (
-                      <span className="text-fg-muted">, {ex.venue}</span>
-                    )}
-                    {ex.city && (
-                      <span className="text-fg-muted">, {ex.city}</span>
-                    )}
-                  </span>
-                </li>
-              )
-            )}
+            {project.relatedExhibitions.map((ex) => (
+              <li key={ex._id} className="flex items-baseline gap-3 font-sans text-sm">
+                <span className="text-fg-muted tabular-nums shrink-0">
+                  {ex.year}
+                </span>
+                <span className="text-fg">
+                  {ex.title}
+                  {ex.venue && (
+                    <span className="text-fg-muted">, {ex.venue}</span>
+                  )}
+                  {ex.city && (
+                    <span className="text-fg-muted">, {ex.city}</span>
+                  )}
+                </span>
+              </li>
+            ))}
           </ul>
         </RelatedSection>
       ) : null}
 
       {/* Related publications */}
-      {(project as Project & { relatedPublications?: { _id: string; title: string; publisher: string; year: number; purchaseUrl?: string }[] }).relatedPublications?.length ? (
+      {project.relatedPublications?.length ? (
         <RelatedSection title={t("relatedPublications")}>
           <ul className="space-y-3">
-            {(project as Project & { relatedPublications: { _id: string; title: string; publisher: string; year: number; purchaseUrl?: string }[] }).relatedPublications.map(
-              (pub) => (
-                <li key={pub._id} className="flex items-baseline gap-3 font-sans text-sm">
-                  <span className="text-fg-muted tabular-nums shrink-0">
-                    {pub.year}
-                  </span>
-                  <span className="text-fg">
-                    {pub.purchaseUrl ? (
-                      <a
-                        href={pub.purchaseUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline hover:text-accent transition-colors duration-200"
-                      >
-                        {pub.title}
-                      </a>
-                    ) : (
-                      pub.title
-                    )}
-                    {pub.publisher && (
-                      <span className="text-fg-muted">, {pub.publisher}</span>
-                    )}
-                  </span>
-                </li>
-              )
-            )}
+            {project.relatedPublications.map((pub) => (
+              <li key={pub._id} className="flex items-baseline gap-3 font-sans text-sm">
+                <span className="text-fg-muted tabular-nums shrink-0">
+                  {pub.year}
+                </span>
+                <span className="text-fg">
+                  {pub.purchaseUrl ? (
+                    <a
+                      href={pub.purchaseUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-accent transition-colors duration-200"
+                    >
+                      {pub.title}
+                    </a>
+                  ) : (
+                    pub.title
+                  )}
+                  {pub.publisher && (
+                    <span className="text-fg-muted">, {pub.publisher}</span>
+                  )}
+                </span>
+              </li>
+            ))}
           </ul>
         </RelatedSection>
       ) : null}
+
+      {/* Prev / Next navigation */}
+      {(prevProject || nextProject) && (
+        <nav
+          aria-label={t("title")}
+          className="border-t border-border px-8 md:px-12 lg:px-16 py-12"
+        >
+          <div className="max-w-5xl mx-auto flex items-stretch justify-between gap-6">
+            {prevProject ? (
+              <Link
+                href={`/work/${prevProject.slug.current}`}
+                className="group flex-1 flex flex-col items-start text-left"
+              >
+                <span className="font-sans text-xs uppercase tracking-widest text-fg-muted group-hover:text-accent transition-colors duration-200">
+                  ← {locale === "de" ? "Vorheriges" : "Previous"}
+                </span>
+                <span className="font-serif text-lg md:text-xl text-fg mt-2 group-hover:text-accent transition-colors duration-200">
+                  {prevProject.title}
+                </span>
+              </Link>
+            ) : (
+              <span aria-hidden="true" className="flex-1" />
+            )}
+
+            {nextProject ? (
+              <Link
+                href={`/work/${nextProject.slug.current}`}
+                className="group flex-1 flex flex-col items-end text-right"
+              >
+                <span className="font-sans text-xs uppercase tracking-widest text-fg-muted group-hover:text-accent transition-colors duration-200">
+                  {locale === "de" ? "Nächstes" : "Next"} →
+                </span>
+                <span className="font-serif text-lg md:text-xl text-fg mt-2 group-hover:text-accent transition-colors duration-200">
+                  {nextProject.title}
+                </span>
+              </Link>
+            ) : (
+              <span aria-hidden="true" className="flex-1" />
+            )}
+          </div>
+        </nav>
+      )}
     </article>
   );
 }

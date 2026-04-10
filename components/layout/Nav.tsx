@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import NavMobile from "./NavMobile";
@@ -23,6 +23,17 @@ export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const t = useTranslations("nav");
+  const pathname = usePathname();
+
+  // Close mobile nav and search on route change. This must run as an effect so
+  // browser back/forward and direct URL changes also trigger it; the functional
+  // updaters let React bail out when state is already false.
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    setMobileOpen((prev) => (prev ? false : prev));
+    setSearchOpen((prev) => (prev ? false : prev));
+  }, [pathname]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     const handleScroll = () => {
