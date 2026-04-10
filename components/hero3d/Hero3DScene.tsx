@@ -445,16 +445,19 @@ export default function Hero3DScene({
         </div>
       )}
 
-      {/* Text overlay — responsive sizing */}
+      {/* Text overlay — responsive, always fits screen width */}
       <div
         ref={textRef}
-        className="absolute bottom-20 sm:bottom-16 left-6 sm:left-8 md:left-12 lg:left-16 right-6 sm:right-auto opacity-0 z-10"
+        className="absolute bottom-20 sm:bottom-16 left-4 right-4 sm:left-8 sm:right-8 md:left-12 md:right-12 lg:left-16 lg:right-auto opacity-0 z-10"
       >
-        <h1 className="font-serif text-4xl sm:text-6xl md:text-8xl lg:text-9xl tracking-tight text-fg leading-none">
+        <h1
+          className="font-serif tracking-tight text-fg leading-[0.9]"
+          style={{ fontSize: "clamp(1.75rem, 8vw, 8rem)" }}
+        >
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-2 sm:mt-3 font-sans text-xs sm:text-sm tracking-widest uppercase text-fg-muted">
+          <p className="mt-2 sm:mt-3 font-sans text-[10px] sm:text-xs md:text-sm tracking-widest uppercase text-fg-muted truncate">
             {subtitle}
           </p>
         )}
