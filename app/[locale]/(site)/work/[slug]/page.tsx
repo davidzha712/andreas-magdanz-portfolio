@@ -360,7 +360,7 @@ export default async function WorkDetailPage({ params }: PageProps) {
                 className="group flex-1 flex flex-col items-start text-left"
               >
                 <span className="font-sans text-xs uppercase tracking-widest text-fg-muted group-hover:text-accent transition-colors duration-200">
-                  ← {t("previous") || "Previous"}
+                  ← {locale === "de" ? "Vorheriges" : "Previous"}
                 </span>
                 <span className="font-serif text-lg md:text-xl text-fg mt-2 group-hover:text-accent transition-colors duration-200">
                   {prevProject.title}
@@ -376,7 +376,7 @@ export default async function WorkDetailPage({ params }: PageProps) {
                 className="group flex-1 flex flex-col items-end text-right"
               >
                 <span className="font-sans text-xs uppercase tracking-widest text-fg-muted group-hover:text-accent transition-colors duration-200">
-                  {t("next") || "Next"} →
+                  {locale === "de" ? "Nächstes" : "Next"} →
                 </span>
                 <span className="font-serif text-lg md:text-xl text-fg mt-2 group-hover:text-accent transition-colors duration-200">
                   {nextProject.title}

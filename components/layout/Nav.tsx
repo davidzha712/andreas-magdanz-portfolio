@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import NavMobile from "./NavMobile";
@@ -23,6 +23,13 @@ export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const t = useTranslations("nav");
+  const pathname = usePathname();
+
+  // Close mobile nav on route change (also unlocks body scroll via effect below)
+  useEffect(() => {
+    setMobileOpen(false);
+    setSearchOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
