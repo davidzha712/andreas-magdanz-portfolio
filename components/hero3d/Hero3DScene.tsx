@@ -83,20 +83,27 @@ export default function Hero3DScene({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const mobile = isMobileRef.current;
+
     const renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: true,
+      antialias: !mobile, // Skip antialiasing on mobile for perf
       alpha: true,
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // Limit pixel ratio: 2 on desktop, 1.5 on mobile (saves GPU)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.5 : 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
 
     const scene = new THREE.Scene();
 
+    // Wider FOV on portrait mobile so panorama doesn't feel like a tunnel
+    const isPortrait = window.innerHeight > window.innerWidth;
+    const fov = isPortrait ? 90 : 75;
+
     const camera = new THREE.PerspectiveCamera(
-      75,
+      fov,
       window.innerWidth / window.innerHeight,
       0.1,
       100
@@ -172,6 +179,8 @@ export default function Hero3DScene({
     rafRef.current = requestAnimationFrame(animate);
 
     const onResize = () => {
+      const portrait = window.innerHeight > window.innerWidth;
+      camera.fov = portrait ? 90 : 75;
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -426,9 +435,9 @@ export default function Hero3DScene({
         </div>
       )}
 
-      {/* Drag hint */}
+      {/* Drag hint — positioned above text overlay */}
       {isLoaded && !hasInteracted && (
-        <div className="absolute bottom-28 right-8 z-10 flex items-center gap-2 text-fg-muted/50 animate-pulse pointer-events-none">
+        <div className="absolute bottom-36 sm:bottom-28 right-6 sm:right-8 z-10 flex items-center gap-2 text-fg-muted/50 animate-pulse pointer-events-none">
           <DragIcon />
           <span className="font-sans text-[10px] tracking-widest uppercase">
             {isMobile ? "SWIPE TO EXPLORE" : "DRAG TO EXPLORE"}
@@ -436,23 +445,23 @@ export default function Hero3DScene({
         </div>
       )}
 
-      {/* Text overlay */}
+      {/* Text overlay — responsive sizing */}
       <div
         ref={textRef}
-        className="absolute bottom-16 left-8 md:left-12 lg:left-16 opacity-0 z-10"
+        className="absolute bottom-20 sm:bottom-16 left-6 sm:left-8 md:left-12 lg:left-16 right-6 sm:right-auto opacity-0 z-10"
       >
-        <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl tracking-tight text-fg leading-none">
+        <h1 className="font-serif text-4xl sm:text-6xl md:text-8xl lg:text-9xl tracking-tight text-fg leading-none">
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-3 font-sans text-sm tracking-widest uppercase text-fg-muted">
+          <p className="mt-2 sm:mt-3 font-sans text-xs sm:text-sm tracking-widest uppercase text-fg-muted">
             {subtitle}
           </p>
         )}
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-fg-muted/60 z-10">
+      <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-fg-muted/60 z-10">
         <span className="font-sans text-[10px] tracking-widest uppercase">
           {scrollLabel}
         </span>
