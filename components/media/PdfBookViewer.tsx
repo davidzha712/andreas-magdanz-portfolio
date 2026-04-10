@@ -11,6 +11,15 @@ import HTMLFlipBook from "react-pageflip";
 
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
+interface PageFlipAPI {
+  flipNext: () => void;
+  flipPrev: () => void;
+}
+
+interface HTMLFlipBookRef {
+  pageFlip: () => PageFlipAPI;
+}
+
 interface PdfBookViewerProps {
   pdfUrl: string;
   title: string;
@@ -229,9 +238,9 @@ export default function PdfBookViewer({
   const [currentPage, setCurrentPage] = useState(0);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const bookRef = useRef<any>(null);
+  const bookRef = useRef<HTMLFlipBookRef | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const createdBlobUrlsRef = useRef<string[]>([]);
 
   /* ── Reduced motion ── */
   useEffect(() => {
@@ -260,6 +269,23 @@ export default function PdfBookViewer({
   /* ── Load PDF and render all pages to images ── */
   useEffect(() => {
     let cancelled = false;
+    const createdUrls: string[] = [];
+
+    const canvasToBlobUrl = (canvas: HTMLCanvasElement, quality: number) =>
+      new Promise<string>((resolve, reject) => {
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error("Canvas toBlob returned null"));
+              return;
+            }
+            const url = URL.createObjectURL(blob);
+            resolve(url);
+          },
+          "image/jpeg",
+          quality
+        );
+      });
 
     async function loadPdf() {
       try {
@@ -269,6 +295,11 @@ export default function PdfBookViewer({
         let coverW = 0;
         let coverH = 0;
 
+        // Cap render scale on mobile to reduce memory pressure
+        const isMobileRender =
+          typeof window !== "undefined" && window.innerWidth < 640;
+        const scale = isMobileRender ? 1.2 : 2;
+
         for (let i = 1; i <= numPages; i++) {
           if (cancelled) return;
           const page = await pdf.getPage(i);
@@ -277,12 +308,10 @@ export default function PdfBookViewer({
           if (i === 1) {
             const vp = page.getViewport({ scale: 1 });
             setPageAspect(vp.height / vp.width);
-            coverW = Math.round(vp.width * 2);
-            coverH = Math.round(vp.height * 2);
+            coverW = Math.round(vp.width * scale);
+            coverH = Math.round(vp.height * scale);
           }
 
-          // Render at 2x for clarity
-          const scale = 2;
           const viewport = page.getViewport({ scale });
           const canvas = document.createElement("canvas");
           canvas.width = viewport.width;
@@ -291,7 +320,13 @@ export default function PdfBookViewer({
 
           await page.render({ canvasContext: ctx, viewport, canvas } as Parameters<typeof page.render>[0]).promise;
 
-          contentImages.push(canvas.toDataURL("image/jpeg", 0.92));
+          const url = await canvasToBlobUrl(canvas, 0.92);
+          if (cancelled) {
+            URL.revokeObjectURL(url);
+            return;
+          }
+          createdUrls.push(url);
+          contentImages.push(url);
           setLoadProgress(Math.round((i / numPages) * 100));
         }
 
@@ -300,6 +335,7 @@ export default function PdfBookViewer({
           const cover = renderCover(coverW, coverH, title, source, date);
           const back = renderBackCover(coverW, coverH);
 
+          createdBlobUrlsRef.current = createdUrls;
           setPdfPageCount(numPages);
           setPageImages([cover, ...contentImages, back]);
           setIsLoading(false);
@@ -316,6 +352,9 @@ export default function PdfBookViewer({
     loadPdf();
     return () => {
       cancelled = true;
+      // Revoke any blob URLs created during this load to free memory
+      createdUrls.forEach((url) => URL.revokeObjectURL(url));
+      createdBlobUrlsRef.current = [];
     };
   }, [proxiedUrl, title, source, date, t.error]);
 
@@ -339,8 +378,7 @@ export default function PdfBookViewer({
     : Math.max(240, Math.min((containerWidth - 48) / 2, 480));
   const pageHeight = Math.round(pageWidth * pageAspect);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onFlip = (e: any) => setCurrentPage(e.data);
+  const onFlip = (e: { data: number }) => setCurrentPage(e.data);
 
   // Page label: cover = title, content = "Page X of Y", back cover = empty
   const isCoverPage = currentPage === 0;
@@ -390,7 +428,7 @@ export default function PdfBookViewer({
         <>
           <div className="flex justify-center">
             <HTMLFlipBook
-              ref={bookRef}
+              ref={bookRef as unknown as React.Ref<HTMLFlipBookRef>}
               width={pageWidth}
               height={pageHeight}
               size="stretch"

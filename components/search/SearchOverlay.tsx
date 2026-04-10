@@ -243,7 +243,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   }
 
   return (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={() => setQuery("")}>
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -311,7 +311,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
               {!loading &&
                 data &&
-                ["project", "exhibition", "publication", "cvEntry", "mediaItem"].map(
+                SECTION_ORDER.map(
                   (type) => {
                     const results = groupedResults.get(type);
                     if (!results?.length) return null;

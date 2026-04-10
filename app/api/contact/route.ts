@@ -47,14 +47,14 @@ function checkRateLimit(ip: string): boolean {
 
   // Opportunistic cleanup to prevent unbounded growth
   if (rateLimitMap.size > 5000) {
-    for (const [key, times] of rateLimitMap) {
+    rateLimitMap.forEach((times, key) => {
       const kept = times.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
       if (kept.length === 0) {
         rateLimitMap.delete(key);
       } else {
         rateLimitMap.set(key, kept);
       }
-    }
+    });
   }
 
   return true;
