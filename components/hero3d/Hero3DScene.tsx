@@ -221,13 +221,15 @@ export default function Hero3DScene({
     const onOrientation = (e: DeviceOrientationEvent) => {
       if (e.gamma === null || e.beta === null) return;
       gyroActive.current = true;
+      // gamma: positive = tilt right → look right (positive H)
       gazeTargetH.current = clamp(
-        (-e.gamma / 45) * GAZE_RANGE_H,
+        (e.gamma / 45) * GAZE_RANGE_H,
         -GAZE_RANGE_H,
         GAZE_RANGE_H
       );
+      // beta: ~60 = vertical hold neutral, tilt forward → look down
       gazeTargetV.current = clamp(
-        ((e.beta - 60) / 40) * GAZE_RANGE_V, // 60 = typical phone holding angle
+        -((e.beta - 60) / 40) * GAZE_RANGE_V,
         -GAZE_RANGE_V,
         GAZE_RANGE_V
       );
