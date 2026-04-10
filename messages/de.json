@@ -110,5 +110,114 @@
     "viewAll": "Alle anzeigen",
     "readMore": "Weiterlesen",
     "noResults": "Keine Ergebnisse gefunden."
+  },
+  "legal": {
+    "impressumTitle": "Impressum",
+    "datenschutzTitle": "Datenschutzerklärung",
+    "draftNotice": "Entwurf — ausstehende rechtliche Prüfung. Persönliche Daten werden vor Veröffentlichung ergänzt.",
+    "lastUpdatedLabel": "Zuletzt aktualisiert",
+    "lastUpdatedDate": "10. April 2026",
+    "impressum": {
+      "tmg": {
+        "title": "Angaben gemäß § 5 TMG",
+        "nameLabel": "Name",
+        "addressLabel": "Anschrift",
+        "countryLabel": "Land",
+        "country": "Deutschland"
+      },
+      "contact": {
+        "title": "Kontakt",
+        "phoneLabel": "Telefon",
+        "emailLabel": "E-Mail"
+      },
+      "vat": {
+        "title": "Umsatzsteuer-ID",
+        "body": "Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:"
+      },
+      "responsible": {
+        "title": "Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV"
+      },
+      "disclaimer": {
+        "title": "Haftungsausschluss",
+        "contentHeading": "Haftung für Inhalte",
+        "content": "Die Inhalte dieser Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.",
+        "linksHeading": "Haftung für Links",
+        "links": "Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar. Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen.",
+        "copyrightHeading": "Urheberrecht",
+        "copyright": "Die durch den Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet. Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet. Insbesondere werden Inhalte Dritter als solche gekennzeichnet. Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen."
+      },
+      "euDispute": {
+        "title": "EU-Streitschlichtung",
+        "body": "Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:",
+        "linkLabel": "ec.europa.eu/consumers/odr",
+        "suffix": "Unsere E-Mail-Adresse finden Sie oben im Impressum."
+      },
+      "consumerDispute": {
+        "title": "Verbraucherstreitbeilegung / Universalschlichtungsstelle",
+        "body": "Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."
+      }
+    },
+    "datenschutz": {
+      "overview": {
+        "title": "1. Datenschutz auf einen Blick",
+        "generalHeading": "Allgemeine Hinweise",
+        "general": "Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können. Ausführliche Informationen zum Thema Datenschutz entnehmen Sie unserer in diesem Text aufgeführten Datenschutzerklärung.",
+        "collectionHeading": "Datenerfassung auf dieser Website",
+        "collection": "Die Datenverarbeitung auf dieser Website erfolgt durch den Websitebetreiber. Dessen Kontaktdaten können Sie dem Abschnitt „Verantwortlicher\" dieser Datenschutzerklärung entnehmen. Ihre Daten werden zum einen dadurch erhoben, dass Sie uns diese mitteilen (z. B. über das Kontaktformular). Andere Daten werden automatisch oder nach Ihrer Einwilligung beim Besuch der Website durch unsere IT-Systeme erfasst (Server-Logfiles). Sobald Sie diese Website betreten, werden diese Daten automatisch erhoben."
+      },
+      "controller": {
+        "title": "2. Verantwortlicher",
+        "intro": "Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO) ist:",
+        "emailLabel": "E-Mail"
+      },
+      "collection": {
+        "title": "3. Datenerfassung auf dieser Website",
+        "logsHeading": "Server-Log-Dateien",
+        "logs": "Der Provider dieser Seiten erhebt und speichert automatisch Informationen in sogenannten Server-Log-Dateien, die Ihr Browser automatisch an uns übermittelt. Dies sind: Browsertyp und Browserversion, verwendetes Betriebssystem, Referrer URL, Hostname des zugreifenden Rechners, Uhrzeit der Serveranfrage und IP-Adresse. Eine Zusammenführung dieser Daten mit anderen Datenquellen wird nicht vorgenommen. Die Erfassung dieser Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO. Der Websitebetreiber hat ein berechtigtes Interesse an der technisch fehlerfreien Darstellung und der Optimierung seiner Website — hierzu müssen die Server-Log-Files erfasst werden. Log-Daten werden spätestens nach sieben Tagen automatisch gelöscht, sofern keine sicherheitsrelevanten Vorkommnisse eine längere Speicherung erfordern.",
+        "formHeading": "Kontaktformular",
+        "form": "Wenn Sie uns per Kontaktformular Anfragen zukommen lassen, werden Ihre Angaben aus dem Anfrageformular inklusive der von Ihnen dort angegebenen Kontaktdaten zwecks Bearbeitung der Anfrage und für den Fall von Anschlussfragen bei uns gespeichert. Diese Daten geben wir nicht ohne Ihre Einwilligung weiter. Die Verarbeitung dieser Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO, sofern Ihre Anfrage mit der Erfüllung eines Vertrags zusammenhängt oder zur Durchführung vorvertraglicher Maßnahmen erforderlich ist. In allen übrigen Fällen beruht die Verarbeitung auf unserem berechtigten Interesse an der effektiven Bearbeitung der an uns gerichteten Anfragen (Art. 6 Abs. 1 lit. f DSGVO). Die Zustellung der E-Mail erfolgt über den Dienstleister Resend (siehe Auftragsverarbeiter). Die von Ihnen im Kontaktformular eingegebenen Daten verbleiben bei uns, bis Sie uns zur Löschung auffordern, Ihre Einwilligung zur Speicherung widerrufen oder der Zweck für die Datenspeicherung entfällt."
+      },
+      "processors": {
+        "title": "4. Auftragsverarbeiter",
+        "intro": "Wir setzen folgende Dienstleister als Auftragsverarbeiter gemäß Art. 28 DSGVO ein. Mit allen Dienstleistern bestehen entsprechende Auftragsverarbeitungsverträge.",
+        "vercelHeading": "Vercel Inc. (Hosting)",
+        "vercel": "Diese Website wird bei Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA gehostet. Vercel verarbeitet in unserem Auftrag personenbezogene Daten (insbesondere IP-Adressen in Server-Logs). Eine Übermittlung in die USA kann stattfinden; hierfür stützen wir uns auf die Standardvertragsklauseln der EU-Kommission sowie ggf. das EU-US Data Privacy Framework. Datenverarbeitungsvertrag:",
+        "vercelDpaLabel": "vercel.com/legal/dpa",
+        "sanityHeading": "Sanity.io (Content-Management-System)",
+        "sanity": "Redaktionelle Inhalte dieser Website werden über das Content-Management-System Sanity verwaltet und ausgeliefert (Sanity.io, Lysaker, Norwegen). Beim Abruf von Bildern und Inhalten wird Ihre IP-Adresse technisch bedingt an Sanity bzw. dessen CDN übermittelt. Datenverarbeitungsvertrag:",
+        "sanityDpaLabel": "sanity.io/legal/dpa",
+        "resendHeading": "Resend, Inc. (Transaktions-E-Mails)",
+        "resend": "Für den Versand der Nachrichten aus dem Kontaktformular nutzen wir den Dienst Resend (Resend, Inc., 2261 Market Street #5039, San Francisco, CA 94114, USA). Die von Ihnen im Kontaktformular eingegebenen Daten werden zu diesem Zweck an Resend übermittelt und dort verarbeitet. Datenverarbeitungsvertrag:",
+        "resendDpaLabel": "resend.com/legal/dpa",
+        "fontsHeading": "Google Fonts (selbst gehostet)",
+        "fonts": "Zur einheitlichen Darstellung von Schriftarten verwenden wir Google Fonts. Die verwendeten Schriften (Cormorant Garamond, DM Sans) werden über next/font zur Build-Zeit heruntergeladen und von unserem eigenen Server bzw. von Vercel ausgeliefert. Es findet keine Verbindung zu Google-Servern und keine Übertragung personenbezogener Daten an Google statt.",
+        "mediapipeHeading": "MediaPipe (Kopfbewegungs-Tracking, optional)",
+        "mediapipe": "Die Startseite bietet optional eine interaktive 3D-Szene mit Kopfbewegungs-Steuerung. Hierfür wird die Bibliothek MediaPipe von Google verwendet. Die Aktivierung erfolgt ausschließlich mit Ihrer ausdrücklichen Zustimmung (Kamerafreigabe im Browser). Die Bildverarbeitung findet vollständig lokal in Ihrem Browser statt; es werden weder Bilder noch Landmarks an uns oder an Dritte übermittelt. Die für die Initialisierung benötigten Modell-Dateien werden über ein öffentliches CDN (jsDelivr) geladen; dabei kann Ihre IP-Adresse technisch bedingt an den CDN-Betreiber übermittelt werden."
+      },
+      "cookies": {
+        "title": "5. Cookies",
+        "body": "Unsere Website verwendet ausschließlich technisch notwendige Cookies bzw. gleichwertige Speichermechanismen. Konkret setzen wir einen Cookie bzw. einen Local-Storage-Eintrag zur Speicherung Ihrer Theme-Präferenz (Hell-/Dunkelmodus) über die Bibliothek next-themes ein. Dieser Cookie enthält keine personenbezogenen Daten, ermöglicht kein Tracking und wird nicht an Dritte weitergegeben. Es werden keine Analyse-, Marketing- oder Drittanbieter-Tracking-Cookies eingesetzt. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO sowie § 25 Abs. 2 Nr. 2 TTDSG (unbedingt erforderliche Speicherung)."
+      },
+      "rights": {
+        "title": "6. Ihre Rechte",
+        "intro": "Sie haben jederzeit das Recht auf unentgeltliche Auskunft über Ihre gespeicherten personenbezogenen Daten, deren Herkunft und Empfänger und den Zweck der Datenverarbeitung sowie ein Recht auf Berichtigung oder Löschung dieser Daten. Im Einzelnen stehen Ihnen folgende Rechte zu:",
+        "access": "Recht auf Auskunft (Art. 15 DSGVO) — Sie können Auskunft darüber verlangen, ob und welche personenbezogenen Daten wir über Sie verarbeiten.",
+        "rectification": "Recht auf Berichtigung (Art. 16 DSGVO) — Sie können die Berichtigung unrichtiger oder die Vervollständigung unvollständiger Daten verlangen.",
+        "erasure": "Recht auf Löschung (Art. 17 DSGVO) — Sie können die Löschung Ihrer Daten verlangen, sofern die gesetzlichen Voraussetzungen vorliegen.",
+        "restriction": "Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO) — Sie können unter bestimmten Voraussetzungen die Einschränkung der Verarbeitung verlangen.",
+        "portability": "Recht auf Datenübertragbarkeit (Art. 20 DSGVO) — Sie können verlangen, dass wir Ihnen Ihre Daten in einem strukturierten, gängigen und maschinenlesbaren Format aushändigen.",
+        "objection": "Widerspruchsrecht (Art. 21 DSGVO) — Sie können der Verarbeitung Ihrer Daten jederzeit widersprechen, wenn diese auf berechtigtem Interesse beruht.",
+        "complaint": "Beschwerderecht bei einer Aufsichtsbehörde (Art. 77 DSGVO) — Sie haben das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren, etwa der Landesbeauftragten für Datenschutz und Informationsfreiheit Nordrhein-Westfalen (LfDI NRW), Kavalleriestraße 2-4, 40213 Düsseldorf.",
+        "outro": "Zur Ausübung Ihrer Rechte genügt eine formlose Mitteilung an die oben genannte Adresse des Verantwortlichen."
+      },
+      "ssl": {
+        "title": "7. SSL-/TLS-Verschlüsselung",
+        "body": "Diese Seite nutzt aus Sicherheitsgründen und zum Schutz der Übertragung vertraulicher Inhalte, wie zum Beispiel Anfragen, die Sie an uns als Seitenbetreiber senden, eine SSL-/TLS-Verschlüsselung. Eine verschlüsselte Verbindung erkennen Sie daran, dass die Adresszeile des Browsers von „http://\" auf „https://\" wechselt und an dem Schloss-Symbol in Ihrer Browserzeile. Wenn die SSL-/TLS-Verschlüsselung aktiviert ist, können die Daten, die Sie an uns übermitteln, nicht von Dritten mitgelesen werden."
+      },
+      "changes": {
+        "title": "8. Änderungen dieser Datenschutzerklärung",
+        "body": "Wir behalten uns vor, diese Datenschutzerklärung gelegentlich anzupassen, damit sie stets den aktuellen rechtlichen Anforderungen entspricht oder um Änderungen unserer Leistungen in der Datenschutzerklärung umzusetzen, z. B. bei der Einführung neuer Dienste. Für Ihren erneuten Besuch gilt dann die neue Datenschutzerklärung."
+      }
+    }
   }
 }

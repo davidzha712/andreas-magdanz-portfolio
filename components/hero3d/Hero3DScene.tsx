@@ -68,7 +68,16 @@ export default function Hero3DScene({
   const gazeTargetV = useRef(0);
   const gazeCurrentH = useRef(0);
   const gazeCurrentV = useRef(0);
+  // gyroActive: ref for hot-path reads in RAF loop + mouse handler;
+  // parallel state for UI gating (render must not read refs directly).
   const gyroActive = useRef(false);
+  const [gyroActiveState, setGyroActiveState] = useState(false);
+  const activateGyro = useCallback(() => {
+    if (!gyroActive.current) {
+      gyroActive.current = true;
+      setGyroActiveState(true);
+    }
+  }, []);
 
   const dragLon = useRef(0);
   const dragLat = useRef(0);
@@ -247,7 +256,7 @@ export default function Hero3DScene({
     // Uses screen.orientation to handle portrait vs landscape correctly
     const onOrientation = (e: DeviceOrientationEvent) => {
       if (e.gamma === null || e.beta === null) return;
-      gyroActive.current = true;
+      activateGyro();
 
       const gamma = clamp(e.gamma, -80, 80);
       const beta = clamp(e.beta, -10, 130);
@@ -287,7 +296,7 @@ export default function Hero3DScene({
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("deviceorientation", onOrientation);
     };
-  }, [isLoaded, headTracking.isTracking, headTracking.position, pauseDrift]);
+  }, [isLoaded, headTracking.isTracking, headTracking.position, pauseDrift, activateGyro]);
 
   // --- Layer 3: Drag / touch-drag ---
   useEffect(() => {
@@ -361,14 +370,14 @@ export default function Hero3DScene({
       try {
         const permission = await DOE.requestPermission();
         if (permission === "granted") {
-          gyroActive.current = true;
+          activateGyro();
         }
       } catch {
         // User denied
       }
     }
     setHasInteracted(true);
-  }, []);
+  }, [activateGyro]);
 
   // GSAP entrance animation
   useEffect(() => {
@@ -439,7 +448,7 @@ export default function Hero3DScene({
       )}
 
       {/* Mobile: gyroscope enable button */}
-      {isLoaded && isMobile && !gyroActive.current && !hasInteracted && (
+      {isLoaded && isMobile && !gyroActiveState && !hasInteracted && (
         <button
           onClick={requestGyroPermission}
           className="absolute top-4 right-4 z-10 flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 font-sans text-[10px] tracking-wider text-fg-muted backdrop-blur-sm"

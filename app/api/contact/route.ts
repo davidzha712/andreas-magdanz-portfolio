@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
 interface ContactPayload {
   name: string;
@@ -11,7 +13,74 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+// ---------------------------------------------------------------------------
+// Rate limiting
+//
+// Prefer Upstash Redis (works across Vercel's multi-region serverless). When
+// the Upstash env vars are missing, fall back to an in-memory limiter so that
+// local development and preview deployments continue to work without manual
+// configuration.
+// ---------------------------------------------------------------------------
+
+const hasUpstash = Boolean(
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+);
+
+const upstashRatelimit = hasUpstash
+  ? new Ratelimit({
+      redis: Redis.fromEnv(),
+      limiter: Ratelimit.slidingWindow(3, "10 m"),
+      analytics: true,
+      prefix: "ratelimit:contact",
+    })
+  : null;
+
+if (!hasUpstash && process.env.NODE_ENV === "production") {
+  console.warn(
+    "[contact] UPSTASH_REDIS_REST_URL not set — falling back to in-memory rate limiter. Not recommended for production."
+  );
+}
+
+const IN_MEMORY_WINDOW_MS = 10 * 60 * 1000;
+const IN_MEMORY_LIMIT = 3;
+const inMemoryHits = new Map<string, number[]>();
+
+async function checkRateLimit(ip: string): Promise<{ allowed: boolean }> {
+  if (upstashRatelimit) {
+    const { success } = await upstashRatelimit.limit(ip);
+    return { allowed: success };
+  }
+
+  const now = Date.now();
+  const hits = (inMemoryHits.get(ip) ?? []).filter(
+    (t) => now - t < IN_MEMORY_WINDOW_MS
+  );
+  if (hits.length >= IN_MEMORY_LIMIT) {
+    return { allowed: false };
+  }
+  inMemoryHits.set(ip, [...hits, now]);
+  return { allowed: true };
+}
+
+function getClientIp(request: NextRequest): string {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0]?.trim() || "unknown";
+  }
+  return request.headers.get("x-real-ip") ?? "unknown";
+}
+
 export async function POST(request: NextRequest) {
+  // Rate limit before touching the body
+  const ip = getClientIp(request);
+  const { allowed } = await checkRateLimit(ip);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   let body: Partial<ContactPayload>;
 
   try {

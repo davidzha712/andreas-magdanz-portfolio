@@ -21,7 +21,7 @@ npm run test         # Run tests (node --test lib/search/searchUtils.test.ts)
 
 - **Bilingual**: German (`de`, default) and English (`en`) via `next-intl`
 - Locale prefix is always shown (`/de/...`, `/en/...`)
-- `middleware.ts` handles locale routing; excludes `/api`, `/studio`, and static files
+- `proxy.ts` (formerly `middleware.ts` — renamed for Next.js 16) handles locale routing; excludes `/api`, `/studio`, and static files
 - i18n config lives in `i18n/` — routing, config, request handler
 - Translation strings in `messages/de.json` and `messages/en.json`
 - Content translations use a field-level pattern: Sanity stores both `field` (German) and `fieldEn` (English), resolved via GROQ `select($locale == "en" => coalesce(fieldEn, field), field)`
