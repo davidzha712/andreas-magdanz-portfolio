@@ -8,6 +8,7 @@ interface FormState {
   email: string;
   subject: string;
   message: string;
+  website: string; // honeypot — must stay empty
 }
 
 type SubmitStatus = "idle" | "loading" | "success" | "error";
@@ -17,6 +18,7 @@ const INITIAL_FORM: FormState = {
   email: "",
   subject: "",
   message: "",
+  website: "",
 };
 
 function isValidEmail(email: string): boolean {
@@ -92,6 +94,25 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
+      {/* Honeypot — hidden from real users, bots will fill it */}
+      <input
+        type="text"
+        name="website"
+        value={form.website}
+        onChange={handleChange}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          width: "1px",
+          height: "1px",
+          opacity: 0,
+          pointerEvents: "none",
+        }}
+      />
+
       {/* Name */}
       <div>
         <label
@@ -235,7 +256,11 @@ export default function ContactForm() {
 
       {/* Success message */}
       {status === "success" && (
-        <div className="border border-green-700/40 bg-green-900/10 px-4 py-3">
+        <div
+          role="status"
+          aria-live="polite"
+          className="border border-green-700/40 bg-green-900/10 px-4 py-3"
+        >
           <p className="font-sans text-sm text-green-400">
             {t("success")}
           </p>
@@ -244,7 +269,11 @@ export default function ContactForm() {
 
       {/* Error message */}
       {status === "error" && (
-        <div className="border border-red-700/40 bg-red-900/10 px-4 py-3">
+        <div
+          role="status"
+          aria-live="polite"
+          className="border border-red-700/40 bg-red-900/10 px-4 py-3"
+        >
           <p className="font-sans text-sm text-red-400">
             {errorMessage || t("error")}
           </p>

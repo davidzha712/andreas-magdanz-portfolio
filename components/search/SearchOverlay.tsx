@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { client } from "@/lib/sanity/client";
 import { searchAllContentQuery } from "@/lib/sanity/queries";
 import {
@@ -34,10 +34,11 @@ type SearchResult =
 function highlightMatch(text: string, query: string) {
   if (!query.trim()) return text;
   const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const regex = new RegExp(`(${escaped})`, "gi");
-  const parts = text.split(regex);
+  const splitRegex = new RegExp(`(${escaped})`, "gi");
+  const lowerQuery = query.toLowerCase();
+  const parts = text.split(splitRegex);
   return parts.map((part, i) =>
-    regex.test(part) ? (
+    part.toLowerCase() === lowerQuery ? (
       <mark key={i} className="bg-accent/20 text-fg rounded-sm px-0.5">
         {part}
       </mark>
@@ -46,6 +47,14 @@ function highlightMatch(text: string, query: string) {
     )
   );
 }
+
+const SECTION_ORDER = [
+  "project",
+  "exhibition",
+  "publication",
+  "cvEntry",
+  "mediaItem",
+] as const;
 
 function getSearchableText(result: SearchResult): string[] {
   switch (result.type) {
@@ -102,15 +111,17 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         cacheRef.current = result as SearchData;
         setData(result as SearchData);
       })
+      .catch((err) => {
+        console.error("Search fetch failed:", err);
+      })
       .finally(() => setLoading(false));
   }, [isOpen, locale]);
 
   // Focus input on open
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-    } else {
-      setTimeout(() => setQuery(""), 0);
+      const id = window.setTimeout(() => inputRef.current?.focus(), 100);
+      return () => window.clearTimeout(id);
     }
   }, [isOpen]);
 
@@ -136,7 +147,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [isOpen, onClose]);
 
-  const filterResults = useCallback((): Map<string, SearchResult[]> => {
+  const groupedResults = useMemo<Map<string, SearchResult[]>>(() => {
     if (!data) return new Map();
 
     const q = query.toLowerCase().trim();
@@ -177,16 +188,18 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     return grouped;
   }, [data, query]);
 
-  const groupedResults = filterResults();
   const hasResults = groupedResults.size > 0;
 
-  const sectionLabels: Record<string, string> = {
-    project: t("work"),
-    exhibition: t("exhibitions"),
-    publication: t("publications"),
-    cvEntry: t("cv"),
-    mediaItem: t("media"),
-  };
+  const sectionLabels = useMemo<Record<string, string>>(
+    () => ({
+      project: t("work"),
+      exhibition: t("exhibitions"),
+      publication: t("publications"),
+      cvEntry: t("cv"),
+      mediaItem: t("media"),
+    }),
+    [t]
+  );
 
   function getHref(result: SearchResult): string {
     switch (result.type) {

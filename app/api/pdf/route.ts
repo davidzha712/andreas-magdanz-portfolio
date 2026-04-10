@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 // Only proxy PDFs from our own Sanity project to prevent open-proxy abuse
 const ALLOWED_PREFIX = "https://cdn.sanity.io/files/b8e16q3y/";
+const MAX_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.searchParams.get("url");
@@ -24,10 +28,31 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Validate content-type: only accept application/pdf
+    const contentType = upstream.headers.get("content-type") ?? "";
+    if (!contentType.toLowerCase().startsWith("application/pdf")) {
+      return NextResponse.json(
+        { error: "Unsupported media type" },
+        { status: 415 }
+      );
+    }
+
+    // Enforce size limit based on upstream content-length header
+    const contentLengthHeader = upstream.headers.get("content-length");
+    if (contentLengthHeader) {
+      const contentLength = Number(contentLengthHeader);
+      if (Number.isFinite(contentLength) && contentLength > MAX_SIZE_BYTES) {
+        return NextResponse.json(
+          { error: "Payload too large" },
+          { status: 413 }
+        );
+      }
+    }
+
     return new NextResponse(upstream.body, {
       status: 200,
       headers: {
-        "Content-Type": "application/pdf",
+        "Content-Type": contentType,
         "Cache-Control": "public, max-age=86400, s-maxage=86400",
       },
     });

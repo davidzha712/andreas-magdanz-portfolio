@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
+import { parseBody } from "next-sanity/webhook";
+
+export const runtime = "nodejs";
 
 const LOCALES = ["de", "en"];
+
+interface SanityWebhookBody {
+  _type: string;
+  slug?: { current?: string };
+}
 
 function revalidateLocalized(path: string) {
   for (const locale of LOCALES) {
@@ -12,28 +20,42 @@ function revalidateLocalized(path: string) {
 export async function POST(request: NextRequest) {
   const secret = process.env.SANITY_REVALIDATE_SECRET;
 
-  // Verify secret if configured
-  if (secret) {
-    const authHeader = request.headers.get("authorization");
-    const querySecret = request.nextUrl.searchParams.get("secret");
-    const providedSecret = authHeader?.replace("Bearer ", "") ?? querySecret;
-
-    if (providedSecret !== secret) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  if (!secret) {
+    console.error(
+      "[revalidate route] SANITY_REVALIDATE_SECRET is not configured"
+    );
+    return NextResponse.json(
+      { error: "Server not configured" },
+      { status: 500 }
+    );
   }
 
-  let body: { _type?: string; slug?: { current?: string } } = {};
+  let body: SanityWebhookBody | null = null;
 
   try {
-    body = await request.json();
-  } catch {
-    // Body is optional — still revalidate all
+    const parsed = await parseBody<SanityWebhookBody>(request, secret);
+
+    if (!parsed.isValidSignature) {
+      return NextResponse.json(
+        { error: "Invalid signature" },
+        { status: 401 }
+      );
+    }
+
+    body = parsed.body;
+  } catch (err) {
+    console.error("[revalidate route] Failed to parse webhook body:", err);
+    return NextResponse.json(
+      { error: "Invalid webhook payload" },
+      { status: 400 }
+    );
   }
 
   try {
     const documentType = body?._type;
     const slug = body?.slug?.current;
+
+    let revalidated = true;
 
     switch (documentType) {
       case "project":
@@ -66,15 +88,15 @@ export async function POST(request: NextRequest) {
         break;
 
       default:
-        // Revalidate root layout (covers all localized paths)
-        revalidatePath("/", "layout");
+        // Unknown document type — do not mass-revalidate
+        revalidated = false;
         break;
     }
 
     return NextResponse.json(
       {
-        revalidated: true,
-        documentType: documentType ?? "all",
+        revalidated,
+        documentType: documentType ?? null,
         slug: slug ?? null,
         timestamp: new Date().toISOString(),
       },
