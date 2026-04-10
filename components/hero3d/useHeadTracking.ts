@@ -18,6 +18,13 @@ interface HeadTrackingState {
 const DEFAULT_POSITION: HeadPosition = { x: 0, y: 0, z: 1.0 };
 const SMOOTHING = 0.15;
 
+// Blend weights: rotation (yaw/pitch) vs position (face location in frame)
+const ROTATION_WEIGHT = 0.85;
+const POSITION_WEIGHT = 0.15;
+const YAW_SENSITIVITY = 2.5; // ~30 deg head turn → full pan
+const PITCH_SENSITIVITY = 2.0; // pitch feels less natural, lower gain
+const POSITION_SENSITIVITY = 0.4; // subtle parallax from position
+
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
@@ -102,31 +109,46 @@ export function useHeadTracking(): HeadTrackingState {
         if (results.faceLandmarks?.length > 0) {
           const landmarks = results.faceLandmarks[0];
 
-          // Nose tip (landmark 1)
-          const noseTip = landmarks[1];
-          // Left eye outer (landmark 33), right eye outer (landmark 263)
-          const leftEye = landmarks[33];
-          const rightEye = landmarks[263];
-          // Forehead (landmark 10)
-          const forehead = landmarks[10];
+          const noseTip = landmarks[1]; // Nose tip
+          const leftEye = landmarks[33]; // Left eye outer
+          const rightEye = landmarks[263]; // Right eye outer
+          const forehead = landmarks[10]; // Forehead center
+          const chin = landmarks[152]; // Chin
 
-          // X: horizontal head position (left/right turn)
-          const eyeCenterX = (leftEye.x + rightEye.x) / 2;
-          const rawX = -(eyeCenterX - 0.5) * 2; // Invert: webcam is mirrored
+          // --- ROTATION component (primary, 85%) ---
 
-          // Y: head pitch (nod up/down) — measured by angle between
-          // forehead-to-nose vector vs vertical. When looking down,
-          // nose drops below eye line; when looking up, nose rises.
-          const eyeCenterY = (leftEye.y + rightEye.y) / 2;
-          const noseOffsetY = noseTip.y - eyeCenterY; // positive = nose below eyes
-          const foreheadToEyeY = eyeCenterY - forehead.y; // face height reference
-          // Normalize pitch: 0 = neutral, negative = looking up, positive = looking down
-          const pitchRatio = foreheadToEyeY > 0.01
-            ? (noseOffsetY / foreheadToEyeY - 1.2) // 1.2 = neutral nose-below-eyes ratio
-            : 0;
-          const rawY = clamp(-pitchRatio * 1.5, -1, 1); // Invert: look down → view down
+          // Yaw: nose offset relative to eye midpoint, normalized by eye distance
+          const eyeDistance = rightEye.x - leftEye.x;
+          const eyeMidX = (leftEye.x + rightEye.x) / 2;
+          const noseDeltaX = noseTip.x - eyeMidX;
+          const halfEyeDist = Math.max(eyeDistance * 0.5, 0.01);
+          // asin gives rotation angle; clamp input to [-1,1] for safety
+          const yaw = Math.asin(clamp(noseDeltaX / halfEyeDist, -1, 1));
 
-          // Depth from inter-ocular distance (closer = larger distance)
+          // Pitch: nose offset below eye line, normalized by face height
+          const faceHeight = Math.max(chin.y - forehead.y, 0.01);
+          const eyeMidY = (leftEye.y + rightEye.y) / 2;
+          const noseDeltaY = noseTip.y - (forehead.y + faceHeight * 0.45);
+          const pitch = Math.asin(
+            clamp(noseDeltaY / (faceHeight * 0.5), -1, 1)
+          );
+
+          // Normalize rotation to [-1, 1] range
+          const rotX = clamp(yaw * YAW_SENSITIVITY, -1, 1);
+          const rotY = clamp(-pitch * PITCH_SENSITIVITY, -1, 1);
+
+          // --- POSITION component (secondary, 15%) ---
+          // Raw face center position in frame (0-1 → -1 to 1)
+          const posX = -(eyeMidX - 0.5) * 2; // Invert: webcam is mirrored
+          const posY = -(eyeMidY - 0.5) * 2; // Invert: webcam Y is top-down
+
+          // --- BLEND rotation + position ---
+          const rawX = (ROTATION_WEIGHT * rotX) +
+            (POSITION_WEIGHT * posX * POSITION_SENSITIVITY);
+          const rawY = (ROTATION_WEIGHT * rotY) +
+            (POSITION_WEIGHT * posY * POSITION_SENSITIVITY);
+
+          // Depth from inter-ocular distance
           const eyeDist = Math.sqrt(
             (rightEye.x - leftEye.x) ** 2 + (rightEye.y - leftEye.y) ** 2
           );
