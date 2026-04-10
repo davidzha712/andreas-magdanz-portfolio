@@ -342,7 +342,6 @@ export default function PdfBookViewer({
         }
       } catch (err) {
         if (!cancelled) {
-          console.error("PDF load error:", err);
           setError(t.error);
           setIsLoading(false);
         }

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 
-export interface HeadPosition {
+interface HeadPosition {
   x: number; // -1 to 1 (left to right)
   y: number; // -1 to 1 (down to up)
   z: number; // 0.5 to 2.0 (close to far)
@@ -11,7 +11,6 @@ export interface HeadPosition {
 interface HeadTrackingState {
   position: HeadPosition;
   isTracking: boolean;
-  error: string | null;
   requestPermission: () => void;
 }
 
@@ -35,7 +34,6 @@ function clamp(value: number, min: number, max: number): number {
 
 export function useHeadTracking(): HeadTrackingState {
   const [isTracking, setIsTracking] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const positionRef = useRef<HeadPosition>({ ...DEFAULT_POSITION });
   const smoothedRef = useRef<HeadPosition>({ ...DEFAULT_POSITION });
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -59,8 +57,6 @@ export function useHeadTracking(): HeadTrackingState {
 
   const requestPermission = useCallback(async () => {
     try {
-      setError(null);
-
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user", width: 320, height: 240 },
       });
@@ -175,9 +171,6 @@ export function useHeadTracking(): HeadTrackingState {
 
       rafRef.current = requestAnimationFrame(detect);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Camera access denied";
-      setError(message);
       setIsTracking(false);
     }
   }, []);
@@ -189,7 +182,6 @@ export function useHeadTracking(): HeadTrackingState {
   return {
     position: smoothedRef.current,
     isTracking,
-    error,
     requestPermission,
   };
 }
