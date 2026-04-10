@@ -1,12 +1,3 @@
-interface PortableTextSpanLike {
-  text?: string;
-}
-
-interface PortableTextBlockLike {
-  _type?: string;
-  children?: PortableTextSpanLike[];
-}
-
 interface MediaItemLike {
   _id: string;
   mediaType: string;
@@ -18,26 +9,6 @@ interface SearchableMediaItemLike extends MediaItemLike {
   date?: string;
   descriptionText?: string | null;
   externalUrl?: string | null;
-}
-
-export function portableTextToPlainText(
-  blocks?: PortableTextBlockLike[] | null
-): string {
-  if (!blocks?.length) return "";
-
-  return blocks
-    .flatMap((block) => {
-      if (block?._type !== "block") return [];
-
-      const text = block.children
-        ?.map((child) => child.text ?? "")
-        .join("")
-        .replace(/\s+/g, " ")
-        .trim();
-
-      return text ? [text] : [];
-    })
-    .join(" ");
 }
 
 function sanitizeAnchorSegment(value: string): string {

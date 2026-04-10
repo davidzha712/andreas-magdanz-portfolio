@@ -67,7 +67,6 @@ export const allExhibitionsQuery = defineQuery(
       $locale == "en" => coalesce(descriptionEn, description),
       description
     ),
-    relatedProject->{ _id, title, slug }
   }`
 );
 

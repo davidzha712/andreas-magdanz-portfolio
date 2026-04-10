@@ -28,8 +28,7 @@
   "about": {
     "title": "Andreas Magdanz",
     "subtitle": "Photographer — Aachen, Germany",
-    "representation": "Representation",
-    "teaching": "Teaching"
+    "representation": "Representation"
   },
   "cv": {
     "title": "Curriculum Vitae",
@@ -48,8 +47,7 @@
     "description": "Selected solo and group exhibitions.",
     "solo": "Solo",
     "group": "Group",
-    "all": "All",
-    "filter": "Filter"
+    "all": "All"
   },
   "publications": {
     "title": "Publications",
@@ -62,9 +60,7 @@
     "video": "Video",
     "press": "Press",
     "read": "Read",
-    "close": "Close",
     "listen": "Listen",
-    "watchVideo": "Watch Video",
     "viewPdf": "Open PDF",
     "openArticle": "Open article",
     "pdfAvailable": "This article is available as a PDF.",
@@ -97,18 +93,11 @@
   },
   "search": {
     "placeholder": "Search…",
-    "close": "Close",
     "noResults": "No results found.",
     "work": "Work",
     "exhibitions": "Exhibitions",
     "publications": "Publications",
     "cv": "CV",
     "media": "Media"
-  },
-  "common": {
-    "backToTop": "Back to top",
-    "viewAll": "View all",
-    "readMore": "Read more",
-    "noResults": "No results found."
   }
 }
