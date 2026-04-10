@@ -170,7 +170,7 @@ export function useHeadTracking(): HeadTrackingState {
       };
 
       rafRef.current = requestAnimationFrame(detect);
-    } catch (err) {
+    } catch {
       setIsTracking(false);
     }
   }, []);

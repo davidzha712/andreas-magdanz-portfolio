@@ -25,11 +25,15 @@ export default function Nav() {
   const t = useTranslations("nav");
   const pathname = usePathname();
 
-  // Close mobile nav on route change (also unlocks body scroll via effect below)
+  // Close mobile nav and search on route change. This must run as an effect so
+  // browser back/forward and direct URL changes also trigger it; the functional
+  // updaters let React bail out when state is already false.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    setMobileOpen(false);
-    setSearchOpen(false);
+    setMobileOpen((prev) => (prev ? false : prev));
+    setSearchOpen((prev) => (prev ? false : prev));
   }, [pathname]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     const handleScroll = () => {
