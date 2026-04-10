@@ -40,142 +40,163 @@ export default async function DatenschutzPage({
           {t("draftNotice")}
         </p>
 
-        <div className="space-y-10 font-sans text-sm text-fg-muted leading-relaxed">
+        <div className="space-y-12 font-sans text-sm text-fg-muted leading-relaxed">
+          {/* 1. Overview */}
           <section>
             <h2 className="font-serif text-2xl text-fg mb-4">
-              1. Verantwortlicher
-            </h2>
-            <p>
-              Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO)
-              ist:
-            </p>
-            <address className="not-italic whitespace-pre-line mt-3">
-              {/* TODO: Controller contact — same as Impressum */}
-              Andreas Magdanz{"\n"}
-              [Straße und Hausnummer]{"\n"}
-              [PLZ Ort]{"\n"}
-              Deutschland{"\n"}
-              E-Mail: [E-Mail-Adresse]
-            </address>
-          </section>
-
-          <section>
-            <h2 className="font-serif text-2xl text-fg mb-4">
-              2. Datenerfassung auf unserer Website
+              {t("datenschutz.overview.title")}
             </h2>
             <h3 className="font-serif text-lg text-fg mt-4 mb-2">
-              Server-Log-Dateien
+              {t("datenschutz.overview.generalHeading")}
+            </h3>
+            <p>{t("datenschutz.overview.general")}</p>
+            <h3 className="font-serif text-lg text-fg mt-6 mb-2">
+              {t("datenschutz.overview.collectionHeading")}
+            </h3>
+            <p>{t("datenschutz.overview.collection")}</p>
+          </section>
+
+          {/* 2. Controller */}
+          <section>
+            <h2 className="font-serif text-2xl text-fg mb-4">
+              {t("datenschutz.controller.title")}
+            </h2>
+            <p>{t("datenschutz.controller.intro")}</p>
+            <address className="not-italic whitespace-pre-line mt-3">
+              {"[Name]\n[Straße und Hausnummer]\n[PLZ Ort]\nDeutschland"}
+            </address>
+            <p className="mt-2">
+              {t("datenschutz.controller.emailLabel")}: [E-Mail]
+            </p>
+          </section>
+
+          {/* 3. Collection */}
+          <section>
+            <h2 className="font-serif text-2xl text-fg mb-4">
+              {t("datenschutz.collection.title")}
+            </h2>
+            <h3 className="font-serif text-lg text-fg mt-4 mb-2">
+              {t("datenschutz.collection.logsHeading")}
+            </h3>
+            <p>{t("datenschutz.collection.logs")}</p>
+
+            <h3 className="font-serif text-lg text-fg mt-6 mb-2">
+              {t("datenschutz.collection.formHeading")}
+            </h3>
+            <p>{t("datenschutz.collection.form")}</p>
+          </section>
+
+          {/* 4. Processors */}
+          <section>
+            <h2 className="font-serif text-2xl text-fg mb-4">
+              {t("datenschutz.processors.title")}
+            </h2>
+            <p>{t("datenschutz.processors.intro")}</p>
+
+            <h3 className="font-serif text-lg text-fg mt-6 mb-2">
+              {t("datenschutz.processors.vercelHeading")}
             </h3>
             <p>
-              Der Provider der Seiten erhebt und speichert automatisch
-              Informationen in sogenannten Server-Log-Dateien, die Ihr Browser
-              automatisch an uns übermittelt. Dies sind: Browsertyp und
-              Browserversion, verwendetes Betriebssystem, Referrer URL, Hostname
-              des zugreifenden Rechners, Uhrzeit der Serveranfrage und
-              IP-Adresse. Eine Zusammenführung dieser Daten mit anderen
-              Datenquellen wird nicht vorgenommen. Rechtsgrundlage: Art. 6 Abs.
-              1 lit. f DSGVO (berechtigtes Interesse an technisch fehlerfreier
-              Darstellung).
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-serif text-2xl text-fg mb-4">3. Cookies</h2>
-            <p>
-              {/* TODO: Adjust if tracking cookies are added */}
-              Unsere Website verwendet ausschließlich technisch notwendige
-              Cookies, die für den Betrieb der Seite erforderlich sind (z. B.
-              zum Speichern der Spracheinstellung und des Farbschemas). Es
-              werden keine Tracking- oder Marketing-Cookies eingesetzt.
-              Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-serif text-2xl text-fg mb-4">
-              4. Kontaktformular
-            </h2>
-            <p>
-              Wenn Sie uns per Kontaktformular Anfragen zukommen lassen, werden
-              Ihre Angaben aus dem Anfrageformular inklusive der von Ihnen dort
-              angegebenen Kontaktdaten zwecks Bearbeitung der Anfrage und für
-              den Fall von Anschlussfragen bei uns gespeichert. Der Versand
-              erfolgt über den Dienstleister{" "}
-              <strong className="text-fg">Resend</strong> (Resend, Inc., USA),
-              der als Auftragsverarbeiter gemäß Art. 28 DSGVO tätig wird.
-              Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Vertragsanbahnung)
-              bzw. Art. 6 Abs. 1 lit. f DSGVO.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-serif text-2xl text-fg mb-4">
-              5. Inhalte aus dem CMS (Sanity)
-            </h2>
-            <p>
-              Redaktionelle Inhalte dieser Website werden über das
-              Content-Management-System{" "}
-              <strong className="text-fg">Sanity</strong> (Sanity.io, Norwegen)
-              verwaltet und ausgeliefert. Beim Abruf von Bildern und Inhalten
-              wird Ihre IP-Adresse technisch bedingt an Sanity übermittelt.
-              Sanity ist ein Auftragsverarbeiter gemäß Art. 28 DSGVO.
-              Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-serif text-2xl text-fg mb-4">6. Hosting</h2>
-            <p>
-              Diese Website wird bei{" "}
-              <strong className="text-fg">Vercel Inc.</strong> (340 S Lemon Ave
-              #4133, Walnut, CA 91789, USA) gehostet. Vercel verarbeitet in
-              unserem Auftrag personenbezogene Daten (insbesondere IP-Adressen
-              in Server-Logs) als Auftragsverarbeiter gemäß Art. 28 DSGVO. Da
-              eine Übermittlung in die USA stattfinden kann, stützen wir uns
-              hierfür auf die Standardvertragsklauseln der EU-Kommission sowie
-              ggf. das EU-US Data Privacy Framework. Weitere Informationen
-              finden Sie in der Datenschutzerklärung von Vercel:{" "}
+              {t("datenschutz.processors.vercel")}{" "}
               <a
-                href="https://vercel.com/legal/privacy-policy"
+                href="https://vercel.com/legal/dpa"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-accent hover:text-fg transition-colors"
+                className="text-accent hover:text-fg transition-colors underline underline-offset-4"
               >
-                vercel.com/legal/privacy-policy
+                {t("datenschutz.processors.vercelDpaLabel")}
               </a>
               .
             </p>
+
+            <h3 className="font-serif text-lg text-fg mt-6 mb-2">
+              {t("datenschutz.processors.sanityHeading")}
+            </h3>
+            <p>
+              {t("datenschutz.processors.sanity")}{" "}
+              <a
+                href="https://www.sanity.io/legal/dpa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent hover:text-fg transition-colors underline underline-offset-4"
+              >
+                {t("datenschutz.processors.sanityDpaLabel")}
+              </a>
+              .
+            </p>
+
+            <h3 className="font-serif text-lg text-fg mt-6 mb-2">
+              {t("datenschutz.processors.resendHeading")}
+            </h3>
+            <p>
+              {t("datenschutz.processors.resend")}{" "}
+              <a
+                href="https://resend.com/legal/dpa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent hover:text-fg transition-colors underline underline-offset-4"
+              >
+                {t("datenschutz.processors.resendDpaLabel")}
+              </a>
+              .
+            </p>
+
+            <h3 className="font-serif text-lg text-fg mt-6 mb-2">
+              {t("datenschutz.processors.fontsHeading")}
+            </h3>
+            <p>{t("datenschutz.processors.fonts")}</p>
+
+            <h3 className="font-serif text-lg text-fg mt-6 mb-2">
+              {t("datenschutz.processors.mediapipeHeading")}
+            </h3>
+            <p>{t("datenschutz.processors.mediapipe")}</p>
           </section>
 
+          {/* 5. Cookies */}
           <section>
             <h2 className="font-serif text-2xl text-fg mb-4">
-              7. Ihre Rechte
+              {t("datenschutz.cookies.title")}
             </h2>
-            <p>
-              Sie haben jederzeit das Recht auf unentgeltliche Auskunft über
-              Ihre gespeicherten personenbezogenen Daten, deren Herkunft und
-              Empfänger und den Zweck der Datenverarbeitung sowie ein Recht auf
-              Berichtigung, Sperrung oder Löschung dieser Daten. Ihnen stehen
-              insbesondere folgende Rechte zu:
-            </p>
-            <ul className="list-disc pl-6 mt-3 space-y-1">
-              <li>Recht auf Auskunft (Art. 15 DSGVO)</li>
-              <li>Recht auf Berichtigung (Art. 16 DSGVO)</li>
-              <li>Recht auf Löschung (Art. 17 DSGVO)</li>
-              <li>
-                Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO)
-              </li>
-              <li>Recht auf Datenübertragbarkeit (Art. 20 DSGVO)</li>
-              <li>Widerspruchsrecht (Art. 21 DSGVO)</li>
-              <li>
-                Beschwerderecht bei einer Aufsichtsbehörde (Art. 77 DSGVO)
-              </li>
-            </ul>
-            <p className="mt-3">
-              Zur Ausübung Ihrer Rechte wenden Sie sich bitte an den oben
-              genannten Verantwortlichen.
-            </p>
+            <p>{t("datenschutz.cookies.body")}</p>
           </section>
+
+          {/* 6. Rights */}
+          <section>
+            <h2 className="font-serif text-2xl text-fg mb-4">
+              {t("datenschutz.rights.title")}
+            </h2>
+            <p>{t("datenschutz.rights.intro")}</p>
+            <ul className="list-disc pl-6 mt-4 space-y-2">
+              <li>{t("datenschutz.rights.access")}</li>
+              <li>{t("datenschutz.rights.rectification")}</li>
+              <li>{t("datenschutz.rights.erasure")}</li>
+              <li>{t("datenschutz.rights.restriction")}</li>
+              <li>{t("datenschutz.rights.portability")}</li>
+              <li>{t("datenschutz.rights.objection")}</li>
+              <li>{t("datenschutz.rights.complaint")}</li>
+            </ul>
+            <p className="mt-4">{t("datenschutz.rights.outro")}</p>
+          </section>
+
+          {/* 7. SSL */}
+          <section>
+            <h2 className="font-serif text-2xl text-fg mb-4">
+              {t("datenschutz.ssl.title")}
+            </h2>
+            <p>{t("datenschutz.ssl.body")}</p>
+          </section>
+
+          {/* 8. Changes */}
+          <section>
+            <h2 className="font-serif text-2xl text-fg mb-4">
+              {t("datenschutz.changes.title")}
+            </h2>
+            <p>{t("datenschutz.changes.body")}</p>
+          </section>
+
+          <p className="pt-6 text-xs text-fg-muted/70">
+            {t("lastUpdatedLabel")}: {t("lastUpdatedDate")}
+          </p>
         </div>
       </div>
     </div>

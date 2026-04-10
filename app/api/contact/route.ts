@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
 export const runtime = "nodejs";
 
@@ -24,40 +26,74 @@ function escapeHtml(input: string): string {
     .replace(/'/g, "&#39;");
 }
 
-// In-memory rate limiter: 3 requests per 10 minutes per IP.
-// NOTE: This is per-instance only. On Vercel serverless / multi-region
-// deployments it provides only best-effort protection. For production use
-// a distributed store such as Upstash Redis (@upstash/ratelimit).
-const RATE_LIMIT_MAX = 3;
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const rateLimitMap = new Map<string, number[]>();
+// ---------------------------------------------------------------------------
+// Rate limiting
+//
+// Prefer Upstash Redis (works across Vercel's multi-region serverless). When
+// the Upstash env vars are missing, fall back to an in-memory limiter so that
+// local development and preview deployments continue to work without manual
+// configuration.
+// ---------------------------------------------------------------------------
 
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const timestamps = rateLimitMap.get(ip) ?? [];
-  const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+const hasUpstash = Boolean(
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+);
 
-  if (recent.length >= RATE_LIMIT_MAX) {
-    rateLimitMap.set(ip, recent);
-    return false;
+const upstashRatelimit = hasUpstash
+  ? new Ratelimit({
+      redis: Redis.fromEnv(),
+      limiter: Ratelimit.slidingWindow(3, "10 m"),
+      analytics: true,
+      prefix: "ratelimit:contact",
+    })
+  : null;
+
+if (!hasUpstash && process.env.NODE_ENV === "production") {
+  console.warn(
+    "[contact] UPSTASH_REDIS_REST_URL not set — falling back to in-memory rate limiter. Not recommended for production."
+  );
+}
+
+const IN_MEMORY_WINDOW_MS = 10 * 60 * 1000;
+const IN_MEMORY_LIMIT = 3;
+const inMemoryHits = new Map<string, number[]>();
+
+async function checkRateLimit(ip: string): Promise<{ allowed: boolean }> {
+  if (upstashRatelimit) {
+    const { success } = await upstashRatelimit.limit(ip);
+    return { allowed: success };
   }
 
-  recent.push(now);
-  rateLimitMap.set(ip, recent);
+  const now = Date.now();
+  const hits = (inMemoryHits.get(ip) ?? []).filter(
+    (t) => now - t < IN_MEMORY_WINDOW_MS
+  );
+  if (hits.length >= IN_MEMORY_LIMIT) {
+    return { allowed: false };
+  }
+  inMemoryHits.set(ip, [...hits, now]);
 
   // Opportunistic cleanup to prevent unbounded growth
-  if (rateLimitMap.size > 5000) {
-    rateLimitMap.forEach((times, key) => {
-      const kept = times.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  if (inMemoryHits.size > 5000) {
+    inMemoryHits.forEach((times, key) => {
+      const kept = times.filter((t) => now - t < IN_MEMORY_WINDOW_MS);
       if (kept.length === 0) {
-        rateLimitMap.delete(key);
+        inMemoryHits.delete(key);
       } else {
-        rateLimitMap.set(key, kept);
+        inMemoryHits.set(key, kept);
       }
     });
   }
 
-  return true;
+  return { allowed: true };
+}
+
+function getClientIp(request: NextRequest): string {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0]?.trim() || "unknown";
+  }
+  return request.headers.get("x-real-ip") ?? "unknown";
 }
 
 export async function POST(request: NextRequest) {
@@ -76,11 +112,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  // Rate limit per IP
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-
-  if (!checkRateLimit(ip)) {
+  // Rate limit per IP (Upstash with in-memory fallback)
+  const ip = getClientIp(request);
+  const { allowed } = await checkRateLimit(ip);
+  if (!allowed) {
     return NextResponse.json(
       { error: "Too many requests. Please try again later." },
       { status: 429 }

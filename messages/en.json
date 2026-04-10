@@ -104,9 +104,113 @@
     "home": "Back to home"
   },
   "legal": {
-    "draftNotice": "This page is a draft pending legal review before publication.",
     "impressumTitle": "Imprint",
-    "datenschutzTitle": "Privacy Policy"
+    "datenschutzTitle": "Privacy Policy",
+    "draftNotice": "Draft — pending legal review. Personal details will be added before publication.",
+    "lastUpdatedLabel": "Last updated",
+    "lastUpdatedDate": "10 April 2026",
+    "impressum": {
+      "tmg": {
+        "title": "Information according to § 5 TMG",
+        "nameLabel": "Name",
+        "addressLabel": "Address",
+        "countryLabel": "Country",
+        "country": "Germany"
+      },
+      "contact": {
+        "title": "Contact",
+        "phoneLabel": "Phone",
+        "emailLabel": "Email"
+      },
+      "vat": {
+        "title": "VAT Identification Number",
+        "body": "VAT identification number according to § 27 a of the German VAT Act (UStG):"
+      },
+      "responsible": {
+        "title": "Responsible for content according to § 55 (2) RStV"
+      },
+      "disclaimer": {
+        "title": "Disclaimer",
+        "contentHeading": "Liability for Content",
+        "content": "The contents of these pages have been created with the greatest possible care. However, we cannot guarantee the accuracy, completeness, or timeliness of the content. As a service provider, we are responsible for our own content on these pages in accordance with § 7 (1) TMG and general legislation. According to §§ 8 to 10 TMG, however, we as a service provider are not obligated to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity. Obligations to remove or block the use of information under general laws remain unaffected. However, liability in this respect is only possible from the time of knowledge of a specific infringement. Upon becoming aware of any such legal violations, we will remove the content immediately.",
+        "linksHeading": "Liability for Links",
+        "links": "Our website contains links to external third-party websites over whose content we have no influence. Therefore, we cannot assume any liability for this external content. The respective provider or operator of the linked pages is always responsible for their content. The linked pages were checked for possible legal violations at the time of linking. Illegal content was not recognisable at the time of linking. However, permanent content monitoring of the linked pages is not reasonable without concrete indications of an infringement. Upon becoming aware of any legal violations, we will remove such links immediately.",
+        "copyrightHeading": "Copyright",
+        "copyright": "The content and works on these pages created by the site operator are subject to German copyright law. Duplication, processing, distribution, and any form of commercialisation of such material beyond the scope of the copyright law require the written consent of the respective author or creator. Downloads and copies of this site are only permitted for private, non-commercial use. Insofar as the content on this site was not created by the operator, the copyrights of third parties are respected. In particular, third-party content is identified as such. Should you nevertheless become aware of a copyright infringement, please inform us accordingly. Upon becoming aware of any legal violations, we will remove such content immediately."
+      },
+      "euDispute": {
+        "title": "EU Dispute Resolution",
+        "body": "The European Commission provides a platform for online dispute resolution (ODR):",
+        "linkLabel": "ec.europa.eu/consumers/odr",
+        "suffix": "You can find our email address above in the imprint."
+      },
+      "consumerDispute": {
+        "title": "Consumer Dispute Resolution",
+        "body": "We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board."
+      }
+    },
+    "datenschutz": {
+      "overview": {
+        "title": "1. Privacy at a Glance",
+        "generalHeading": "General Information",
+        "general": "The following notices provide a simple overview of what happens to your personal data when you visit this website. Personal data is any data with which you can be personally identified. For detailed information on the subject of data protection, please refer to our privacy policy listed in this text.",
+        "collectionHeading": "Data Collection on This Website",
+        "collection": "Data processing on this website is carried out by the website operator. You can find their contact details in the \"Controller\" section of this privacy policy. Your data is collected in two ways: either because you provide it to us (e.g. via the contact form), or automatically when you visit the site via our IT systems (server log files). As soon as you enter this website, this data is collected automatically."
+      },
+      "controller": {
+        "title": "2. Controller",
+        "intro": "The controller responsible for data processing on this website within the meaning of the General Data Protection Regulation (GDPR) is:",
+        "emailLabel": "Email"
+      },
+      "collection": {
+        "title": "3. Data Collection on This Website",
+        "logsHeading": "Server Log Files",
+        "logs": "The provider of these pages automatically collects and stores information in so-called server log files, which your browser transmits to us automatically. This includes: browser type and browser version, operating system used, referrer URL, hostname of the accessing computer, time of the server request, and IP address. This data is not merged with other data sources. The collection of this data is based on Art. 6 (1) lit. f GDPR. The website operator has a legitimate interest in the technically error-free presentation and optimisation of the website — for this purpose, server log files must be collected. Log data is automatically deleted no later than seven days after collection, unless security-relevant incidents require longer retention.",
+        "formHeading": "Contact Form",
+        "form": "If you send us enquiries via the contact form, your details from the enquiry form, including the contact details you provided there, will be stored by us for the purpose of processing the enquiry and in case of follow-up questions. We do not share this data without your consent. The processing of this data is based on Art. 6 (1) lit. b GDPR, provided your request is related to the performance of a contract or is necessary to carry out pre-contractual measures. In all other cases, the processing is based on our legitimate interest in the effective handling of enquiries addressed to us (Art. 6 (1) lit. f GDPR). Email delivery is handled by the service provider Resend (see Processors). The data you enter in the contact form will remain with us until you request deletion, revoke your consent to its storage, or the purpose for its storage no longer applies."
+      },
+      "processors": {
+        "title": "4. Data Processors",
+        "intro": "We use the following service providers as processors within the meaning of Art. 28 GDPR. Appropriate data processing agreements are in place with all of them.",
+        "vercelHeading": "Vercel Inc. (Hosting)",
+        "vercel": "This website is hosted by Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA. Vercel processes personal data on our behalf (in particular IP addresses in server logs). Data may be transferred to the USA; for this we rely on the EU Standard Contractual Clauses and, where applicable, the EU-US Data Privacy Framework. Data processing agreement:",
+        "vercelDpaLabel": "vercel.com/legal/dpa",
+        "sanityHeading": "Sanity.io (Content Management System)",
+        "sanity": "Editorial content of this website is managed and delivered via the Sanity content management system (Sanity.io, Lysaker, Norway). When retrieving images and content, your IP address is technically transmitted to Sanity or its CDN. Data processing agreement:",
+        "sanityDpaLabel": "sanity.io/legal/dpa",
+        "resendHeading": "Resend, Inc. (Transactional Email)",
+        "resend": "For sending messages from the contact form we use the service Resend (Resend, Inc., 2261 Market Street #5039, San Francisco, CA 94114, USA). The data you enter in the contact form is transmitted to Resend for this purpose and processed there. Data processing agreement:",
+        "resendDpaLabel": "resend.com/legal/dpa",
+        "fontsHeading": "Google Fonts (self-hosted)",
+        "fonts": "To display fonts consistently, we use Google Fonts. The fonts used (Cormorant Garamond, DM Sans) are downloaded at build time via next/font and served from our own server or from Vercel. No connection is made to Google servers and no personal data is transmitted to Google.",
+        "mediapipeHeading": "MediaPipe (Head Tracking, Optional)",
+        "mediapipe": "The homepage offers an optional interactive 3D scene with head-movement controls. For this we use Google's MediaPipe library. It is activated only with your explicit consent (camera permission in the browser). Image processing takes place entirely locally in your browser; neither images nor landmarks are transmitted to us or to third parties. The model files required for initialisation are loaded from a public CDN (jsDelivr); in doing so, your IP address may be technically transmitted to the CDN operator."
+      },
+      "cookies": {
+        "title": "5. Cookies",
+        "body": "Our website uses exclusively technically necessary cookies or equivalent storage mechanisms. Specifically, we set one cookie or local storage entry to remember your theme preference (light/dark mode) via the next-themes library. This cookie contains no personal data, enables no tracking, and is not shared with third parties. No analytics, marketing, or third-party tracking cookies are used. The legal basis is Art. 6 (1) lit. f GDPR and § 25 (2) No. 2 TTDSG (strictly necessary storage)."
+      },
+      "rights": {
+        "title": "6. Your Rights",
+        "intro": "You have the right at any time to free information about your stored personal data, its origin and recipients, and the purpose of data processing, as well as the right to rectification or deletion of this data. In particular, you have the following rights:",
+        "access": "Right of access (Art. 15 GDPR) — you may request information about whether and which personal data we process about you.",
+        "rectification": "Right to rectification (Art. 16 GDPR) — you may request the correction of inaccurate or the completion of incomplete data.",
+        "erasure": "Right to erasure (Art. 17 GDPR) — you may request the deletion of your data, provided the legal requirements are met.",
+        "restriction": "Right to restriction of processing (Art. 18 GDPR) — under certain conditions you may request that processing be restricted.",
+        "portability": "Right to data portability (Art. 20 GDPR) — you may request that we provide your data in a structured, commonly used, and machine-readable format.",
+        "objection": "Right to object (Art. 21 GDPR) — you may object at any time to the processing of your data where it is based on legitimate interests.",
+        "complaint": "Right to lodge a complaint with a supervisory authority (Art. 77 GDPR) — you have the right to lodge a complaint with a data protection supervisory authority, for example the State Commissioner for Data Protection and Freedom of Information of North Rhine-Westphalia (LfDI NRW), Kavalleriestraße 2-4, 40213 Düsseldorf, Germany.",
+        "outro": "To exercise your rights, an informal message to the controller's address above is sufficient."
+      },
+      "ssl": {
+        "title": "7. SSL/TLS Encryption",
+        "body": "For security reasons and to protect the transmission of confidential content, such as enquiries you send to us as the site operator, this site uses SSL/TLS encryption. You can recognise an encrypted connection by the fact that the browser's address line changes from \"http://\" to \"https://\" and by the lock symbol in your browser bar. When SSL/TLS encryption is activated, the data you transmit to us cannot be read by third parties."
+      },
+      "changes": {
+        "title": "8. Changes to This Privacy Policy",
+        "body": "We reserve the right to adapt this privacy policy occasionally so that it always complies with current legal requirements or to implement changes to our services in the privacy policy, e.g. when introducing new services. The new privacy policy will then apply to your next visit."
+      }
+    }
   },
   "search": {
     "placeholder": "Search…",

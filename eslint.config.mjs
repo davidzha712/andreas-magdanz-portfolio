@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Minified third-party worker bundle shipped with react-pdf
+    "public/pdf.worker.min.mjs",
   ]),
 ]);
 
