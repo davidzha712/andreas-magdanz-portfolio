@@ -206,7 +206,7 @@ export default function Hero3DScene({
     if (!isLoaded) return;
 
     if (headTracking.isTracking) {
-      gazeTargetH.current = -headTracking.position.x * GAZE_RANGE_H; // turn right → look right (negative lon)
+      gazeTargetH.current = headTracking.position.x * GAZE_RANGE_H;
       gazeTargetV.current = headTracking.position.y * GAZE_RANGE_V;
       pauseDrift(DRIFT_RESUME_PASSIVE);
       return;
@@ -288,8 +288,8 @@ export default function Hero3DScene({
       if (!isDragging.current) return;
       const dx = e.clientX - lastX;
       const dy = e.clientY - lastY;
-      dragVelLon.current = -dx * sensitivity; // drag right → look right (decrease lon)
-      dragVelLat.current = -dy * sensitivity; // drag up → look up (increase lat)
+      dragVelLon.current = -dx * sensitivity;
+      dragVelLat.current = dy * sensitivity;
       dragLon.current += dragVelLon.current;
       dragLat.current += dragVelLat.current;
       dragLat.current = clamp(dragLat.current, -85, 85);
