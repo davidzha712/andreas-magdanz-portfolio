@@ -211,4 +211,20 @@ export interface SiteSettings {
   universityInfo?: string;
   universityInfoEn?: string;
   universityAddress?: string;
+  legalInfo?: LegalInfo;
+}
+
+export interface LegalInfo {
+  legalName?: string;
+  street?: string;
+  postalCode?: string;
+  city?: string;
+  country?: string;
+  phone?: string;
+  email?: string;
+  vatId?: string;
+  responsibleName?: string;
+  responsibleAddress?: string;
+  supervisoryAuthority?: string;
+  published?: boolean;
 }

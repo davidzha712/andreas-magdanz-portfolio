@@ -1,4 +1,32 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { client } from "@/lib/sanity/client";
+import { siteSettingsQuery } from "@/lib/sanity/queries";
+import type { SiteSettings, LegalInfo } from "@/types/sanity";
+
+export const revalidate = 60;
+
+const PLACEHOLDER = {
+  name: "[Name]",
+  street: "[Straße und Hausnummer]",
+  postalCode: "[PLZ]",
+  city: "[Ort]",
+  phone: "[Telefon]",
+  email: "[E-Mail]",
+  vatId: "[USt-IdNr.]",
+} as const;
+
+function isFullyConfigured(legal: LegalInfo | undefined): boolean {
+  if (!legal) return false;
+  return Boolean(
+    legal.legalName?.trim() &&
+      legal.street?.trim() &&
+      legal.postalCode?.trim() &&
+      legal.city?.trim() &&
+      legal.phone?.trim() &&
+      legal.email?.trim() &&
+      legal.vatId?.trim()
+  );
+}
 
 export async function generateMetadata({
   params,
@@ -7,9 +35,20 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "legal" });
+  const settings = await client.fetch<SiteSettings | null>(
+    siteSettingsQuery,
+    { locale }
+  );
+
+  const isLive =
+    settings?.legalInfo?.published === true &&
+    isFullyConfigured(settings.legalInfo);
+
   return {
     title: `${t("impressumTitle")} — Andreas Magdanz`,
-    robots: { index: false, follow: false },
+    robots: isLive
+      ? { index: true, follow: true }
+      : { index: false, follow: false },
   };
 }
 
@@ -21,6 +60,27 @@ export default async function ImpressumPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("legal");
+  const settings = await client.fetch<SiteSettings | null>(
+    siteSettingsQuery,
+    { locale }
+  );
+
+  const legal = settings?.legalInfo;
+  const isLive =
+    legal?.published === true && isFullyConfigured(legal);
+
+  // Resolve fields with fallback to placeholders
+  const name = legal?.legalName?.trim() || PLACEHOLDER.name;
+  const street = legal?.street?.trim() || PLACEHOLDER.street;
+  const postalCode = legal?.postalCode?.trim() || PLACEHOLDER.postalCode;
+  const city = legal?.city?.trim() || PLACEHOLDER.city;
+  const country = legal?.country?.trim() || t("impressum.tmg.country");
+  const phone = legal?.phone?.trim() || PLACEHOLDER.phone;
+  const email = legal?.email?.trim() || PLACEHOLDER.email;
+  const vatId = legal?.vatId?.trim() || PLACEHOLDER.vatId;
+  const responsibleName = legal?.responsibleName?.trim() || name;
+  const responsibleAddress =
+    legal?.responsibleAddress?.trim() || `${street}\n${postalCode} ${city}`;
 
   return (
     <div className="px-8 md:px-12 lg:px-16 py-16">
@@ -32,13 +92,14 @@ export default async function ImpressumPage({
           <div className="mt-4 w-12 h-px bg-accent" />
         </header>
 
-        {/* Draft notice — remove after legal review */}
-        <p
-          className="mb-10 border border-accent/40 bg-accent/5 px-4 py-3 font-sans text-xs uppercase tracking-widest text-accent"
-          role="note"
-        >
-          {t("draftNotice")}
-        </p>
+        {!isLive && (
+          <p
+            className="mb-10 border border-accent/40 bg-accent/5 px-4 py-3 font-sans text-xs uppercase tracking-widest text-accent"
+            role="note"
+          >
+            {t("draftNotice")}
+          </p>
+        )}
 
         <div className="space-y-12 font-sans text-sm text-fg-muted leading-relaxed">
           {/* § 5 TMG */}
@@ -48,13 +109,13 @@ export default async function ImpressumPage({
             </h2>
             <dl className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-2">
               <dt className="text-fg">{t("impressum.tmg.nameLabel")}</dt>
-              <dd>[Name]</dd>
+              <dd>{name}</dd>
               <dt className="text-fg">{t("impressum.tmg.addressLabel")}</dt>
               <dd className="whitespace-pre-line">
-                {"[Straße und Hausnummer]\n[PLZ Ort]"}
+                {`${street}\n${postalCode} ${city}`}
               </dd>
               <dt className="text-fg">{t("impressum.tmg.countryLabel")}</dt>
-              <dd>{t("impressum.tmg.country")}</dd>
+              <dd>{country}</dd>
             </dl>
           </section>
 
@@ -65,9 +126,20 @@ export default async function ImpressumPage({
             </h2>
             <dl className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-2">
               <dt className="text-fg">{t("impressum.contact.phoneLabel")}</dt>
-              <dd>[Telefon]</dd>
+              <dd>{phone}</dd>
               <dt className="text-fg">{t("impressum.contact.emailLabel")}</dt>
-              <dd>[E-Mail]</dd>
+              <dd>
+                {legal?.email ? (
+                  <a
+                    href={`mailto:${email}`}
+                    className="hover:text-accent transition-colors"
+                  >
+                    {email}
+                  </a>
+                ) : (
+                  email
+                )}
+              </dd>
             </dl>
           </section>
 
@@ -77,7 +149,7 @@ export default async function ImpressumPage({
               {t("impressum.vat.title")}
             </h2>
             <p>
-              {t("impressum.vat.body")} <span>[USt-IdNr.]</span>
+              {t("impressum.vat.body")} <span>{vatId}</span>
             </p>
           </section>
 
@@ -87,7 +159,7 @@ export default async function ImpressumPage({
               {t("impressum.responsible.title")}
             </h2>
             <address className="not-italic whitespace-pre-line">
-              {"[Name]\n[Straße und Hausnummer]\n[PLZ Ort]"}
+              {`${responsibleName}\n${responsibleAddress}`}
             </address>
           </section>
 

@@ -1,4 +1,23 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { client } from "@/lib/sanity/client";
+import { siteSettingsQuery } from "@/lib/sanity/queries";
+import type { SiteSettings, LegalInfo } from "@/types/sanity";
+
+export const revalidate = 60;
+
+const DEFAULT_SUPERVISORY_AUTHORITY =
+  "Landesbeauftragte für Datenschutz und Informationsfreiheit Nordrhein-Westfalen (LfDI NRW), Kavalleriestraße 2-4, 40213 Düsseldorf";
+
+function isFullyConfigured(legal: LegalInfo | undefined): boolean {
+  if (!legal) return false;
+  return Boolean(
+    legal.legalName?.trim() &&
+      legal.street?.trim() &&
+      legal.postalCode?.trim() &&
+      legal.city?.trim() &&
+      legal.email?.trim()
+  );
+}
 
 export async function generateMetadata({
   params,
@@ -7,9 +26,20 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "legal" });
+  const settings = await client.fetch<SiteSettings | null>(
+    siteSettingsQuery,
+    { locale }
+  );
+
+  const isLive =
+    settings?.legalInfo?.published === true &&
+    isFullyConfigured(settings.legalInfo);
+
   return {
     title: `${t("datenschutzTitle")} — Andreas Magdanz`,
-    robots: { index: false, follow: false },
+    robots: isLive
+      ? { index: true, follow: true }
+      : { index: false, follow: false },
   };
 }
 
@@ -21,6 +51,25 @@ export default async function DatenschutzPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("legal");
+  const settings = await client.fetch<SiteSettings | null>(
+    siteSettingsQuery,
+    { locale }
+  );
+
+  const legal = settings?.legalInfo;
+  const isLive =
+    legal?.published === true && isFullyConfigured(legal);
+
+  const controllerName = legal?.legalName?.trim() || "[Name]";
+  const controllerStreet = legal?.street?.trim() || "[Straße und Hausnummer]";
+  const controllerCity =
+    legal?.postalCode?.trim() && legal?.city?.trim()
+      ? `${legal.postalCode.trim()} ${legal.city.trim()}`
+      : "[PLZ Ort]";
+  const controllerCountry = legal?.country?.trim() || "Deutschland";
+  const controllerEmail = legal?.email?.trim() || "[E-Mail]";
+  const supervisoryAuthority =
+    legal?.supervisoryAuthority?.trim() || DEFAULT_SUPERVISORY_AUTHORITY;
 
   return (
     <div className="px-8 md:px-12 lg:px-16 py-16">
@@ -32,13 +81,14 @@ export default async function DatenschutzPage({
           <div className="mt-4 w-12 h-px bg-accent" />
         </header>
 
-        {/* Draft notice — remove after legal review */}
-        <p
-          className="mb-10 border border-accent/40 bg-accent/5 px-4 py-3 font-sans text-xs uppercase tracking-widest text-accent"
-          role="note"
-        >
-          {t("draftNotice")}
-        </p>
+        {!isLive && (
+          <p
+            className="mb-10 border border-accent/40 bg-accent/5 px-4 py-3 font-sans text-xs uppercase tracking-widest text-accent"
+            role="note"
+          >
+            {t("draftNotice")}
+          </p>
+        )}
 
         <div className="space-y-12 font-sans text-sm text-fg-muted leading-relaxed">
           {/* 1. Overview */}
@@ -63,10 +113,20 @@ export default async function DatenschutzPage({
             </h2>
             <p>{t("datenschutz.controller.intro")}</p>
             <address className="not-italic whitespace-pre-line mt-3">
-              {"[Name]\n[Straße und Hausnummer]\n[PLZ Ort]\nDeutschland"}
+              {`${controllerName}\n${controllerStreet}\n${controllerCity}\n${controllerCountry}`}
             </address>
             <p className="mt-2">
-              {t("datenschutz.controller.emailLabel")}: [E-Mail]
+              {t("datenschutz.controller.emailLabel")}:{" "}
+              {legal?.email ? (
+                <a
+                  href={`mailto:${controllerEmail}`}
+                  className="hover:text-accent transition-colors"
+                >
+                  {controllerEmail}
+                </a>
+              ) : (
+                controllerEmail
+              )}
             </p>
           </section>
 
@@ -173,7 +233,10 @@ export default async function DatenschutzPage({
               <li>{t("datenschutz.rights.restriction")}</li>
               <li>{t("datenschutz.rights.portability")}</li>
               <li>{t("datenschutz.rights.objection")}</li>
-              <li>{t("datenschutz.rights.complaint")}</li>
+              <li>
+                {t("datenschutz.rights.complaintIntro")}
+                {supervisoryAuthority}.
+              </li>
             </ul>
             <p className="mt-4">{t("datenschutz.rights.outro")}</p>
           </section>

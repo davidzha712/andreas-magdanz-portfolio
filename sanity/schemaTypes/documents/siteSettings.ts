@@ -179,6 +179,96 @@ export const siteSettings = defineType({
       type: "text",
       rows: 3,
     }),
+    defineField({
+      name: "legalInfo",
+      title: "Rechtliche Angaben (Impressum / Datenschutz)",
+      type: "object",
+      description:
+        "Personenbezogene Daten für Impressum und Datenschutzerklärung. Erst NACH juristischer Prüfung 'Veröffentlicht' aktivieren — dies entfernt den Entwurfs-Hinweis und gibt die Seiten für Suchmaschinen frei.",
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({
+          name: "legalName",
+          title: "Name / Firma",
+          type: "string",
+          description: "Vollständiger Name (Vorname Nachname) oder Firmenname",
+        }),
+        defineField({
+          name: "street",
+          title: "Straße und Hausnummer",
+          type: "string",
+        }),
+        defineField({
+          name: "postalCode",
+          title: "PLZ",
+          type: "string",
+        }),
+        defineField({
+          name: "city",
+          title: "Stadt",
+          type: "string",
+        }),
+        defineField({
+          name: "country",
+          title: "Land",
+          type: "string",
+          initialValue: "Deutschland",
+        }),
+        defineField({
+          name: "phone",
+          title: "Telefon",
+          type: "string",
+        }),
+        defineField({
+          name: "email",
+          title: "E-Mail",
+          type: "string",
+          validation: (r) =>
+            r.custom((value) => {
+              if (!value) return true;
+              return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+                ? true
+                : "Ungültige E-Mail-Adresse";
+            }),
+        }),
+        defineField({
+          name: "vatId",
+          title: "Umsatzsteuer-ID (oder § 19 UStG Hinweis)",
+          type: "string",
+          description:
+            "Z. B. 'DE123456789' oder 'Kleinunternehmer gemäß § 19 UStG, daher keine USt-ID'",
+        }),
+        defineField({
+          name: "responsibleName",
+          title: "Verantwortlich für den Inhalt (§ 55 RStV) — Name",
+          type: "string",
+          description:
+            "Leer lassen, um denselben Namen wie oben zu verwenden",
+        }),
+        defineField({
+          name: "responsibleAddress",
+          title: "Verantwortlich für den Inhalt — Anschrift",
+          type: "string",
+          description:
+            "Leer lassen, um dieselbe Anschrift wie oben zu verwenden",
+        }),
+        defineField({
+          name: "supervisoryAuthority",
+          title: "Datenschutz-Aufsichtsbehörde",
+          type: "string",
+          description:
+            "Z. B. 'Landesbeauftragte für Datenschutz und Informationsfreiheit Nordrhein-Westfalen (LfDI NRW), Kavalleriestraße 2-4, 40213 Düsseldorf'. Leer = LfDI NRW Default.",
+        }),
+        defineField({
+          name: "published",
+          title: "Veröffentlicht (nach juristischer Prüfung)",
+          type: "boolean",
+          description:
+            "NUR aktivieren, wenn alle Pflichtfelder ausgefüllt UND ein Anwalt den Text geprüft hat. Aktivierung entfernt den 'Entwurf'-Banner und gibt die Seiten für Google frei (entfernt noindex).",
+          initialValue: false,
+        }),
+      ],
+    }),
   ],
   preview: {
     select: {
