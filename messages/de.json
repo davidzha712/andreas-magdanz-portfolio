@@ -199,7 +199,7 @@
         "restriction": "Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO) — Sie können unter bestimmten Voraussetzungen die Einschränkung der Verarbeitung verlangen.",
         "portability": "Recht auf Datenübertragbarkeit (Art. 20 DSGVO) — Sie können verlangen, dass wir Ihnen Ihre Daten in einem strukturierten, gängigen und maschinenlesbaren Format aushändigen.",
         "objection": "Widerspruchsrecht (Art. 21 DSGVO) — Sie können der Verarbeitung Ihrer Daten jederzeit widersprechen, wenn diese auf berechtigtem Interesse beruht.",
-        "complaint": "Beschwerderecht bei einer Aufsichtsbehörde (Art. 77 DSGVO) — Sie haben das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren, etwa der Landesbeauftragten für Datenschutz und Informationsfreiheit Nordrhein-Westfalen (LfDI NRW), Kavalleriestraße 2-4, 40213 Düsseldorf.",
+        "complaintIntro": "Beschwerderecht bei einer Aufsichtsbehörde (Art. 77 DSGVO) — Sie haben das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren, etwa: ",
         "outro": "Zur Ausübung Ihrer Rechte genügt eine formlose Mitteilung an die oben genannte Adresse des Verantwortlichen."
       },
       "ssl": {

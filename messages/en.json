@@ -199,7 +199,7 @@
         "restriction": "Right to restriction of processing (Art. 18 GDPR) — under certain conditions you may request that processing be restricted.",
         "portability": "Right to data portability (Art. 20 GDPR) — you may request that we provide your data in a structured, commonly used, and machine-readable format.",
         "objection": "Right to object (Art. 21 GDPR) — you may object at any time to the processing of your data where it is based on legitimate interests.",
-        "complaint": "Right to lodge a complaint with a supervisory authority (Art. 77 GDPR) — you have the right to lodge a complaint with a data protection supervisory authority, for example the State Commissioner for Data Protection and Freedom of Information of North Rhine-Westphalia (LfDI NRW), Kavalleriestraße 2-4, 40213 Düsseldorf, Germany.",
+        "complaintIntro": "Right to lodge a complaint with a supervisory authority (Art. 77 GDPR) — you have the right to lodge a complaint with a data protection supervisory authority, for example: ",
         "outro": "To exercise your rights, an informal message to the controller's address above is sufficient."
       },
       "ssl": {

@@ -22,6 +22,7 @@ export const siteSettingsQuery = defineQuery(
     "heroVideoUrls": heroVideos[].asset->url,
     heroVideoPosition,
     "ogImageUrl": ogImage.asset->url + "?w=1200&h=630&fit=crop&auto=format",
+    legalInfo,
     homeHeroProject->{
       _id, title, slug, coverImage, year, location
     }
