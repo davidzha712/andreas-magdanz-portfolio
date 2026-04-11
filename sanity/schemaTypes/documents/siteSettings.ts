@@ -104,8 +104,17 @@ export const siteSettings = defineType({
     }),
     defineField({
       name: "contactEmail",
-      title: "Contact Email",
+      title: "Contact Email (Empfänger des Kontaktformulars)",
       type: "string",
+      description:
+        "Empfängeradresse für Nachrichten aus dem Kontaktformular. Wird sofort wirksam (kein Deploy nötig). Muss eine bei Resend verifizierte Domain verwenden oder eine Adresse auf einer verifizierten Domain sein.",
+      validation: (r) =>
+        r.custom((value) => {
+          if (!value) return true;
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+            ? true
+            : "Ungültige E-Mail-Adresse";
+        }),
     }),
     defineField({
       name: "contactAddress",
