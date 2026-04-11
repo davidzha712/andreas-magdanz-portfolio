@@ -1,0 +1,8 @@
+name = "sanity-cdn-proxy"
+main = "src/index.ts"
+compatibility_date = "2025-11-01"
+workers_dev = true
+
+# Observability — keep logs for debugging cache hit rates
+[observability]
+enabled = true

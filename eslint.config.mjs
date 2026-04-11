@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Minified third-party worker bundle shipped with react-pdf
     "public/pdf.worker.min.mjs",
+    // Cloudflare Worker — separate project with its own tsconfig/runtime
+    "cdn-proxy/**",
   ]),
 ]);
 
