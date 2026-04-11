@@ -1,8 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { client } from "@/lib/sanity/client";
 
 export const runtime = "nodejs";
+
+// Resolve the recipient email: Sanity siteSettings > env var > hardcoded fallback.
+// Sanity is the canonical source — Andreas can edit it from /studio without
+// touching Vercel env vars. Env var is a deployment override; fallback is a
+// last-resort constant.
+async function resolveContactEmail(): Promise<string> {
+  try {
+    const settings = await client.fetch<{
+      contactEmail?: string;
+      legalInfo?: { email?: string };
+    } | null>(
+      `*[_type == "siteSettings"][0]{ contactEmail, legalInfo { email } }`
+    );
+    const sanityEmail =
+      settings?.contactEmail?.trim() || settings?.legalInfo?.email?.trim();
+    if (sanityEmail) return sanityEmail;
+  } catch (err) {
+    console.error("[contact route] Failed to fetch siteSettings:", err);
+    // Fall through to env/fallback
+  }
+  return process.env.CONTACT_EMAIL ?? "studio@andreasmagdanz.de";
+}
 
 interface ContactPayload {
   name: string;
@@ -171,7 +194,7 @@ export async function POST(request: NextRequest) {
 
   // Attempt to send via Resend if API key is configured
   const resendApiKey = process.env.RESEND_API_KEY;
-  const toEmail = process.env.CONTACT_EMAIL ?? "studio@andreasmagdanz.de";
+  const toEmail = await resolveContactEmail();
 
   if (resendApiKey) {
     try {
