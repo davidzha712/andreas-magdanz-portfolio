@@ -206,8 +206,18 @@ export async function POST(request: NextRequest) {
       const safeSubject = escapeHtml(trimmedSubject);
       const safeMessage = escapeHtml(trimmedMessage);
 
+      // Sender address — must be on a Resend-verified domain.
+      // Default is Resend's test sender, which works without verification
+      // but can ONLY deliver to the Resend account owner's email.
+      // After verifying andreasmagdanz.de in Resend, set RESEND_FROM_EMAIL
+      // (and optionally RESEND_FROM_NAME) env vars in Vercel — no code change.
+      const fromEmail =
+        process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
+      const fromName =
+        process.env.RESEND_FROM_NAME ?? "Andreas Magdanz Portfolio";
+
       const { error } = await resend.emails.send({
-        from: "Portfolio Contact <noreply@andreasmagdanz.de>",
+        from: `${fromName} <${fromEmail}>`,
         to: toEmail,
         replyTo: trimmedEmail,
         subject: `[Contact] ${trimmedSubject}`,
