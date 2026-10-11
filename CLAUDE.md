@@ -9,10 +9,10 @@ Portfolio website for photographer Andreas Magdanz. Built with Next.js 16 (App R
 ## Commands
 
 ```bash
-npm run dev          # Start dev server (localhost:3000)
-npm run build        # Production build
-npm run lint         # ESLint
-npm run test         # Run tests (node --test lib/search/searchUtils.test.ts)
+pnpm dev              # Start dev server (localhost:3000)
+pnpm build            # Production build
+pnpm lint             # ESLint
+pnpm test             # Run tests (node --test lib/search/searchUtils.test.ts)
 ```
 
 ## Architecture

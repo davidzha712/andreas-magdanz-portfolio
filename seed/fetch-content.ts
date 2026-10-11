@@ -2,7 +2,7 @@
  * Fetches all German content from Sanity that needs English translation.
  * Outputs to /tmp/sanity-content-dump.json
  *
- * Usage: cd seed && npx tsx fetch-content.ts
+ * Usage: cd seed && pnpm dlx tsx fetch-content.ts
  */
 import { createClient } from "@sanity/client";
 import fs from "fs";

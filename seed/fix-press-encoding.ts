@@ -8,7 +8,7 @@
  *         the externalUrl to point to the Sanity CDN URL.
  *
  * Usage:
- *   cd seed && export $(cat ../.env.local | xargs) && npx tsx fix-press-encoding.ts
+ *   cd seed && export $(cat ../.env.local | xargs) && pnpm dlx tsx fix-press-encoding.ts
  */
 
 import { createClient, type SanityClient } from "@sanity/client";

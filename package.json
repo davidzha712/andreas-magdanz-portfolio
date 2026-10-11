@@ -13,6 +13,7 @@
     "@gsap/react": "^2.1.2",
     "@mediapipe/tasks-vision": "^0.10.34",
     "@portabletext/react": "^6.0.2",
+    "@sanity/icons": "^3.7.4",
     "@sanity/image-url": "^2.0.3",
     "@sanity/vision": "^5.12.0",
     "@upstash/ratelimit": "^2.0.8",
@@ -32,6 +33,7 @@
     "three": "^0.183.2"
   },
   "devDependencies": {
+    "@sanity/client": "^7.16.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

@@ -5,8 +5,8 @@
  * Translations were produced by Gemini 2.5 Pro.
  *
  * Usage:
- *   cd seed && npx tsx patch-translations.ts
- *   cd seed && npx tsx patch-translations.ts --dry-run
+ *   cd seed && pnpm dlx tsx patch-translations.ts
+ *   cd seed && pnpm dlx tsx patch-translations.ts --dry-run
  */
 
 import { createClient } from "@sanity/client";

@@ -5,7 +5,7 @@
  * Uses actual project photographs instead of the 750x150 banner images.
  *
  * Usage:
- *   SANITY_API_WRITE_TOKEN=<token> npx tsx fix-covers-v2.ts
+ *   SANITY_API_WRITE_TOKEN=<token> pnpm dlx tsx fix-covers-v2.ts
  */
 
 import { createClient } from "@sanity/client";

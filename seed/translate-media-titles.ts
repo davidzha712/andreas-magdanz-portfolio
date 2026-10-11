@@ -5,7 +5,7 @@
  * Translations: merged best of Claude Opus 4.6 + Gemini 2.5 Pro
  *
  * Usage:
- *   cd seed && npx tsx translate-media-titles.ts
+ *   cd seed && pnpm dlx tsx translate-media-titles.ts
  */
 
 import { createClient } from "@sanity/client";
