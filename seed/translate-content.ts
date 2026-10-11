@@ -9,7 +9,7 @@
  *   GEMINI_API_KEY — Google Gemini API key
  *
  * Usage:
- *   cd seed && pnpm dlx tsx translate-content.ts
+ *   cd seed && pnpm exec tsx translate-content.ts
  *
  * Options:
  *   --dry-run     Preview translations without writing to Sanity

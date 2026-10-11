@@ -10,7 +10,7 @@
  *   2. Set SANITY_API_WRITE_TOKEN in the environment.
  *
  * Usage:
- *   cd seed && pnpm dlx tsx seed-media.ts
+ *   cd seed && pnpm exec tsx seed-media.ts
  */
 
 import { createClient, type SanityClient } from "@sanity/client";

@@ -5,7 +5,7 @@
  * Also adds English translations for project descriptions scraped from old site.
  *
  * Usage:
- *   SANITY_API_WRITE_TOKEN=<token> pnpm dlx tsx fix-covers.ts
+ *   SANITY_API_WRITE_TOKEN=<token> pnpm exec tsx fix-covers.ts
  */
 
 import { createClient } from "@sanity/client";

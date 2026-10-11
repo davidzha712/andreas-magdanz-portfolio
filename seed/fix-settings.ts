@@ -5,7 +5,7 @@
  * universityInfo with German/English versions.
  *
  * Usage:
- *   SANITY_API_WRITE_TOKEN=<token> pnpm dlx tsx fix-settings.ts
+ *   SANITY_API_WRITE_TOKEN=<token> pnpm exec tsx fix-settings.ts
  */
 
 import { createClient } from "@sanity/client";

@@ -5,7 +5,7 @@
  *
  * Usage:
  *   1. Save the portrait image as seed/images/portrait.jpg
- *   2. SANITY_API_WRITE_TOKEN=<token> pnpm dlx tsx upload-portrait.ts
+ *   2. SANITY_API_WRITE_TOKEN=<token> pnpm exec tsx upload-portrait.ts
  */
 
 import { createClient } from "@sanity/client";
