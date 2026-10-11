@@ -106,6 +106,15 @@ importers:
         specifier: ^5
         version: 5.9.3
 
+  seed:
+    dependencies:
+      '@sanity/client':
+        specifier: ^6.0.0
+        version: 6.29.1(debug@4.4.3(supports-color@8.1.1))
+      tsx:
+        specifier: ^4.0.0
+        version: 4.21.0
+
 packages:
 
   '@acemir/cssom@0.9.31':
@@ -2107,6 +2116,10 @@ packages:
     peerDependenciesMeta:
       babel-plugin-react-compiler:
         optional: true
+
+  '@sanity/client@6.29.1':
+    resolution: {integrity: sha512-BQRCMeDlBxwnMbFtB61HUxFf9aSb4HNVrpfrC7IFVqFf4cwcc3o5H8/nlrL9U3cDFedbe4W0AXt1mQzwbY/ljw==}
+    engines: {node: '>=14.18'}
 
   '@sanity/client@7.16.0':
     resolution: {integrity: sha512-6kesQ1iPzcuQM9oLEx6UVRaSjffssp2RnFOVE3MHOAEeq2T3AOtTU5BpZf2jzB+FDBfOYTyKUdzVsmRUZbCfAw==}
@@ -8579,6 +8592,14 @@ snapshots:
       - typescript
       - utf-8-validate
       - yaml
+
+  '@sanity/client@6.29.1(debug@4.4.3(supports-color@8.1.1))':
+    dependencies:
+      '@sanity/eventsource': 5.0.2
+      get-it: 8.7.0(debug@4.4.3(supports-color@8.1.1))
+      rxjs: 7.8.2
+    transitivePeerDependencies:
+      - debug
 
   '@sanity/client@7.16.0(debug@4.4.3(supports-color@8.1.1))':
     dependencies:
