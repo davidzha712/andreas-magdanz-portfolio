@@ -5,7 +5,7 @@
  * of the siteSettings document, preserving all other settings.
  *
  * Usage:
- *   SANITY_API_WRITE_TOKEN=<token> npx tsx upload-hero-videos.ts
+ *   SANITY_API_WRITE_TOKEN=<token> pnpm exec tsx upload-hero-videos.ts
  */
 
 import { createClient } from "@sanity/client";

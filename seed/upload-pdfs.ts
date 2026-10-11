@@ -5,7 +5,7 @@
  * and patches the `pdfFile` field on each mediaItem document.
  *
  * Usage:
- *   cd seed && npx tsx upload-pdfs.ts
+ *   cd seed && pnpm exec tsx upload-pdfs.ts
  *
  * Requires SANITY_API_WRITE_TOKEN in environment or ../.env.local
  */

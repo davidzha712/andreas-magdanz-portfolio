@@ -6,7 +6,7 @@
  * For text articles, converts them to Portable Text and sets description.
  *
  * Usage:
- *   SANITY_API_WRITE_TOKEN=<token> npx tsx upload-press.ts
+ *   SANITY_API_WRITE_TOKEN=<token> pnpm exec tsx upload-press.ts
  */
 
 import { createClient } from "@sanity/client";

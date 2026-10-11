@@ -2,7 +2,7 @@
   "name": "seed",
   "type": "module",
   "scripts": {
-    "seed": "npx tsx seed.ts"
+    "seed": "tsx seed.ts"
   },
   "dependencies": {
     "@sanity/client": "^6.0.0",

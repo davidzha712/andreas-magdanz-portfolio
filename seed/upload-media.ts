@@ -6,7 +6,7 @@
  * Also sets siteSettings.heroImage from site_header.jpg.
  *
  * Usage:
- *   SANITY_API_WRITE_TOKEN=<token> npx tsx upload-media.ts
+ *   SANITY_API_WRITE_TOKEN=<token> pnpm exec tsx upload-media.ts
  */
 
 import { createClient } from "@sanity/client";
